@@ -19,23 +19,21 @@ public class ContainerLayout extends SplitPane
                 getItems().addAll(navigator, workbench);
                 setDividerPositions(ratio);
 
-                SplitPane.Divider divider = getDividers().get(0);
+                SplitPane.Divider divider = getDividers().getFirst();
 
-                Platform.runLater(() -> {
-                        lookupAll(".split-pane-divider").forEach(node -> {
+                Platform.runLater(() -> lookupAll(".split-pane-divider").forEach(node -> {
 
-                                // 只监听分割条才触发事件，避免因窗口大小导致 ratio 记忆失效
-                                node.setOnMousePressed(e -> node.setUserData(Boolean.TRUE));
-                                node.setOnMouseReleased(e -> node.setUserData(Boolean.FALSE));
+                        // 只监听分割条才触发事件，避免因窗口大小导致 ratio 记忆失效
+                        node.setOnMousePressed(e -> node.setUserData(Boolean.TRUE));
+                        node.setOnMouseReleased(e -> node.setUserData(Boolean.FALSE));
 
-                                // Pane 比例变化监听
-                                divider.positionProperty().addListener((obs, oldVal, newVal) -> {
-                                        if (node.getUserData() == Boolean.TRUE)
-                                                ratio = newVal.doubleValue();
-                                });
-
+                        // Pane 比例变化监听
+                        divider.positionProperty().addListener((obs, oldVal, newVal) -> {
+                                if (node.getUserData() == Boolean.TRUE)
+                                        ratio = newVal.doubleValue();
                         });
-                });
+
+                }));
 
                 navigator.widthProperty().addListener((obs, oldVal, newVal) -> setDividerPositions(ratio));
         }

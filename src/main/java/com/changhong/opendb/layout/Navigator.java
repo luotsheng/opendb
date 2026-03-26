@@ -1,6 +1,7 @@
 package com.changhong.opendb.layout;
 
-import javafx.geometry.Insets;
+import com.changhong.opendb.dialog.JDBCCreateDialog;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -9,42 +10,104 @@ import javafx.scene.layout.VBox;
  * @author Luo Tiansheng
  * @since 2026/3/25
  */
-@SuppressWarnings({"FieldCanBeLocal", "unchecked"})
+@SuppressWarnings({"FieldCanBeLocal"})
 public class Navigator extends VBox
 {
-        private final TabPane tabPane = new TabPane();
+        private final TabPane tabPane;
+        private final TextField searchField;
+        private final TreeView<String> treeView;
+        private final ContextMenu rootContextMenu;
 
         public Navigator()
         {
-                setPadding(new Insets(0));
+                this.tabPane = createTabPane();
+                this.searchField = createSearchField();
+                this.treeView = createTreeView();
+                this.rootContextMenu = createRootContextMenu();
+
+                setupContextMenu();
+                initializeLayout();
+        }
+
+        private TabPane createTabPane()
+        {
+                TabPane tabPane = new TabPane();
 
                 Tab navTab = new Tab("连接管理");
                 navTab.setClosable(false);
 
-                tabPane.getTabs().addAll(
-                        navTab
-                );
+                tabPane.getTabs().addAll(navTab);
 
+                return tabPane;
+        }
+
+        private TextField createSearchField()
+        {
                 TextField searchField = new TextField();
                 searchField.setPromptText("搜索...");
+                return searchField;
+        }
 
-                TreeItem<String> rootItem = new TreeItem<>("根节点");
-
-                TreeItem<String> child1Item = new TreeItem<>("本地数据库");
-                TreeItem<String> child2Item = new TreeItem<>("其他数据库");
-                TreeItem<String> child3Item = new TreeItem<>("长虹数据库");
-
-                rootItem.getChildren().addAll(child1Item, child2Item, child3Item);
+        private TreeView<String> createTreeView()
+        {
+                TreeItem<String> rootItem = new TreeItem<>("我的连接");
 
                 TreeView<String> treeView = new TreeView<>(rootItem);
                 treeView.setShowRoot(true);
 
+                return treeView;
+        }
+
+        private ContextMenu createRootContextMenu()
+        {
+                ContextMenu rootContextMenu = new ContextMenu();
+
+                Menu connectMenu = new Menu("新建连接");
+                MenuItem mysqlItem =  new MenuItem("MySQL");
+                MenuItem postgreSQLItem =  new MenuItem("PostgreSQL");
+                connectMenu.getItems().addAll(mysqlItem, postgreSQLItem);
+
+                mysqlItem.setOnAction(event -> {
+                        JDBCCreateDialog dialog = new JDBCCreateDialog();
+                        dialog.showAndWait();
+                });
+
+                MenuItem openAllItem =  new MenuItem("打开所有连接");
+                MenuItem closeAllItem =  new MenuItem("关闭所有连接");
+
+                rootContextMenu.getItems().addAll(
+                        connectMenu,
+                        openAllItem,
+                        closeAllItem);
+
+                return rootContextMenu;
+        }
+
+        private void setupContextMenu()
+        {
+                treeView.setOnContextMenuRequested(event -> {
+                        Node node = event.getPickResult().getIntersectedNode();
+
+                        while (node != null && !(node instanceof TreeCell<?>))
+                                node = node.getParent();
+
+                        if (node instanceof TreeCell<?> cell) {
+                                if (cell.getTreeItem() == treeView.getRoot()) {
+                                        rootContextMenu.show(cell, event.getScreenX(), event.getScreenY());
+                                }
+                        }
+
+                        event.consume();
+                });
+        }
+
+        private void initializeLayout()
+        {
                 VBox vbox = new VBox(searchField, treeView);
                 vbox.setSpacing(2);
 
+                tabPane.getTabs().getFirst().setContent(vbox);
                 VBox.setVgrow(treeView, Priority.ALWAYS);
-
-                navTab.setContent(vbox);
 
                 getChildren().add(tabPane);
                 setVgrow(tabPane, Priority.ALWAYS);

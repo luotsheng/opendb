@@ -1,5 +1,9 @@
 package com.changhong.opendb.menu;
 
+import com.changhong.opendb.util.OS;
+import com.sun.javafx.PlatformUtil;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -13,7 +17,12 @@ public class ODBMenuBar extends MenuBar
 {
         public ODBMenuBar()
         {
-                setUseSystemMenuBar(true);
+                if (OS.isMac()) {
+                        setUseSystemMenuBar(true);
+                        setMinHeight(0);
+                        setMaxHeight(0);
+                        setMouseTransparent(true);
+                }
 
                 // 文件菜单
                 Menu fileMenu = new Menu("文件");

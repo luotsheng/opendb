@@ -1,0 +1,15 @@
+package com.changhong.opendb.util;
+
+/**
+ * @author Luo Tiansheng
+ * @since 2026/3/26
+ */
+public class OS
+{
+        public static boolean isMac()
+        {
+                return System.getProperty("os.name")
+                        .toLowerCase()
+                        .contains("mac");
+        }
+}
