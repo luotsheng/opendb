@@ -1,4 +1,4 @@
-package com.changhong.opendb.bus;
+package com.changhong.opendb.ebus;
 
 /**
  * @author Luo Tiansheng

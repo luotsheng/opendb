@@ -1,6 +1,6 @@
 package com.changhong.opendb.layout;
 
-import com.changhong.opendb.dialog.JDBCCreateDialog;
+import com.changhong.opendb.dialog.connect.ConnectDialog;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.Priority;
@@ -68,7 +68,7 @@ public class Navigator extends VBox
                 connectMenu.getItems().addAll(mysqlItem, postgreSQLItem);
 
                 mysqlItem.setOnAction(event -> {
-                        JDBCCreateDialog dialog = new JDBCCreateDialog();
+                        ConnectDialog dialog = new ConnectDialog();
                         dialog.showAndWait();
                 });
 

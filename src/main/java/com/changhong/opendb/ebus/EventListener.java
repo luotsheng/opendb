@@ -1,4 +1,4 @@
-package com.changhong.opendb.bus;
+package com.changhong.opendb.ebus;
 
 /**
  * 事件监听器，所有事件通过事件总线发送。
