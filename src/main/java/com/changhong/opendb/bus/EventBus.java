@@ -1,4 +1,4 @@
-package com.changhong.opendb.ebus;
+package com.changhong.opendb.bus;
 
 import java.util.ArrayList;
 import java.util.List;

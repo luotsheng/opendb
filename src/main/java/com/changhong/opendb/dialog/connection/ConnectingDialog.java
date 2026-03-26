@@ -1,6 +1,8 @@
 package com.changhong.opendb.dialog.connection;
 
 import com.changhong.opendb.Users;
+import com.changhong.opendb.bus.EventBus;
+import com.changhong.opendb.bus.event.RefreshConnectionEvent;
 import com.changhong.opendb.model.ConnectionModel;
 import com.changhong.opendb.utils.JSONUtils;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -86,6 +88,9 @@ public class ConnectingDialog extends Stage
         {
                 String content = JSONUtils.toJSONString(model, SerializationFeature.INDENT_OUTPUT);
                 Users.saveConnection(model.getName(), content);
+
                 close();
+
+                EventBus.publish(new RefreshConnectionEvent());
         }
 }

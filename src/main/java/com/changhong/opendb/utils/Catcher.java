@@ -1,7 +1,7 @@
 package com.changhong.opendb.utils;
 
-import com.changhong.opendb.ebus.EventBus;
-import com.changhong.opendb.ebus.event.CatcherEvent;
+import com.changhong.opendb.bus.EventBus;
+import com.changhong.opendb.bus.event.CatcherEvent;
 import com.changhong.opendb.exception.CatcherException;
 
 /**

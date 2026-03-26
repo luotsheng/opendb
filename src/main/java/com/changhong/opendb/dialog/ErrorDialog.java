@@ -1,9 +1,9 @@
 package com.changhong.opendb.dialog;
 
-import com.changhong.opendb.ebus.Event;
-import com.changhong.opendb.ebus.EventBus;
-import com.changhong.opendb.ebus.EventListener;
-import com.changhong.opendb.ebus.event.CatcherEvent;
+import com.changhong.opendb.bus.Event;
+import com.changhong.opendb.bus.EventBus;
+import com.changhong.opendb.bus.EventListener;
+import com.changhong.opendb.bus.event.CatcherEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

@@ -1,22 +1,38 @@
 package com.changhong.opendb.layout;
 
+import com.changhong.opendb.Users;
+import com.changhong.opendb.bus.Event;
+import com.changhong.opendb.bus.EventBus;
+import com.changhong.opendb.bus.EventListener;
+import com.changhong.opendb.bus.event.RefreshConnectionEvent;
 import com.changhong.opendb.dialog.connection.ConnectingDialog;
+import com.changhong.opendb.layout.odbn.ODBNConnection;
+import com.changhong.opendb.model.ConnectionModel;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Luo Tiansheng
  * @since 2026/3/25
  */
 @SuppressWarnings({"FieldCanBeLocal"})
-public class Navigator extends VBox
+public class Navigator extends VBox implements EventListener
 {
         private final TabPane tabPane;
         private final TextField searchField;
         private final TreeView<String> treeView;
         private final ContextMenu rootContextMenu;
+
+        private final Map<String, ODBNConnection> connections
+                = new HashMap<>();
 
         public Navigator()
         {
@@ -25,8 +41,18 @@ public class Navigator extends VBox
                 this.treeView = createTreeView();
                 this.rootContextMenu = createRootContextMenu();
 
+                EventBus.subscribe(RefreshConnectionEvent.class, this);
+
                 setupContextMenu();
                 initializeLayout();
+                refreshODBNConnection();
+        }
+
+        @Override
+        public void onEvent(Event event)
+        {
+                if (event instanceof RefreshConnectionEvent)
+                        refreshODBNConnection();
         }
 
         private TabPane createTabPane()
@@ -69,14 +95,17 @@ public class Navigator extends VBox
 
                 MenuItem openAllItem =  new MenuItem("打开所有连接");
                 MenuItem closeAllItem =  new MenuItem("关闭所有连接");
+                MenuItem refreshAllItem =  new MenuItem("刷新连接");
 
                 rootContextMenu.getItems().addAll(
                         connectMenu,
                         openAllItem,
-                        closeAllItem);
+                        closeAllItem,
+                        refreshAllItem);
 
                 /* 设置事件 */
                 mysqlItem.setOnAction(event -> openMySQLConnectionDialog());
+                refreshAllItem.setOnAction(event -> refreshODBNConnection());
 
                 return rootContextMenu;
         }
@@ -84,6 +113,7 @@ public class Navigator extends VBox
         private void setupContextMenu()
         {
                 treeView.setOnContextMenuRequested(event -> {
+
                         Node node = event.getPickResult().getIntersectedNode();
 
                         while (node != null && !(node instanceof TreeCell<?>))
@@ -96,6 +126,7 @@ public class Navigator extends VBox
                         }
 
                         event.consume();
+
                 });
         }
 
@@ -109,6 +140,38 @@ public class Navigator extends VBox
 
                 getChildren().add(tabPane);
                 setVgrow(tabPane, Priority.ALWAYS);
+        }
+
+        private void refreshODBNConnection()
+        {
+                List<ODBNConnection> removeList = new ArrayList<>();
+                List<ConnectionModel> models = Users.loadConnections();
+
+                connections.forEach((k, v) -> {
+
+                        boolean isMatch = models.stream()
+                                .anyMatch(e -> e.getName().equals(k));
+
+                        if (!isMatch)
+                                removeList.add(v);
+
+                });
+
+                ObservableList<TreeItem<String>> children = treeView.getRoot().getChildren();
+
+                removeList.forEach(children::remove);
+
+                for (ConnectionModel model : models) {
+
+                        if (connections.containsKey(model.getName()))
+                                continue;
+
+                        ODBNConnection connection = new ODBNConnection(model);
+
+                        connections.put(model.getName(), connection);
+                        children.add(connection);
+
+                }
         }
 
         private void openMySQLConnectionDialog()

@@ -1,8 +1,10 @@
-package com.changhong.opendb.ebus.event;
+package com.changhong.opendb.bus.event;
 
-import com.changhong.opendb.ebus.Event;
+import com.changhong.opendb.bus.Event;
 
 /**
+ * 异常捕获事件
+ *
  * @author Luo Tiansheng
  * @since 2026/3/26
  */
