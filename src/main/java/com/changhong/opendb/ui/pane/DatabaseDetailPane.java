@@ -28,6 +28,7 @@ public class DatabaseDetailPane extends BorderPane
         private TableColumn<Table, Date> createTime;
         private TableColumn<Table, Date> updateTime;
         private TableColumn<Table, String> engine;
+        private TableColumn<Table, Float> size;
         private TableColumn<Table, String> rows;
         private TableColumn<Table, String> comment;
 
@@ -52,6 +53,7 @@ public class DatabaseDetailPane extends BorderPane
                 createTime = TableViewFactory.createColumn("创建时间");
                 updateTime = TableViewFactory.createColumn("更新时间");
                 engine = TableViewFactory.createColumn("存储引擎");
+                size = TableViewFactory.createColumn("表大小");
                 rows = TableViewFactory.createColumn("数据条数");
                 comment = TableViewFactory.createColumn("注释");
 
@@ -60,6 +62,7 @@ public class DatabaseDetailPane extends BorderPane
                 createTime.setCellValueFactory(new PropertyValueFactory<>("createTime"));
                 updateTime.setCellValueFactory(new PropertyValueFactory<>("updateTime"));
                 engine.setCellValueFactory(new PropertyValueFactory<>("engine"));
+                size.setCellValueFactory(new PropertyValueFactory<>("size"));
                 rows.setCellValueFactory(new PropertyValueFactory<>("rows"));
                 comment.setCellValueFactory(new PropertyValueFactory<>("comment"));
 
@@ -68,6 +71,7 @@ public class DatabaseDetailPane extends BorderPane
                 createTime.setPrefWidth(230);
                 updateTime.setPrefWidth(230);
                 engine.setPrefWidth(120);
+                size.setPrefWidth(100);
                 rows.setPrefWidth(100);
                 comment.setPrefWidth(600);
 
@@ -77,6 +81,7 @@ public class DatabaseDetailPane extends BorderPane
                         createTime,
                         updateTime,
                         engine,
+                        size,
                         rows,
                         comment
                 );
@@ -94,6 +99,24 @@ public class DatabaseDetailPane extends BorderPane
                                 if (item != null) {
                                         setText(item);
                                         setGraphic(ResourceManager.use("table"));
+                                }
+                        }
+                });
+
+                size.setCellFactory(col -> new TableCell<>() {
+                        @Override
+                        protected void updateItem(Float item, boolean empty)
+                        {
+                                super.updateItem(item, empty);
+
+                                if (item != null) {
+                                        if (item > (1024 * 1024)) {
+                                                setText((item / 1024 / 1024) + "G");
+                                        } else if (item > 1024) {
+                                                setText((item / 1024) + "M");
+                                        } else {
+                                                setText(item + "K");
+                                        }
                                 }
                         }
                 });

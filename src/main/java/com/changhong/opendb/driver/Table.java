@@ -36,7 +36,7 @@ public class Table
         /**
          * 数据库大小（KB）
          */
-        private Integer size;
+        private Float size;
 
         /**
          * 数据行数
