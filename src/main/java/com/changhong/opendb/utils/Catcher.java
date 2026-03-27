@@ -34,7 +34,7 @@ public class Catcher
                         e = new CatcherException(throwable);
                 }
 
-                EventBus.publish(new ExceptionEvent(e.getCause().getMessage()));
+                EventBus.publish(e);
 
                 throw e;
         }

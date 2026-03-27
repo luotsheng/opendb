@@ -1,21 +1,26 @@
 package com.changhong.opendb.ui.dialog.connection;
 
-import com.changhong.opendb.repository.ConnectionRepository;
 import com.changhong.opendb.core.event.EventBus;
 import com.changhong.opendb.core.event.RefreshConnectionEvent;
-import com.changhong.opendb.model.ConnectionModel;
+import com.changhong.opendb.driver.MySQLDataSource;
+import com.changhong.opendb.driver.ODBDataSource;
+import com.changhong.opendb.model.ConnectionInfo;
+import com.changhong.opendb.repository.ConnectionRepository;
 import com.changhong.opendb.utils.JSONUtils;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.sql.Connection;
 
 /**
  * @author Luo Tiansheng
@@ -25,7 +30,8 @@ public class ConnectionDialog extends Stage
 {
         private TabPane tabPane;
         private HBox buttonBar;
-        private final ConnectionModel model = new ConnectionModel("mysql");
+        private final ConnectionInfo info = new ConnectionInfo("mysql");
+        private final Label status = new Label();
 
         private static final int WW = 650;
         private static final int WH = 500;
@@ -43,11 +49,11 @@ public class ConnectionDialog extends Stage
 
                 Tab generalTab = new Tab("常规属性");
                 generalTab.setClosable(false);
-                generalTab.setContent(new ConnectionGeneralPane(model));
+                generalTab.setContent(new ConnectionGeneralPane(info));
 
                 Tab advanceTab = new Tab("高级属性");
                 advanceTab.setClosable(false);
-                advanceTab.setContent(new ConnectionAdvancedPane(model));
+                advanceTab.setContent(new ConnectionAdvancedPane(info));
 
                 tabPane.getTabs().addAll(generalTab, advanceTab);
         }
@@ -72,22 +78,36 @@ public class ConnectionDialog extends Stage
         {
                 setTitle("新增连接");
 
-                VBox vbox = new VBox(10, tabPane, buttonBar);
+                HBox statusBar = new HBox(status);
+                statusBar.setPadding(new Insets(20, 0, 0, 20));
+                statusBar.setAlignment(Pos.BOTTOM_LEFT);
+
+                VBox vbox = new VBox(10, tabPane, statusBar, buttonBar);
                 VBox.setVgrow(tabPane, Priority.ALWAYS);
 
                 Scene scene = new Scene(vbox, WW, WH);
                 setScene(scene);
         }
 
+        @SuppressWarnings({
+                "unused"
+        })
         public void testConnection()
         {
-
+                try (ODBDataSource dataSource = new MySQLDataSource(info);
+                     Connection connection = dataSource.getConnection()) {
+                        status.setText("Connected successfully...");
+                        status.setStyle("-fx-text-fill: #28a745;");
+                } catch (Exception e) {
+                        status.setText(e.getCause().getMessage());
+                        status.setStyle("-fx-text-fill: #b8312b;");
+                }
         }
 
         private void saveConnection()
         {
-                String content = JSONUtils.toJSONString(model, SerializationFeature.INDENT_OUTPUT);
-                ConnectionRepository.saveConnection(model.getName(), content);
+                String content = JSONUtils.toJSONString(info, SerializationFeature.INDENT_OUTPUT);
+                ConnectionRepository.saveConnection(info.getName(), content);
 
                 close();
 

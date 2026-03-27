@@ -1,6 +1,6 @@
 package com.changhong.opendb.ui.dialog.connection;
 
-import com.changhong.opendb.model.ConnectionModel;
+import com.changhong.opendb.model.ConnectionInfo;
 import com.changhong.opendb.ui.widgets.PropertyGridPane;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -13,7 +13,7 @@ import javafx.scene.control.TextField;
  */
 class ConnectionGeneralPane extends PropertyGridPane
 {
-        private final ConnectionModel model;
+        private final ConnectionInfo info;
 
         private final TextField name = new TextField();
         private final TextField host = new TextField();
@@ -22,20 +22,21 @@ class ConnectionGeneralPane extends PropertyGridPane
         private final PasswordField password = new PasswordField();
         private final CheckBox savePassword = new CheckBox("保存密码");
 
-        public ConnectionGeneralPane(ConnectionModel model)
+        public ConnectionGeneralPane(ConnectionInfo info)
         {
                 super();
-                this.model = model;
+                this.info = info;
                 bindModelProperty();
                 setupPaneLayout();
         }
 
         private void bindModelProperty()
         {
-                name.textProperty().bindBidirectional(model.nameProperty());
-                host.textProperty().bindBidirectional(model.hostProperty());
-                port.textProperty().bindBidirectional(model.portProperty());
-                username.textProperty().bindBidirectional(model.usernameProperty());
+                name.textProperty().bindBidirectional(info.nameProperty());
+                host.textProperty().bindBidirectional(info.hostProperty());
+                port.textProperty().bindBidirectional(info.portProperty());
+                password.textProperty().bindBidirectional(info.passwordProperty());
+                username.textProperty().bindBidirectional(info.usernameProperty());
         }
 
         private void setupPaneLayout()

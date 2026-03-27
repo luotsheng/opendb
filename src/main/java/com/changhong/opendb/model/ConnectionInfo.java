@@ -16,7 +16,7 @@ import java.util.Map;
  * @since 2026/3/26
  */
 @SuppressWarnings("unused")
-public class ConnectionModel
+public class ConnectionInfo
 {
         private final StringProperty name = new SimpleStringProperty();
         private final StringProperty type = new SimpleStringProperty();
@@ -33,12 +33,12 @@ public class ConnectionModel
         /* jdbc url 属性 */
         private final Map<String, String> jdbcQuery = new HashMap<>();
 
-        public ConnectionModel()
+        public ConnectionInfo()
         {
                 /* DO NOTHING */
         }
 
-        public ConnectionModel(String type)
+        public ConnectionInfo(String type)
         {
                 this.name.set("本地数据库");
                 this.host.set("127.0.0.1");

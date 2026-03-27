@@ -1,6 +1,6 @@
 package com.changhong.opendb.repository;
 
-import com.changhong.opendb.model.ConnectionModel;
+import com.changhong.opendb.model.ConnectionInfo;
 import com.changhong.opendb.utils.Catcher;
 import com.changhong.opendb.utils.FileUtils;
 import com.changhong.opendb.utils.JSONUtils;
@@ -52,10 +52,10 @@ public class ConnectionRepository
                 }
         }
 
-        public static List<ConnectionModel> loadConnections()
+        public static List<ConnectionInfo> loadConnections()
         {
                 File[] files = ODB_CONN_DIR.listFiles();
-                List<ConnectionModel> ret = new ArrayList<>();
+                List<ConnectionInfo> ret = new ArrayList<>();
 
                 if (files == null)
                         return ret;
@@ -71,7 +71,7 @@ public class ConnectionRepository
                         try (FileInputStream fis = new FileInputStream(odbc)) {
                                 byte[] bytes = fis.readAllBytes();
                                 String content = new String(bytes, StandardCharsets.UTF_8);
-                                ret.add(JSONUtils.toJavaObject(content, ConnectionModel.class));
+                                ret.add(JSONUtils.toJavaObject(content, ConnectionInfo.class));
                         } catch (Exception e) {
                                 Catcher.ithrow(e);
                         }

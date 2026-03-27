@@ -10,9 +10,9 @@ public class ExceptionEvent extends Event
 {
         public final String message;
 
-        public ExceptionEvent(String message)
+        public ExceptionEvent(Throwable e)
         {
                 super(null);
-                this.message = message;
+                this.message = e.getCause().getMessage();
         }
 }

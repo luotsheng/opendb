@@ -1,6 +1,6 @@
 package com.changhong.opendb.ui.dialog.connection;
 
-import com.changhong.opendb.model.ConnectionModel;
+import com.changhong.opendb.model.ConnectionInfo;
 import com.changhong.opendb.ui.widgets.PropertyGridPane;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -12,7 +12,7 @@ import javafx.scene.control.TextField;
  */
 class ConnectionAdvancedPane extends PropertyGridPane
 {
-        private final ConnectionModel model;
+        private final ConnectionInfo info;
 
         private final TextField jdbcUrl = new TextField("jdbc:mysql://");
         private final ComboBox<String> timezone = new ComboBox<>();
@@ -36,10 +36,10 @@ class ConnectionAdvancedPane extends PropertyGridPane
                 "Asia/Tokyo",
         };
 
-        public ConnectionAdvancedPane(ConnectionModel model)
+        public ConnectionAdvancedPane(ConnectionInfo info)
         {
                 super();
-                this.model = model;
+                this.info = info;
                 bindModelProperty();
                 setupTimezone();
                 setupPaneLayout();
@@ -47,9 +47,9 @@ class ConnectionAdvancedPane extends PropertyGridPane
 
         private void bindModelProperty()
         {
-                jdbcUrl.textProperty().bindBidirectional(model.jdbcUrlProperty());
-                timezone.valueProperty().bindBidirectional(model.timezoneProperty());
-                useSSL.selectedProperty().bindBidirectional(model.useSSLProperty());
+                jdbcUrl.textProperty().bindBidirectional(info.jdbcUrlProperty());
+                timezone.valueProperty().bindBidirectional(info.timezoneProperty());
+                useSSL.selectedProperty().bindBidirectional(info.useSSLProperty());
         }
 
         private void setupTimezone()

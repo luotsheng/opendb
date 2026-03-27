@@ -1,5 +1,6 @@
 package com.changhong.opendb.navigator;
 
+import com.changhong.opendb.navigator.node.ODBNode;
 import com.changhong.opendb.repository.ConnectionRepository;
 import com.changhong.opendb.core.event.Event;
 import com.changhong.opendb.core.event.EventBus;
@@ -7,10 +8,11 @@ import com.changhong.opendb.core.event.EventListener;
 import com.changhong.opendb.core.event.RefreshConnectionEvent;
 import com.changhong.opendb.ui.dialog.connection.ConnectionDialog;
 import com.changhong.opendb.navigator.node.ODBNConnection;
-import com.changhong.opendb.model.ConnectionModel;
+import com.changhong.opendb.model.ConnectionInfo;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
@@ -44,6 +46,7 @@ public class Navigator extends VBox implements EventListener
                 EventBus.subscribe(RefreshConnectionEvent.class, this);
 
                 setupContextMenu();
+                setupMouseClickListener();
                 initializeLayout();
                 refreshODBNConnection();
         }
@@ -113,21 +116,40 @@ public class Navigator extends VBox implements EventListener
         private void setupContextMenu()
         {
                 treeView.setOnContextMenuRequested(event -> {
-
                         Node node = event.getPickResult().getIntersectedNode();
 
                         while (node != null && !(node instanceof TreeCell<?>))
                                 node = node.getParent();
 
                         if (node instanceof TreeCell<?> cell) {
-
                                 if (cell.getTreeItem() == treeView.getRoot())
                                         rootContextMenu.show(cell, event.getScreenX(), event.getScreenY());
-
                         }
 
                         event.consume();
+                });
+        }
 
+        private void setupMouseClickListener()
+        {
+                treeView.setOnMouseClicked(event -> {
+                        if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+                                Node node = event.getPickResult().getIntersectedNode();
+
+                                while (node != null && !(node instanceof TreeCell<?>))
+                                        node = node.getParent();
+
+                                if (node instanceof TreeCell<?> cell) {
+                                        TreeItem<?> item = cell.getTreeItem();
+
+                                        if (!(item instanceof ODBNode odbNode))
+                                                return;
+
+                                        odbNode.onMouseDoubleClickEvent(event);
+                                }
+
+                                event.consume();
+                        }
                 });
         }
 
@@ -146,32 +168,33 @@ public class Navigator extends VBox implements EventListener
         private void refreshODBNConnection()
         {
                 List<ODBNConnection> removeList = new ArrayList<>();
-                List<ConnectionModel> models = ConnectionRepository.loadConnections();
+                List<ConnectionInfo> models = ConnectionRepository.loadConnections();
 
                 connections.forEach((k, v) -> {
-
                         boolean isMatch = models.stream()
                                 .anyMatch(e -> e.getName().equals(k));
 
                         if (!isMatch)
                                 removeList.add(v);
-
                 });
 
                 ObservableList<TreeItem<String>> children = treeView.getRoot().getChildren();
 
-                removeList.forEach(children::remove);
+                if (!removeList.isEmpty()) {
+                        for (ODBNConnection connection : removeList) {
+                                children.remove(connection);
+                                connections.remove(connection.getName());
+                        }
+                }
 
-                for (ConnectionModel model : models) {
-
-                        if (connections.containsKey(model.getName()))
+                for (ConnectionInfo info : models) {
+                        if (connections.containsKey(info.getName()))
                                 continue;
 
-                        ODBNConnection connection = new ODBNConnection(model);
+                        ODBNConnection connection = new ODBNConnection(info);
 
-                        connections.put(model.getName(), connection);
+                        connections.put(info.getName(), connection);
                         children.add(connection);
-
                 }
         }
 
