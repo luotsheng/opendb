@@ -3,7 +3,6 @@ package com.changhong.opendb.ui.navigator.node;
 import com.changhong.opendb.driver.Table;
 import com.changhong.opendb.driver.datasource.DataSourceProvider;
 import com.changhong.opendb.resource.ResourceManager;
-import javafx.scene.input.MouseEvent;
 
 /**
  * @author Luo Tiansheng
@@ -21,17 +20,5 @@ public class ODBNTable extends ODBNode
                 setGraphic(ResourceManager.use("table"));
                 this.dataSource = dataSource;
                 this.table = table;
-        }
-
-        @Override
-        public void onSelectedEvent()
-        {
-                /* DO NOTHING */
-        }
-
-        @Override
-        public void onMouseDoubleClickEvent(MouseEvent event)
-        {
-                /* DO NOTHING */
         }
 }

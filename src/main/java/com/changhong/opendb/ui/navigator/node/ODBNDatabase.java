@@ -64,6 +64,7 @@ public class ODBNDatabase extends ODBNode
                 super(name);
                 setGraphic(ResourceManager.use("database1"));
                 this.dataSource = dataSource;
+                setupListenerEvent();
         }
 
         private void openDatabase()
@@ -76,8 +77,11 @@ public class ODBNDatabase extends ODBNode
                 getChildren().addAll(tableItem, queryItem);
 
                 tables = dataSource.getTables(name);
-                for (Table table : tables)
-                        tableItem.getChildren().add(new ODBNTable(dataSource, table));
+                for (Table table : tables) {
+                        ODBNTable tableNode = new ODBNTable(dataSource, table);
+                        tableNode.setSelectedEvent(this::openWorkbenchPane);
+                        tableItem.getChildren().add(tableNode);
+                }
 
                 setExpanded(true);
                 detailPane.update(tables);
@@ -94,6 +98,18 @@ public class ODBNDatabase extends ODBNode
                 getChildren().clear();
 
                 openFlag = false;
+        }
+
+        private void openWorkbenchPane()
+        {
+                if (tables != null)
+                        EventBus.publish(openWorkbenchPaneEvent);
+        }
+
+        public void setupListenerEvent()
+        {
+                setSelectedEvent(this::openWorkbenchPane);
+                setMouseDoubleClickEvent(event -> openDatabase());
         }
 
         @Override
@@ -124,18 +140,5 @@ public class ODBNDatabase extends ODBNode
                 }
 
                 super.showContextMenu(node, x, y);
-        }
-
-        @Override
-        public void onSelectedEvent()
-        {
-               if (tables != null)
-                       EventBus.publish(openWorkbenchPaneEvent);
-        }
-
-        @Override
-        public void onMouseDoubleClickEvent(MouseEvent event)
-        {
-                openDatabase();
         }
 }

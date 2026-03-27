@@ -37,6 +37,7 @@ public class ODBNConnection extends ODBNode
                 super(info.getName());
                 setGraphic(ResourceManager.use("database0"));
                 this.info = info;
+                setupListenerEvent();
         }
 
         private void openConnection()
@@ -108,16 +109,9 @@ public class ODBNConnection extends ODBNode
                 super.showContextMenu(node, x, y);
         }
 
-        @Override
-        public void onMouseDoubleClickEvent(MouseEvent event)
+        private void setupListenerEvent()
         {
-                openConnection();
-        }
-
-        @Override
-        public void onSelectedEvent()
-        {
-                /* DO NOTHING */
+                setMouseDoubleClickEvent(event -> openConnection());
         }
 
         private void setupDatabases(List<String> databaseNames)

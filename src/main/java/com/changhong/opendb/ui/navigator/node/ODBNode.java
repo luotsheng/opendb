@@ -5,6 +5,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseEvent;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Luo Tiansheng
@@ -23,6 +24,21 @@ public abstract class ODBNode extends TreeItem<String>
          * 节点菜单
          */
         protected final ContextMenu contextMenu;
+
+        public interface MouseDoubleClickEvent
+        {
+                void call(MouseEvent event);
+        }
+
+        public interface SelectedEvent
+        {
+                void call();
+        }
+
+        @Setter
+        private MouseDoubleClickEvent mouseDoubleClickEvent;
+        @Setter
+        private SelectedEvent selectedEvent;
 
         public ODBNode(String name)
         {
@@ -51,19 +67,21 @@ public abstract class ODBNode extends TreeItem<String>
         }
 
         /**
-         * 鼠标双击事件
+         * 触发鼠标双击事件
          */
         public void onMouseDoubleClickEvent(MouseEvent event)
         {
-                /* DO NOTHING */
+                if (mouseDoubleClickEvent != null)
+                        mouseDoubleClickEvent.call(event);
         }
 
         /**
-         * 节点选中事件
+         * 触发节点选中事件
          */
         public void onSelectedEvent()
         {
-                /* DO NOTHING */
+                if (selectedEvent != null)
+                        selectedEvent.call();
         }
 
 }
