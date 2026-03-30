@@ -4,6 +4,7 @@ import com.changhong.opendb.core.event.EventBus;
 import com.changhong.opendb.driver.datasource.DataSourceProvider;
 import com.changhong.opendb.driver.datasource.MySQLDataSourceProvider;
 import com.changhong.opendb.model.ConnectionInfo;
+import com.changhong.opendb.model.ODBNStatus;
 import com.changhong.opendb.resource.ResourceManager;
 import com.changhong.opendb.ui.dialog.connection.ConnectionDialog;
 import com.changhong.opendb.ui.widgets.ConfirmDialog;
@@ -14,7 +15,9 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.MouseEvent;
+import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,13 +27,20 @@ import java.util.List;
 @SuppressWarnings("FieldCanBeLocal")
 public class ODBNConnection extends ODBNode
 {
+        @Getter
         private final ConnectionInfo info;
+
         private boolean openFlag = false;
         private DataSourceProvider dataSource;
 
         // Menu Items
         private MenuItem openOrCloseMenuItem;
         private MenuItem editMenuItem;
+
+        @Getter
+        private final List<ODBNDatabase> databases = new ArrayList<>();
+        @Getter
+        private ODBNDatabase selectedDatabase;
 
         public ODBNConnection(ConnectionInfo info)
         {
@@ -116,6 +126,12 @@ public class ODBNConnection extends ODBNode
                 super.showContextMenu(node, x, y);
         }
 
+        @Override
+        public void onSelectedEvent()
+        {
+                ODBNStatus.getInstance().selectedConnection(this);
+        }
+
         private void setupListenerEvent()
         {
                 setMouseDoubleClickEvent(event -> openConnection());
@@ -124,6 +140,12 @@ public class ODBNConnection extends ODBNode
         private void setupDatabases(List<String> databaseNames)
         {
                 for (String name : databaseNames)
-                        getChildren().add(new ODBNDatabase(dataSource, name));
+                        databases.add(new ODBNDatabase(this, dataSource, name));
+                getChildren().addAll(databases);
+        }
+
+        public void setSelectedDatabase(ODBNDatabase database)
+        {
+                selectedDatabase = database;
         }
 }

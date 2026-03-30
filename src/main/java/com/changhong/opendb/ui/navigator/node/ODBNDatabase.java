@@ -29,6 +29,7 @@ import java.util.List;
 })
 public class ODBNDatabase extends ODBNode
 {
+        private final ODBNConnection connection;
         private final DataSourceProvider dataSource;
         private boolean openFlag = false;
         private List<Table> tables;
@@ -46,6 +47,9 @@ public class ODBNDatabase extends ODBNode
         private final OpenWorkbenchPaneEvent openWorkbenchPaneEvent = new OpenWorkbenchPaneEvent(detailPane);
         private final CloseWorkbenchPaneEvent closeWorkbenchPaneEvent = new CloseWorkbenchPaneEvent(detailPane);
 
+        /**
+         * 内部通用节点
+         */
         public static class ODBInternalNode extends ODBNode
         {
                 private final ODBNDatabase parent;
@@ -64,10 +68,12 @@ public class ODBNDatabase extends ODBNode
                 }
         }
 
-        public ODBNDatabase(DataSourceProvider dataSource,
+        public ODBNDatabase(ODBNConnection connection,
+                            DataSourceProvider dataSource,
                             String name)
         {
                 super(name);
+                this.connection = connection;
                 setGraphic(ResourceManager.use("database1"));
                 this.dataSource = dataSource;
                 setupListenerEvent();
@@ -85,7 +91,7 @@ public class ODBNDatabase extends ODBNode
                 tables = dataSource.getTables(name);
                 for (Table table : tables) {
                         ODBNTable tableNode = new ODBNTable(dataSource, table);
-                        tableNode.setSelectedEvent(this::openWorkbenchPane);
+                        tableNode.setSelectedEvent(this::onSelected);
                         tableItem.getChildren().add(tableNode);
                 }
 
@@ -107,20 +113,21 @@ public class ODBNDatabase extends ODBNode
                 openFlag = false;
         }
 
-        private void openWorkbenchPane()
+        private void onSelected()
         {
                 if (tables != null)
                         EventBus.publish(openWorkbenchPaneEvent);
+                connection.setSelectedDatabase(this);
         }
 
         private void newQueryScript()
         {
-                EventBus.publish(new NewQueryScriptEvent());
+                EventBus.publish(new NewQueryScriptEvent(connection.getInfo()));
         }
 
         public void setupListenerEvent()
         {
-                setSelectedEvent(this::openWorkbenchPane);
+                setSelectedEvent(this::onSelected);
                 setMouseDoubleClickEvent(event -> openDatabase());
         }
 

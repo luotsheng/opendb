@@ -1,7 +1,7 @@
 package com.changhong.opendb.ui.workbench;
 
 import com.changhong.opendb.core.event.*;
-import com.changhong.opendb.ui.widgets.SqlEditor;
+import com.changhong.opendb.model.ConnectionInfo;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Priority;
@@ -9,6 +9,8 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.changhong.opendb.utils.StringUtils.strfmt;
 
 /**
  * @author Luo Tiansheng
@@ -41,6 +43,19 @@ public class Workbench extends VBox implements EventListener
                 tabPane.getTabs().add(detailTab);
         }
 
+        private void openNewQueryScriptPane(NewQueryScriptEvent event)
+        {
+                ConnectionInfo info = event.info;
+
+                Tab queryTab = new Tab(strfmt("查询脚本@%s.sql", info.getName()));
+                queryTab.setContent(new SqlEditor());
+                queryTab.setOnCloseRequest(e -> queryTabs.remove(queryTab));
+
+                queryTabs.add(queryTab);
+                tabPane.getTabs().add(queryTab);
+                tabPane.getSelectionModel().select(queryTab);
+        }
+
         @Override
         public void onEvent(Event event)
         {
@@ -52,13 +67,8 @@ public class Workbench extends VBox implements EventListener
                         detailTab.setContent(null);
                 }
 
-                if (event instanceof NewQueryScriptEvent) {
-                        Tab queryTab = new Tab("查询脚本");
-                        tabPane.getTabs().add(queryTab);
-                        queryTab.setContent(new SqlEditor());
-                        queryTab.setOnCloseRequest(e -> queryTabs.remove(queryTab));
-                        queryTabs.add(queryTab);
-                        tabPane.getSelectionModel().select(queryTab);
+                if (event instanceof NewQueryScriptEvent e) {
+                        openNewQueryScriptPane(e);
                 }
         }
 }

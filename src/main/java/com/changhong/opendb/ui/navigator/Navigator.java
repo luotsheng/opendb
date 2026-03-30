@@ -1,5 +1,6 @@
 package com.changhong.opendb.ui.navigator;
 
+import com.changhong.opendb.model.ODBNStatus;
 import com.changhong.opendb.ui.menu.ConnectionMenuBuilder;
 import com.changhong.opendb.ui.navigator.node.ODBNode;
 import com.changhong.opendb.repository.ConnectionRepository;
@@ -220,7 +221,7 @@ public class Navigator extends VBox implements EventListener
                                 continue;
 
                         ODBNConnection connection = new ODBNConnection(info);
-
+                        ODBNStatus.getInstance().addConnection(connection);
                         connections.put(info.getName(), connection);
                         children.add(connection);
                 }
