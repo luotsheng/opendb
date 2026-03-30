@@ -3,12 +3,10 @@ package com.changhong.opendb.ui.pane;
 import com.changhong.opendb.driver.Table;
 import com.changhong.opendb.resource.ResourceManager;
 import com.changhong.opendb.ui.widgets.DateCell;
-import com.changhong.opendb.ui.widgets.TableViewFactory;
-import javafx.application.Platform;
+import com.changhong.opendb.ui.widgets.VFX;
 import javafx.collections.FXCollections;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.geometry.Orientation;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 
@@ -23,6 +21,7 @@ import java.util.List;
 public class DatabaseDetailPane extends BorderPane
 {
         private final TableView<Table> table;
+        private final ToolBar toolBar;
 
         private TableColumn<Table, String> name;
         private TableColumn<Table, Date> createTime;
@@ -34,28 +33,40 @@ public class DatabaseDetailPane extends BorderPane
 
         public DatabaseDetailPane()
         {
-                table = TableViewFactory.createTable();
-
-                Platform.runLater(() -> table.getStyleClass().add("no-line-table"));
+                table = VFX.newTableView();
+                toolBar = new ToolBar();
 
                 // setup
+                setupToolBar();
                 initializeColumn();
                 setupCellFactory();
 
+                setTop(toolBar);
                 setCenter(table);
+        }
+
+        private void setupToolBar()
+        {
+                toolBar.setOrientation(Orientation.HORIZONTAL);
+
+                Button modifyTable = VFX.newIconButton("编辑表", "modify");
+                Button newTable = VFX.newIconButton("创建表", "plus");
+                Button delTable = VFX.newIconButton("删除表", "minus");
+
+                toolBar.getItems().addAll(modifyTable, newTable, delTable);
         }
 
         @SuppressWarnings("unchecked")
         private void initializeColumn()
         {
                 // 列
-                name = TableViewFactory.createColumn("名称");
-                createTime = TableViewFactory.createColumn("创建时间");
-                updateTime = TableViewFactory.createColumn("更新时间");
-                engine = TableViewFactory.createColumn("存储引擎");
-                size = TableViewFactory.createColumn("表大小");
-                rows = TableViewFactory.createColumn("数据条数");
-                comment = TableViewFactory.createColumn("注释");
+                name = VFX.newTableColumn("名称");
+                createTime = VFX.newTableColumn("创建时间");
+                updateTime = VFX.newTableColumn("更新时间");
+                engine = VFX.newTableColumn("存储引擎");
+                size = VFX.newTableColumn("表大小");
+                rows = VFX.newTableColumn("数据条数");
+                comment = VFX.newTableColumn("注释");
 
                 // 属性配置
                 name.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -91,7 +102,8 @@ public class DatabaseDetailPane extends BorderPane
 
         private void setupCellFactory()
         {
-                name.setCellFactory(col -> new TableCell<>() {
+                name.setCellFactory(col -> new TableCell<>()
+                {
                         @Override
                         protected void updateItem(String item, boolean empty)
                         {
@@ -104,7 +116,8 @@ public class DatabaseDetailPane extends BorderPane
                         }
                 });
 
-                size.setCellFactory(col -> new TableCell<>() {
+                size.setCellFactory(col -> new TableCell<>()
+                {
                         @Override
                         protected void updateItem(Float item, boolean empty)
                         {

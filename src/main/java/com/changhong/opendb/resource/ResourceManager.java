@@ -2,6 +2,7 @@ package com.changhong.opendb.resource;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.shape.SVGPath;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,9 +25,12 @@ public class ResourceManager
         public static ImageView use(String name)
         {
                 ImageView imageView = new ImageView(IMAGES.get(name));
-                imageView.setFitWidth(18);
-                imageView.setFitHeight(18);
+
+                imageView.setFitWidth(16);
+                imageView.setFitHeight(16);
                 imageView.setPreserveRatio(true);
+                imageView.setSmooth(true);
+
                 return imageView;
         }
 
@@ -40,6 +44,10 @@ public class ResourceManager
                 IMAGES.put("run0", load("/assets/icons/run0.png"));
                 IMAGES.put("sql", load("/assets/icons/sql.png"));
                 IMAGES.put("table", load("/assets/icons/table.png"));
+                IMAGES.put("modify", load("/assets/icons/modify.png"));
+                IMAGES.put("plus", load("/assets/icons/plus.png"));
+                IMAGES.put("minus", load("/assets/icons/minus.png"));
+
         }
 
         private static Image load(String path)

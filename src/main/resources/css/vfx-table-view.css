@@ -1,0 +1,8 @@
+.vfx-table-view .table-row-cell:selected {
+    -fx-background-color: #007AFF;
+    -fx-table-cell-border-color: transparent;
+}
+
+.vfx-table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+}

@@ -1,0 +1,9 @@
+.vfx-icon-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.vfx-icon-button:pressed {
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+    -fx-border-width: 0;
+}

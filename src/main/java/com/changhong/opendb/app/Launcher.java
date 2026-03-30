@@ -3,20 +3,12 @@ package com.changhong.opendb.app;
 import atlantafx.base.theme.CupertinoLight;
 import com.changhong.opendb.ui.layout.MainLayout;
 import com.changhong.opendb.ui.widgets.ErrorDialog;
-import com.changhong.opendb.utils.Catcher;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.net.URI;
 import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.stream.Stream;
 
 /**
  * @author Luo Tiansheng
@@ -26,18 +18,25 @@ public class Launcher extends Application
 {
         private static final Class<Launcher> aClass = Launcher.class;
 
+        private static void addVFXStylesheet(Scene scene, String path)
+        {
+                URL url = aClass.getResource(path);
+                ObservableList<String> stylesheets = scene.getStylesheets();
+
+                if (url != null)
+                        stylesheets.add(url.toExternalForm());
+
+        }
+
         static void initialize()
         {
                 ErrorDialog.initializeListener();
         }
 
-        static void initializeCSS(Scene scene)
+        static void initializeVFX(Scene scene)
         {
-                ObservableList<String> stylesheets = scene.getStylesheets();
-
-                URL url = aClass.getResource("/css/no-line-table.css");
-                if (url != null)
-                        stylesheets.add(url.toExternalForm());
+                addVFXStylesheet(scene, "/css/vfx-table-view.css");
+                addVFXStylesheet(scene, "/css/vfx-icon-button.css");
         }
 
         @Override
@@ -46,7 +45,7 @@ public class Launcher extends Application
                 initialize();
                 Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
                 Scene scene = new Scene(new MainLayout(), 1200, 800);
-                initializeCSS(scene);
+                initializeVFX(scene);
                 stage.setTitle("数据库可视化工具");
                 stage.setScene(scene);
                 stage.show();
