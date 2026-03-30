@@ -12,7 +12,6 @@ public class ExceptionEvent extends Event
 
         public ExceptionEvent(Throwable e)
         {
-                super(null);
                 this.message = e.getCause().getMessage();
         }
 }

@@ -6,8 +6,4 @@ package com.changhong.opendb.core.event;
  */
 public class NewQueryScriptEvent extends Event
 {
-        public NewQueryScriptEvent()
-        {
-                super(null);
-        }
 }

@@ -1,7 +1,5 @@
 package com.changhong.opendb.core.event;
 
-import com.changhong.opendb.core.event.Event;
-
 /**
  * 刷新连接事件
  *
@@ -12,6 +10,5 @@ public class RefreshConnectionEvent extends Event
 {
         public RefreshConnectionEvent()
         {
-                super(null);
         }
 }

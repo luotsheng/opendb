@@ -3,6 +3,7 @@ package com.changhong.opendb.ui.pane;
 import com.changhong.opendb.driver.Table;
 import com.changhong.opendb.resource.ResourceManager;
 import com.changhong.opendb.ui.widgets.DateCell;
+import com.changhong.opendb.ui.widgets.DetailPane;
 import com.changhong.opendb.ui.widgets.VFX;
 import com.changhong.opendb.ui.widgets.VSeparator;
 import javafx.collections.FXCollections;
@@ -10,12 +11,9 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
@@ -25,10 +23,8 @@ import java.util.List;
  * @since 2026/3/27
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class DatabaseDetailPane extends BorderPane
+public class DatabaseDetailPane extends DetailPane
 {
-        private Tab owner;
-
         private final TableView<Table> table;
         private final ToolBar toolBar;
 
@@ -172,19 +168,5 @@ public class DatabaseDetailPane extends BorderPane
         public void update(List<Table> tables)
         {
                 table.setItems(FXCollections.observableArrayList(tables));
-        }
-
-        public void attach(Tab owner)
-        {
-                this.owner = owner;
-                this.owner.setContent(this);
-        }
-
-        public void close()
-        {
-                if (owner != null) {
-                        if (owner.getContent() == this)
-                                owner.setContent(null);
-                }
         }
 }

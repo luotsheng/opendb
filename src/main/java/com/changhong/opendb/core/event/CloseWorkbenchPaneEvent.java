@@ -9,12 +9,12 @@ import lombok.Getter;
  * @author Luo Tiansheng
  * @since 2026/3/26
  */
-public class OpenWorkbenchPaneEvent extends Event
+public class CloseWorkbenchPaneEvent extends Event
 {
         @Getter
         private DetailPane pane;
 
-        public OpenWorkbenchPaneEvent(DetailPane pane)
+        public CloseWorkbenchPaneEvent(DetailPane pane)
         {
                 this.pane = pane;
         }

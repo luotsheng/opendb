@@ -1,5 +1,6 @@
 package com.changhong.opendb.ui.navigator.node;
 
+import com.changhong.opendb.core.event.CloseWorkbenchPaneEvent;
 import com.changhong.opendb.core.event.EventBus;
 import com.changhong.opendb.core.event.NewQueryScriptEvent;
 import com.changhong.opendb.core.event.OpenWorkbenchPaneEvent;
@@ -43,6 +44,7 @@ public class ODBNDatabase extends ODBNode
 
         private final DatabaseDetailPane detailPane = new DatabaseDetailPane();
         private final OpenWorkbenchPaneEvent openWorkbenchPaneEvent = new OpenWorkbenchPaneEvent(detailPane);
+        private final CloseWorkbenchPaneEvent closeWorkbenchPaneEvent = new CloseWorkbenchPaneEvent(detailPane);
 
         public static class ODBInternalNode extends ODBNode
         {
@@ -100,7 +102,7 @@ public class ODBNDatabase extends ODBNode
                         return;
 
                 getChildren().clear();
-                detailPane.close();
+                EventBus.publish(closeWorkbenchPaneEvent);
 
                 openFlag = false;
         }

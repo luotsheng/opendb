@@ -6,13 +6,4 @@ package com.changhong.opendb.core.event;
  */
 public abstract class Event
 {
-        /**
-         * 表示哪个对象触发的当前事件
-         */
-        public final Object object;
-
-        public Event(Object object)
-        {
-                this.object = object;
-        }
 }
