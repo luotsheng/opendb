@@ -3,10 +3,17 @@ package com.changhong.opendb.ui.workbench;
 import com.changhong.opendb.core.event.*;
 import com.changhong.opendb.model.ConnectionInfo;
 import com.changhong.opendb.ui.widgets.VFX;
+import javafx.event.EventHandler;
+import javafx.event.EventTarget;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.changhong.opendb.utils.StringUtils.strfmt;
 
@@ -19,6 +26,7 @@ public class Workbench extends VBox implements EventListener
 {
         private final TabPane tabPane = VFX.newTabPane();
         private final Tab detailTab = new Tab("详情");
+        private final Map<String, Tab> queryResultTab = new HashMap<>();
 
         public Workbench()
         {
@@ -74,10 +82,27 @@ public class Workbench extends VBox implements EventListener
                                 e.info
                         );
 
-                        Tab tab = new Tab(strfmt("%s@%s", e.info.getName(), e.database));
+                        String id = strfmt("%s@%s (%s)",
+                                e.info.getName(),
+                                e.database,
+                                e.jdbcTemplate.getConnectionName());
+
+                        if (queryResultTab.containsKey(id)) {
+                                Tab tab = queryResultTab.get(id);
+                                tabPane.getSelectionModel().select(tab);
+                                return;
+                        }
+
+                        Tab tab = new Tab(id);
                         tab.setContent(pane);
+                        tab.setOnCloseRequest(closeEvent -> {
+                                Tab closeTab = (Tab) closeEvent.getTarget();
+                                queryResultTab.remove(closeTab.getText());
+                        });
+
                         tabPane.getTabs().add(tab);
                         tabPane.getSelectionModel().select(tab);
+                        queryResultTab.put(id, tab);
                 }
         }
 }

@@ -2,6 +2,7 @@ package com.changhong.opendb.driver;
 
 import com.changhong.opendb.driver.datasource.DataSourceProxy;
 import com.changhong.opendb.utils.Catcher;
+import lombok.Getter;
 import org.w3c.dom.CDATASection;
 
 import java.sql.Connection;
@@ -19,10 +20,13 @@ import static com.changhong.opendb.utils.StringUtils.strfmt;
  */
 public class JdbcTemplate
 {
+        @Getter
+        private final String connectionName;
         private final DataSourceProxy ds;
 
-        public JdbcTemplate(DataSourceProxy ds)
+        public JdbcTemplate(String connectionName, DataSourceProxy ds)
         {
+                this.connectionName = connectionName;
                 this.ds = ds;
         }
 

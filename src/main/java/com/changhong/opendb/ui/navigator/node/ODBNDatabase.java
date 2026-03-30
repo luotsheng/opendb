@@ -94,7 +94,7 @@ public class ODBNDatabase extends ODBNode
                 }
 
                 setExpanded(true);
-                detailPane.update(tables);
+                detailPane.update(jdbcTemplate, getName(), tables);
                 onSelectedEvent();
 
                 openFlag = true;

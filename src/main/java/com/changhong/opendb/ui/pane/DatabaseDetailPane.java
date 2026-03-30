@@ -1,5 +1,8 @@
 package com.changhong.opendb.ui.pane;
 
+import com.changhong.opendb.core.event.EventBus;
+import com.changhong.opendb.core.event.NewQueryResultSetPaneEvent;
+import com.changhong.opendb.driver.JdbcTemplate;
 import com.changhong.opendb.driver.TableInfo;
 import com.changhong.opendb.resource.ResourceManager;
 import com.changhong.opendb.ui.widgets.DateCell;
@@ -27,6 +30,9 @@ public class DatabaseDetailPane extends DetailPane
 {
         private final TableView<TableInfo> table;
         private final ToolBar toolBar;
+
+        private JdbcTemplate jdbcTemplate;
+        private String database;
 
         private TableColumn<TableInfo, String> name;
         private TableColumn<TableInfo, Date> createTime;
@@ -125,7 +131,7 @@ public class DatabaseDetailPane extends DetailPane
 
                                 if (e.getClickCount() == 2 && !row.isEmpty()) {
                                         TableInfo data = row.getItem();
-                                        System.out.println(data);
+                                        EventBus.publish(new NewQueryResultSetPaneEvent(jdbcTemplate, database, data));
                                 }
 
                         });
@@ -180,8 +186,10 @@ public class DatabaseDetailPane extends DetailPane
                 updateTime.setCellFactory(col -> new DateCell<>());
         }
 
-        public void update(List<TableInfo> tables)
+        public void update(JdbcTemplate jdbcTemplate, String database, List<TableInfo> tables)
         {
+                this.jdbcTemplate = jdbcTemplate;
+                this.database = database;
                 table.setItems(FXCollections.observableArrayList(tables));
         }
 }

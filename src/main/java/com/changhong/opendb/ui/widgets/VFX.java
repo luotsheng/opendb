@@ -15,10 +15,11 @@ public class VFX
 {
         public static ContextMenu tabPaneContextMenu = null;
 
+        private static MenuItem closeCurrent = null;
+        private static MenuItem closeAll = null;
         private static MenuItem closeLeft = null;
         private static MenuItem closeRight = null;
         private static MenuItem closeOther = null;
-        private static MenuItem closeAll = null;
 
         public static <S> TableView<S> newTableView()
         {
@@ -70,13 +71,28 @@ public class VFX
                         tabPaneContextMenu.setAutoHide(true);
                         tabPaneContextMenu.setConsumeAutoHidingEvents(false);
 
+                        closeCurrent = new MenuItem("关闭当前");
+                        closeAll = new MenuItem("关闭所有");
                         closeLeft = new MenuItem("关闭左侧");
                         closeRight = new MenuItem("关闭右侧");
                         closeOther = new MenuItem("关闭其他");
-                        closeAll = new MenuItem("关闭所有");
 
-                        tabPaneContextMenu.getItems().addAll(closeLeft, closeRight, closeOther, closeAll);
+                        tabPaneContextMenu.getItems().addAll(
+                                closeCurrent,
+                                closeAll,
+                                new SeparatorMenuItem(),
+                                closeLeft,
+                                closeRight,
+                                closeOther);
                 }
+
+                closeCurrent.setOnAction(ev -> {
+                        tabPane.getTabs().remove(tab);
+                });
+
+                closeAll.setOnAction(ev -> {
+                        tabPane.getTabs().remove(1, tabPane.getTabs().size());
+                });
 
                 closeLeft.setOnAction(ev -> {
                         int index = tabPane.getTabs().indexOf(tab);
@@ -94,10 +110,6 @@ public class VFX
                         tabPane.getTabs().remove(1, tabPane.getTabs().size());
                         tabPane.getTabs().add(tab);
                         tabPane.getSelectionModel().select(tab);
-                });
-
-                closeAll.setOnAction(ev -> {
-                        tabPane.getTabs().remove(1, tabPane.getTabs().size());
                 });
 
                 tabPaneContextMenu.show(tabPane, e.getScreenX(), e.getScreenY());

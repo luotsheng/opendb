@@ -59,9 +59,9 @@ public abstract class DataSourceProxy
          */
         public abstract List<TableInfo> getTables(String database);
 
-        public JdbcTemplate newJdbcTemplate()
+        public JdbcTemplate newJdbcTemplate(String connectionName)
         {
-                return new JdbcTemplate(this);
+                return new JdbcTemplate(connectionName, this);
         }
 
         /**

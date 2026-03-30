@@ -57,7 +57,7 @@ public class ODBNConnection extends ODBNode
 
                 try {
                         dataSource = new MySQLDataSourceProxy(info);
-                        jdbcTemplate = dataSource.newJdbcTemplate();
+                        jdbcTemplate = dataSource.newJdbcTemplate(getName());
                         setupDatabases(jdbcTemplate.getDatabases());
                         setExpanded(true);
                         openFlag = true;
