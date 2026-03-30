@@ -7,6 +7,8 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
+import java.sql.Connection;
+
 /**
  * @author Luo Tiansheng
  * @since 2026/3/25
@@ -25,20 +27,13 @@ public class AppMenuBar extends MenuBar
                 // 文件菜单
                 Menu fileMenu = new Menu("文件");
 
-                Menu newConnectionMenu = new Menu("新建连接");
-                MenuItem mysqlItem =  new MenuItem("MySQL");
-                MenuItem postgreSQLItem =  new MenuItem("PostgreSQL");
-                newConnectionMenu.getItems().addAll(
-                        mysqlItem,
-                        postgreSQLItem
-                );
-
-                /* bind event */
-                mysqlItem.setOnAction(event -> new ConnectionDialog().showAndWait());
-
                 MenuItem openItem = new MenuItem("打开");
                 MenuItem exitItem = new MenuItem("退出");
-                fileMenu.getItems().addAll(newConnectionMenu, openItem, new SeparatorMenuItem(), exitItem);
+                fileMenu.getItems().addAll(
+                        ConnectionMenuBuilder.buildNewConnectionMenu(),
+                        openItem,
+                        new SeparatorMenuItem(),
+                        exitItem);
 
                 // 编辑菜单
                 Menu editMenu = new Menu("编辑");

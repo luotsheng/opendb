@@ -1,5 +1,6 @@
 package com.changhong.opendb.ui.navigator;
 
+import com.changhong.opendb.ui.menu.ConnectionMenuBuilder;
 import com.changhong.opendb.ui.navigator.node.ODBNode;
 import com.changhong.opendb.repository.ConnectionRepository;
 import com.changhong.opendb.core.event.Event;
@@ -94,11 +95,14 @@ public class Navigator extends VBox implements EventListener
         {
                 ContextMenu rootContextMenu = new ContextMenu();
 
+                Menu newConnectionMenu = ConnectionMenuBuilder.buildNewConnectionMenu();
                 MenuItem openAllItem =  new MenuItem("打开所有连接");
                 MenuItem closeAllItem =  new MenuItem("关闭所有连接");
                 MenuItem refreshAllItem =  new MenuItem("刷新连接");
 
                 rootContextMenu.getItems().addAll(
+                        newConnectionMenu,
+                        new SeparatorMenuItem(),
                         openAllItem,
                         closeAllItem,
                         refreshAllItem);
