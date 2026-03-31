@@ -57,7 +57,7 @@ public class Workbench extends VBox implements EventListener
 
                 String name = queryName(info);
                 Tab queryTab = new Tab(name);
-                queryTab.setContent(new SqlEditor(name));
+                queryTab.setContent(new SqlEditor(name, queryTab));
                 tabPane.getTabs().add(queryTab);
                 tabPane.getSelectionModel().select(queryTab);
         }

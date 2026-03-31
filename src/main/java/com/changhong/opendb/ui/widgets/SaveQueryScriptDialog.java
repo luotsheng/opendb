@@ -1,5 +1,6 @@
 package com.changhong.opendb.ui.widgets;
 
+import com.changhong.opendb.repository.QueryScriptRepository;
 import com.changhong.opendb.ui.navigator.node.ODBNConnection;
 import com.changhong.opendb.ui.navigator.node.ODBNDatabase;
 import com.changhong.opendb.ui.workbench.SqlEditor;
@@ -16,6 +17,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.File;
+
 /**
  * @author Luo Tiansheng
  * @since 2026/3/27
@@ -23,15 +26,24 @@ import javafx.stage.Stage;
 @SuppressWarnings("FieldCanBeLocal")
 public class SaveQueryScriptDialog extends DetailPane
 {
-        public SaveQueryScriptDialog(SqlEditor editor)
+        private final Stage stage;
+        private final SqlEditor sqlEditor;
+        private final TextField textField;
+        private final ComboBox<ODBNConnection> connectionComboBox;
+        private final ComboBox<ODBNDatabase> databaseComboBox;
+
+        public SaveQueryScriptDialog(Stage stage, SqlEditor sqlEditor)
         {
+                this.stage = stage;
+                this.sqlEditor = sqlEditor;
+
                 Label title = new Label("查询名称：");
-                TextField textField = new TextField();
+                textField = new TextField();
                 textField.setPromptText("输入查询名称...");
-                Label curName = new Label("当前名称：" + editor.getName());
+                Label curName = new Label("当前名称：" + sqlEditor.getName());
                 Label savePath = new Label("保存位置：");
-                ComboBox<ODBNConnection> connectionComboBox = editor.copyConnectionComboBox();
-                ComboBox<ODBNDatabase> databaseComboBox = editor.copyDatabaseComboBox();
+                connectionComboBox = sqlEditor.copyConnectionComboBox();
+                databaseComboBox = sqlEditor.copyDatabaseComboBox();
                 connectionComboBox.setMaxWidth(Double.MAX_VALUE);
                 databaseComboBox.setMaxWidth(Double.MAX_VALUE);
                 VBox topBox = new VBox(title, textField, curName, savePath, connectionComboBox, databaseComboBox);
@@ -39,25 +51,73 @@ public class SaveQueryScriptDialog extends DetailPane
                 topBox.setPadding(new Insets(20, 10, 5, 10));
 
                 Button ok = new Button("保存");
+                ok.setOnAction(e -> save());
                 Button cancel = new Button("取消");
+                cancel.setOnAction(e -> cancel());
                 Region spacer = new Region();
                 HBox bottomBox = new HBox(8, spacer, cancel, ok);
                 HBox.setHgrow(spacer, Priority.ALWAYS);
                 bottomBox.setPadding(new Insets(5, 10, 10, 10));
 
+                setupComboBox();
                 setTop(topBox);
                 setBottom(bottomBox);
         }
 
-        public static void showDialog(SqlEditor editor)
+        private void setupComboBox()
+        {
+                connectionComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+                        if (!newVal.isOpen())
+                                return;
+                        databaseComboBox.getItems().clear();
+                        databaseComboBox.getItems().addAll(newVal.getDatabases());
+                });
+        }
+
+        private void save()
+        {
+                File sqlFile = sqlEditor.getSqlFile();
+
+                if (sqlFile == null) {
+                        ODBNConnection connection = connectionComboBox.getSelectionModel()
+                                .getSelectedItem();
+
+                        ODBNDatabase database = databaseComboBox.getSelectionModel()
+                                .getSelectedItem();
+
+                        sqlFile = QueryScriptRepository.saveQueryScript(
+                                connection.getName(),
+                                database.getName(),
+                                textField.getText(),
+                                sqlEditor.getCodeAreaContent()
+                        );
+                } else {
+                        QueryScriptRepository.saveQueryScript(sqlFile, sqlEditor.getCodeAreaContent());
+                }
+
+                sqlEditor.setSqlFile(sqlFile);
+                cancel();
+        }
+
+        private void cancel()
+        {
+                stage.close();
+        }
+
+        public static void showDialog(SqlEditor sqlEditor)
         {
                 Stage stage = new Stage();
 
-                SaveQueryScriptDialog dialog = new SaveQueryScriptDialog(editor);
-                Scene scene = new Scene(dialog, 600, 300);
+                SaveQueryScriptDialog dialog = new SaveQueryScriptDialog(stage, sqlEditor);
 
-                stage.setScene(scene);
-                stage.showAndWait();
+                if (sqlEditor.getSqlFile() == null) {
+                        Scene scene = new Scene(dialog, 600, 300);
+                        stage.setScene(scene);
+                        stage.showAndWait();
+                        return;
+                }
+
+                dialog.save();
         }
 
 }

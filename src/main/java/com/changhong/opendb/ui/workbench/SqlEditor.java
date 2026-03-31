@@ -20,6 +20,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.util.StringConverter;
 import lombok.Getter;
+import lombok.Setter;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -45,6 +46,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("FieldCanBeLocal")
 public class SqlEditor extends SplitPane
 {
+        private final Tab ownerTab;
         private final ToolBar toolBar;
         private final CodeArea codeArea;
         private final VirtualizedScrollPane<CodeArea> virtualizedScrollPane;
@@ -66,9 +68,10 @@ public class SqlEditor extends SplitPane
                 Pattern.CASE_INSENSITIVE
         );
 
-        public SqlEditor(String name)
+        public SqlEditor(String name, Tab ownerTab)
         {
                 this.name = name;
+                this.ownerTab = ownerTab;
 
                 setOrientation(Orientation.VERTICAL);
 
@@ -162,6 +165,7 @@ public class SqlEditor extends SplitPane
         private ComboBox<ODBNConnection> newConnectionComboBox()
         {
                 ComboBox<ODBNConnection> connection = new ComboBox<>();
+                configureConnectionComboBox(connection);
                 connection.setPrefWidth(200);
 
                 connection.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -172,7 +176,26 @@ public class SqlEditor extends SplitPane
                         databaseComboBox.getItems().addAll(newVal.getDatabases());
                 });
 
-                connection.setButtonCell(new ListCell<>()
+                return connection;
+        }
+
+        private ComboBox<ODBNDatabase> newDatabaseComboBox()
+        {
+                ComboBox<ODBNDatabase> database = new ComboBox<>();
+                configureDatabaseComboBox(database);
+                database.setPrefWidth(200);
+
+                database.valueProperty().addListener((obs, oldVal, newVal) -> {
+                        if (!newVal.isOpen())
+                                newVal.openDatabase();
+                });
+
+                return database;
+        }
+
+        private void configureConnectionComboBox(ComboBox<ODBNConnection> comboBox)
+        {
+                comboBox.setButtonCell(new ListCell<>()
                 {
                         @Override
                         protected void updateItem(ODBNConnection item, boolean empty)
@@ -187,7 +210,7 @@ public class SqlEditor extends SplitPane
                         }
                 });
 
-                connection.setCellFactory(list -> new ListCell<>()
+                comboBox.setCellFactory(list -> new ListCell<>()
                 {
                         @Override
                         protected void updateItem(ODBNConnection item, boolean empty)
@@ -202,7 +225,7 @@ public class SqlEditor extends SplitPane
                         }
                 });
 
-                connection.setConverter(new StringConverter<>()
+                comboBox.setConverter(new StringConverter<>()
                 {
                         @Override
                         public String toString(ODBNConnection connection)
@@ -216,21 +239,11 @@ public class SqlEditor extends SplitPane
                                 return null;
                         }
                 });
-
-                return connection;
         }
 
-        private ComboBox<ODBNDatabase> newDatabaseComboBox()
+        private void configureDatabaseComboBox(ComboBox<ODBNDatabase> comboBox)
         {
-                ComboBox<ODBNDatabase> database = new ComboBox<>();
-                database.setPrefWidth(200);
-
-                database.valueProperty().addListener((obs, oldVal, newVal) -> {
-                        if (!newVal.isOpen())
-                                newVal.openDatabase();
-                });
-
-                database.setButtonCell(new ListCell<>()
+                comboBox.setButtonCell(new ListCell<>()
                 {
                         @Override
                         protected void updateItem(ODBNDatabase item, boolean empty)
@@ -246,7 +259,7 @@ public class SqlEditor extends SplitPane
                 });
 
 
-                database.setCellFactory(list -> new ListCell<>()
+                comboBox.setCellFactory(list -> new ListCell<>()
                 {
                         @Override
                         protected void updateItem(ODBNDatabase item, boolean empty)
@@ -261,7 +274,7 @@ public class SqlEditor extends SplitPane
                         }
                 });
 
-                database.setConverter(new StringConverter<>()
+                comboBox.setConverter(new StringConverter<>()
                 {
                         @Override
                         public String toString(ODBNDatabase database)
@@ -275,8 +288,6 @@ public class SqlEditor extends SplitPane
                                 return null;
                         }
                 });
-
-                return database;
         }
 
         private void runSelectedScript()
@@ -332,27 +343,29 @@ public class SqlEditor extends SplitPane
                 }
         }
 
+        public String getCodeAreaContent()
+        {
+                return codeArea.getText();
+        }
+
         public ComboBox<ODBNConnection> copyConnectionComboBox()
         {
                 ComboBox<ODBNConnection> dst = VFX.copyComboBox(connectionComboBox);
-
-                dst.setButtonCell(connectionComboBox.getButtonCell());
-                dst.setCellFactory(connectionComboBox.getCellFactory());
-                dst.setConverter(connectionComboBox.getConverter());
-
+                configureConnectionComboBox(dst);
                 return dst;
         }
 
         public ComboBox<ODBNDatabase> copyDatabaseComboBox()
         {
                 ComboBox<ODBNDatabase> dst = VFX.copyComboBox(databaseComboBox);
-
-                dst.setButtonCell(databaseComboBox.getButtonCell());
-                dst.setCellFactory(databaseComboBox.getCellFactory());
-                dst.setConverter(databaseComboBox.getConverter());
-
+                configureDatabaseComboBox(dst);
                 return dst;
         }
 
+        public void setSqlFile(File sqlFile)
+        {
+                this.sqlFile = sqlFile;
+                ownerTab.setText(sqlFile.getName());
+        }
 }
 
