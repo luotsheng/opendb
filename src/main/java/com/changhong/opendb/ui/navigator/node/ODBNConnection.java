@@ -15,6 +15,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,8 @@ public class ODBNConnection extends ODBNode
 
         private boolean openFlag = false;
         private DataSourceProxy dataSource;
+
+        @Getter
         private JdbcTemplate jdbcTemplate;
 
         // Menu Items
@@ -39,6 +42,8 @@ public class ODBNConnection extends ODBNode
 
         @Getter
         private final List<ODBNDatabase> databases = new ArrayList<>();
+
+        @Setter
         @Getter
         private ODBNDatabase selectedDatabase;
 
@@ -143,11 +148,6 @@ public class ODBNConnection extends ODBNode
                 for (String name : databaseNames)
                         databases.add(new ODBNDatabase(this, jdbcTemplate, name));
                 getChildren().addAll(databases);
-        }
-
-        public void setSelectedDatabase(ODBNDatabase database)
-        {
-                selectedDatabase = database;
         }
 
         public boolean isOpen()

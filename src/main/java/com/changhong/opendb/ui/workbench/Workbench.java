@@ -3,16 +3,12 @@ package com.changhong.opendb.ui.workbench;
 import com.changhong.opendb.core.event.*;
 import com.changhong.opendb.model.ConnectionInfo;
 import com.changhong.opendb.ui.widgets.VFX;
-import javafx.event.EventHandler;
-import javafx.event.EventTarget;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.changhong.opendb.utils.StringUtils.strfmt;
@@ -76,7 +72,7 @@ public class Workbench extends VBox implements EventListener
                 }
 
                 if (event instanceof NewQueryResultSetPaneEvent e) {
-                        ResultSetTableViewPane pane = new ResultSetTableViewPane(
+                        PreviewTableDataPane pane = new PreviewTableDataPane(
                                 e.jdbcTemplate,
                                 e.database,
                                 e.info

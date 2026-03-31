@@ -1,11 +1,15 @@
 package com.changhong.opendb.ui.workbench;
 
+import com.changhong.opendb.driver.JdbcTemplate;
+import com.changhong.opendb.driver.QueryResultSet;
 import com.changhong.opendb.model.ODBNStatus;
 import com.changhong.opendb.resource.ResourceManager;
 import com.changhong.opendb.ui.navigator.node.ODBNConnection;
 import com.changhong.opendb.ui.navigator.node.ODBNDatabase;
 import com.changhong.opendb.ui.widgets.VFX;
 import com.changhong.opendb.ui.widgets.VSeparator;
+import com.changhong.opendb.utils.OS;
+import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
@@ -16,24 +20,32 @@ import javafx.util.StringConverter;
  * @since 2026/3/29
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class SqlEditor extends BorderPane
+public class SqlEditor extends SplitPane
 {
         private final ToolBar toolBar;
         private final TextArea textArea;
+        private final BorderPane topBorderPane;
+        private final ResultSetViewPane resultSetTableViewPane;
 
         private ComboBox<ODBNConnection> connectionComboBox;
         private ComboBox<ODBNDatabase> databaseComboBox;
 
         public SqlEditor()
         {
+                setOrientation(Orientation.VERTICAL);
+
+                topBorderPane = new BorderPane();
                 toolBar = new ToolBar();
                 textArea = new TextArea();
+                resultSetTableViewPane = new ResultSetViewPane();
+
+                topBorderPane.setTop(toolBar);
+                topBorderPane.setCenter(textArea);
 
                 setupToolbar();
                 setupTextArea();
 
-                setTop(toolBar);
-                setCenter(textArea);
+                getItems().addAll(topBorderPane);
         }
 
         public void setupToolbar()
@@ -43,6 +55,7 @@ public class SqlEditor extends BorderPane
 
                 Button run = VFX.newIconButton("运行 SQL", "run0");
                 run.setText("运行");
+                run.setOnAction(event -> runSelectedScript());
 
                 connectionComboBox = newConnectionComboBox();
                 databaseComboBox = newDatabaseComboBox();
@@ -64,9 +77,33 @@ public class SqlEditor extends BorderPane
 
         }
 
+        private void runSelectedScript()
+        {
+                String sql = textArea.getSelectedText();
+
+                ODBNConnection connection = connectionComboBox.getSelectionModel()
+                        .getSelectedItem();
+
+                ODBNDatabase database = connection.getSelectedDatabase();
+                JdbcTemplate jdbcTemplate = connection.getJdbcTemplate();
+
+                QueryResultSet qrs = jdbcTemplate.select(database.getName(), new String[]{sql});
+
+                resultSetTableViewPane.refresh(qrs);
+
+                getItems().remove(resultSetTableViewPane);
+                getItems().add(resultSetTableViewPane);
+        }
+
         public void setupTextArea()
         {
-                textArea.setFont(Font.font("Consolas", 19));
+                if (OS.isMac()) {
+                        textArea.setFont(Font.font("Monaco", 19));
+                } else {
+                        textArea.setFont(Font.font("Consolas", 19));
+                }
+
+                textArea.setText("select * from tra_schedule_from_ai;");
         }
 
         private ComboBox<ODBNConnection> newConnectionComboBox()
@@ -81,7 +118,8 @@ public class SqlEditor extends BorderPane
                         }
                 });
 
-                connection.setButtonCell(new ListCell<>() {
+                connection.setButtonCell(new ListCell<>()
+                {
                         @Override
                         protected void updateItem(ODBNConnection item, boolean empty)
                         {
@@ -95,7 +133,8 @@ public class SqlEditor extends BorderPane
                         }
                 });
 
-                connection.setCellFactory(list -> new ListCell<>() {
+                connection.setCellFactory(list -> new ListCell<>()
+                {
                         @Override
                         protected void updateItem(ODBNConnection item, boolean empty)
                         {
@@ -137,7 +176,8 @@ public class SqlEditor extends BorderPane
                                 newVal.openDatabase();
                 });
 
-                database.setButtonCell(new ListCell<>() {
+                database.setButtonCell(new ListCell<>()
+                {
                         @Override
                         protected void updateItem(ODBNDatabase item, boolean empty)
                         {
@@ -152,7 +192,8 @@ public class SqlEditor extends BorderPane
                 });
 
 
-                database.setCellFactory(list -> new ListCell<>() {
+                database.setCellFactory(list -> new ListCell<>()
+                {
                         @Override
                         protected void updateItem(ODBNDatabase item, boolean empty)
                         {

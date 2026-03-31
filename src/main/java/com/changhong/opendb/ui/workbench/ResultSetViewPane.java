@@ -1,8 +1,6 @@
 package com.changhong.opendb.ui.workbench;
 
-import com.changhong.opendb.driver.JdbcTemplate;
 import com.changhong.opendb.driver.QueryResultSet;
-import com.changhong.opendb.driver.TableInfo;
 import com.changhong.opendb.ui.widgets.VFX;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -17,41 +15,30 @@ import java.util.List;
  * @since 2026/3/30
  */
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
-public class ResultSetTableViewPane extends BorderPane
+public class ResultSetViewPane extends BorderPane
 {
-        private final JdbcTemplate jdbcTemplate;
-        private final TableInfo tableInfo;
-        private final String database;
-        private final TableView<List<String>> tableView;
+        private TableView<List<String>> tableView = VFX.newTableView();
 
-        private int start = 0;
-        private int size = 500;
-
-        public ResultSetTableViewPane(JdbcTemplate jdbcTemplate, String database, TableInfo tableInfo)
+        public ResultSetViewPane()
         {
-                this.jdbcTemplate = jdbcTemplate;
-                this.tableInfo = tableInfo;
-                this.database = database;
-                this.tableView = VFX.newTableView();
-
-                setupTableView();
                 setCenter(tableView);
         }
 
-        private void setupTableView()
+        public void refresh(QueryResultSet qrs)
         {
-                QueryResultSet rs = jdbcTemplate.selectByPage(database, tableInfo.getName(), start, size);
+                tableView.getColumns().clear();
+                tableView.getItems().clear();
 
-                for (int i = 0; i < rs.getColumns().size(); i++)
+                for (int i = 0; i < qrs.getColumns().size(); i++)
                 {
                         int index = i;
 
-                        String colText = rs.getColumns().get(i);
+                        String colText = qrs.getColumns().get(i);
 
                         TableColumn<List<String>, String> col =
                                 new TableColumn<>(colText);
 
-                        col.setPrefWidth(calcColWidth(colText, rs.getRows(), i));
+                        col.setPrefWidth(calcColWidth(colText, qrs.getRows(), i));
                         col.setMaxWidth(1000);
                         col.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().get(index)));
 
@@ -59,7 +46,7 @@ public class ResultSetTableViewPane extends BorderPane
                 }
 
                 tableView.setItems(
-                        FXCollections.observableArrayList(rs.getRows())
+                        FXCollections.observableArrayList(qrs.getRows())
                 );
         }
 

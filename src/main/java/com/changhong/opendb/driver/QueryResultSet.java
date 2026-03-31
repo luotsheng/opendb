@@ -2,6 +2,7 @@ package com.changhong.opendb.driver;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,6 +14,11 @@ public class QueryResultSet
 {
         private List<String> columns;
         private List<List<String>> rows;
+
+        public QueryResultSet()
+        {
+                this(new ArrayList<>(), new ArrayList<>());
+        }
 
         public QueryResultSet(List<String> columns, List<List<String>> rows)
         {
