@@ -13,6 +13,7 @@ import com.changhong.opendb.ui.widgets.SaveQueryScriptDialog;
 import com.changhong.opendb.ui.widgets.VFX;
 import com.changhong.opendb.ui.widgets.VSeparator;
 import com.changhong.opendb.utils.Catcher;
+import com.changhong.opendb.utils.OS;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -113,9 +114,13 @@ public class SqlEditor extends SplitPane
                 ODBNStatus instance = ODBNStatus.getInstance();
                 ODBNConnection selectedConnection = instance.getSelectedConnection();
 
-                Button run = VFX.newIconButton("运行 SQL", "run0");
+                Button run = VFX.newIconButton("运行已选择", "run0");
                 run.setText("运行");
                 run.setOnAction(event -> runSelectedScript());
+
+                Button stop = VFX.newIconButton("停止当时运行", "stop");
+                stop.setText("停止");
+                stop.setDisable(true);
 
                 connectionComboBox = newConnectionComboBox();
                 databaseComboBox = newDatabaseComboBox();
@@ -133,17 +138,25 @@ public class SqlEditor extends SplitPane
                         connectionComboBox,
                         databaseComboBox,
                         new VSeparator(),
-                        run);
+                        run,
+                        stop);
 
         }
 
         public void setupCodeArea()
         {
-                codeArea.setStyle("""
-                        -fx-font-family: "Monaco", "Consolas", monospace;
-                        -fx-font-size: 19px;
-                        -fx-font-weight: normal;
-                        """);
+                codeArea.setStyle("-fx-font-weight: normal;");
+
+                if (OS.isMac())
+                        codeArea.setStyle("-fx-font-family: 'Monaco'; -fx-font-size: 19px;");
+
+                if (OS.isWindows())
+                        codeArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 19px;");
+
+                if (OS.isLinux())
+                        codeArea.setStyle("-fx-font-family: 'DejaVu Sans Mono'; -fx-font-size: 19px;");
+
+
                 codeArea.getStyleClass().add("vfx-code-area");
 
                 codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));

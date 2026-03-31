@@ -60,6 +60,7 @@ public class ResourceManager
                 IMAGES.put("plus", load("/assets/icons/plus.png"));
                 IMAGES.put("minus", load("/assets/icons/minus.png"));
                 IMAGES.put("search", load("/assets/icons/search.png"));
+                IMAGES.put("stop", load("/assets/icons/stop.png"));
 
         }
 

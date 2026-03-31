@@ -15,6 +15,8 @@ import javafx.scene.text.Text;
 
 import java.util.List;
 
+import static com.changhong.opendb.utils.StringUtils.strfmt;
+
 /**
  * @author Luo Tiansheng
  * @since 2026/3/30
@@ -23,7 +25,7 @@ import java.util.List;
 public class ResultSetViewPane extends BorderPane
 {
         private final TabPane tabPane = new TabPane();
-        private final Tab resultSetTab = new Tab("查询结果集");
+        private final Tab resultSetTab = new Tab();
         private TableView<List<String>> tableView = VFX.newTableView();
 
         public ResultSetViewPane()
@@ -39,6 +41,8 @@ public class ResultSetViewPane extends BorderPane
 
                 if (!tabPane.getTabs().contains(resultSetTab))
                         tabPane.getTabs().add(resultSetTab);
+
+                resultSetTab.setText(strfmt("查询结果集 (%d条)", qrs.getRows().size()));
 
                 for (int i = 0; i < qrs.getColumns().size(); i++) {
                         int index = i;
