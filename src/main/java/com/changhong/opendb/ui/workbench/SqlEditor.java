@@ -3,6 +3,7 @@ package com.changhong.opendb.ui.workbench;
 import com.changhong.opendb.driver.JdbcTemplate;
 import com.changhong.opendb.driver.QueryResultSet;
 import com.changhong.opendb.model.ODBNStatus;
+import com.changhong.opendb.model.QueryInfo;
 import com.changhong.opendb.resource.ResourceManager;
 import com.changhong.opendb.ui.navigator.node.ODBNConnection;
 import com.changhong.opendb.ui.navigator.node.ODBNDatabase;
@@ -33,6 +34,9 @@ import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.io.File;
+import java.io.FileReader;
+import java.nio.CharBuffer;
+import java.sql.SQLFeatureNotSupportedException;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
@@ -70,6 +74,16 @@ public class SqlEditor extends SplitPane
 
         public SqlEditor(String name, Tab ownerTab)
         {
+                this(name, null, ownerTab);
+        }
+
+        public SqlEditor(QueryInfo queryInfo, Tab ownerTab)
+        {
+                this(queryInfo.getName(), queryInfo.getSqlFile(), ownerTab);
+        }
+
+        public SqlEditor(String name, File sqlFile, Tab ownerTab)
+        {
                 this.name = name;
                 this.ownerTab = ownerTab;
 
@@ -84,6 +98,8 @@ public class SqlEditor extends SplitPane
                 topBorderPane.setTop(toolBar);
                 topBorderPane.setCenter(virtualizedScrollPane);
 
+                ownerTab.setText(name);
+                setSqlFile(sqlFile);
                 setupPane();
                 setupToolbar();
                 setupCodeArea();
@@ -362,10 +378,27 @@ public class SqlEditor extends SplitPane
                 return dst;
         }
 
+        @SuppressWarnings("ResultOfMethodCallIgnored")
         public void setSqlFile(File sqlFile)
         {
-                this.sqlFile = sqlFile;
-                ownerTab.setText(sqlFile.getName());
+                if (sqlFile != null) {
+                        this.sqlFile = sqlFile;
+                        ownerTab.setText(sqlFile.getName());
+
+                        StringBuilder builder = new StringBuilder();
+                        char[] buf = new char[(int) sqlFile.length()];
+
+                        try (FileReader rw = new FileReader(sqlFile)) {
+                                rw.read(buf);
+                                builder.append(buf);
+                        } catch (Throwable e) {
+                                Catcher.ithrow(e);
+                        }
+
+                        codeArea.clear();
+                        codeArea.appendText(builder.toString());
+                        applyHighlighting(codeArea);
+                }
         }
 }
 

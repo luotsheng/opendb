@@ -5,6 +5,7 @@ import com.changhong.opendb.model.ConnectionInfo;
 import com.changhong.opendb.ui.widgets.VFX;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
@@ -53,11 +54,17 @@ public class Workbench extends VBox implements EventListener
 
         private void openNewQueryScriptPane(NewQueryScriptEvent event)
         {
-                ConnectionInfo info = event.info;
+                Tab queryTab = new Tab();
+                ConnectionInfo info = event.connectionInfo;
+                SqlEditor sqlEditor;
 
-                String name = queryName(info);
-                Tab queryTab = new Tab(name);
-                queryTab.setContent(new SqlEditor(name, queryTab));
+                if (event.queryInfo != null) {
+                        sqlEditor = new SqlEditor(event.queryInfo, queryTab);
+                } else {
+                        sqlEditor = new SqlEditor(queryName(info), queryTab);
+                }
+
+                queryTab.setContent(sqlEditor);
                 tabPane.getTabs().add(queryTab);
                 tabPane.getSelectionModel().select(queryTab);
         }

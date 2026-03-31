@@ -1,11 +1,10 @@
 package com.changhong.opendb.ui.navigator.node;
 
-import com.changhong.opendb.core.event.CloseWorkbenchPaneEvent;
-import com.changhong.opendb.core.event.EventBus;
-import com.changhong.opendb.core.event.NewQueryScriptEvent;
-import com.changhong.opendb.core.event.OpenWorkbenchPaneEvent;
+import com.changhong.opendb.core.event.*;
 import com.changhong.opendb.driver.JdbcTemplate;
 import com.changhong.opendb.driver.TableInfo;
+import com.changhong.opendb.model.QueryInfo;
+import com.changhong.opendb.repository.QueryScriptRepository;
 import com.changhong.opendb.resource.ResourceManager;
 import com.changhong.opendb.ui.pane.DatabaseDetailPane;
 import javafx.scene.Node;
@@ -22,10 +21,9 @@ import java.util.List;
  * @since 2026/3/25
  */
 @SuppressWarnings({
-        "FieldCanBeLocal",
-        "unchecked"
+        "FieldCanBeLocal"
 })
-public class ODBNDatabase extends ODBNode
+public class ODBNDatabase extends ODBNode implements EventListener
 {
         private final ODBNConnection connection;
         private final JdbcTemplate jdbcTemplate;
@@ -33,8 +31,10 @@ public class ODBNDatabase extends ODBNode
         private List<TableInfo> tables;
 
         // Tree Items
-        private TreeItem<String> tableItem;
-        private TreeItem<String> queryItem;
+        private final TreeItem<String> tableItem
+                = new ODBInternalNode(this, "数据表", ResourceManager.use("table"));;
+        private final TreeItem<String> queryItem
+                = new ODBInternalNode(this, "查询脚本", ResourceManager.use("sql"));;
 
         // Menu Items
         private MenuItem openMenuItem;
@@ -75,23 +75,21 @@ public class ODBNDatabase extends ODBNode
                 setGraphic(ResourceManager.use("database1"));
                 this.jdbcTemplate = jdbcTemplate;
                 setupListenerEvent();
+
+                EventBus.subscribe(RefreshTableNodeEvent.class, this);
+                EventBus.subscribe(RefreshQueryNodeEvent.class, this);
         }
 
+        @SuppressWarnings("unchecked")
         public void openDatabase()
         {
                 if (openFlag)
                         return;
 
-                tableItem = new ODBInternalNode(this, "数据表", ResourceManager.use("table"));
-                queryItem = new ODBInternalNode(this, "查询脚本", ResourceManager.use("sql"));
                 getChildren().addAll(tableItem, queryItem);
 
-                tables = jdbcTemplate.getTables(name);
-                for (TableInfo table : tables) {
-                        ODBNTable tableNode = new ODBNTable(jdbcTemplate, this, table);
-                        tableNode.setSelectedEvent(this::onSelected);
-                        tableItem.getChildren().add(tableNode);
-                }
+                refreshTableNode();
+                refreshQueryNode();
 
                 setExpanded(true);
                 detailPane.update(jdbcTemplate, getName(), tables);
@@ -111,6 +109,24 @@ public class ODBNDatabase extends ODBNode
                 openFlag = false;
         }
 
+        private void refreshTableNode()
+        {
+                tables = jdbcTemplate.getTables(name);
+                tableItem.getChildren().clear();
+                for (TableInfo table : tables) {
+                        ODBNTable tableNode = new ODBNTable(jdbcTemplate, this, table);
+                        tableNode.setSelectedEvent(this::onSelected);
+                        tableItem.getChildren().add(tableNode);
+                }
+        }
+
+        private void refreshQueryNode()
+        {
+                queryItem.getChildren().clear();
+                List<QueryInfo> queryInfos = QueryScriptRepository.loadQueryInfo(connection, this);
+                queryInfos.forEach(query -> queryItem.getChildren().add(new ODBNQuery(query)));
+        }
+
         private void onSelected()
         {
                 if (tables != null)
@@ -127,6 +143,16 @@ public class ODBNDatabase extends ODBNode
         {
                 setSelectedEvent(this::onSelected);
                 setMouseDoubleClickEvent(event -> openDatabase());
+        }
+
+        @Override
+        public void onEvent(Event event)
+        {
+                if (event instanceof RefreshTableNodeEvent)
+                        refreshTableNode();
+
+                if (event instanceof RefreshQueryNodeEvent)
+                        refreshQueryNode();
         }
 
         @Override

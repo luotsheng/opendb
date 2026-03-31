@@ -22,4 +22,9 @@ public class QueryInfo
         private ODBNConnection connection;
         private ODBNDatabase database;
         private File sqlFile;
+
+        public String getName()
+        {
+                return sqlFile.getName();
+        }
 }

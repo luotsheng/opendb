@@ -1,5 +1,7 @@
 package com.changhong.opendb.ui.widgets;
 
+import com.changhong.opendb.core.event.EventBus;
+import com.changhong.opendb.core.event.RefreshQueryNodeEvent;
 import com.changhong.opendb.repository.QueryScriptRepository;
 import com.changhong.opendb.ui.navigator.node.ODBNConnection;
 import com.changhong.opendb.ui.navigator.node.ODBNDatabase;
@@ -95,7 +97,9 @@ public class SaveQueryScriptDialog extends DetailPane
                         QueryScriptRepository.saveQueryScript(sqlFile, sqlEditor.getCodeAreaContent());
                 }
 
+                EventBus.publish(new RefreshQueryNodeEvent());
                 sqlEditor.setSqlFile(sqlFile);
+
                 cancel();
         }
 

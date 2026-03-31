@@ -55,7 +55,7 @@ public class QueryScriptRepository
                 List<QueryInfo> queryInfos = new ArrayList<>();
 
                 File sqlDir = new File(
-                        strfmt("%s/%s/%s/%s.sql",
+                        strfmt("%s/%s/%s",
                                 Users.connectionDir,
                                 connection.getName(),
                                 database.getName())
