@@ -33,7 +33,11 @@ public class PreviewTableDataPane extends BorderPane
 
         public void update()
         {
-                QueryResultSet rs = jdbcTemplate.selectByPage(database, tableInfo.getName(), start, size);
+                QueryResultSet rs = jdbcTemplate.selectByPage(
+                        database,
+                        tableInfo.getName(),
+                        start,
+                        size);
                 resultSetViewPane.refresh(rs);
         }
 }

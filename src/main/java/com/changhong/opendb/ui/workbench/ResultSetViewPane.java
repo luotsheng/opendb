@@ -4,9 +4,14 @@ import com.changhong.opendb.driver.QueryResultSet;
 import com.changhong.opendb.ui.widgets.VFX;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.text.Text;
 
 import java.util.List;
 
@@ -17,11 +22,14 @@ import java.util.List;
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class ResultSetViewPane extends BorderPane
 {
+        private final TabPane tabPane = new TabPane();
+        private final Tab resultSetTab = new Tab("查询结果集");
         private TableView<List<String>> tableView = VFX.newTableView();
 
         public ResultSetViewPane()
         {
-                setCenter(tableView);
+                resultSetTab.setContent(tableView);
+                setCenter(tabPane);
         }
 
         public void refresh(QueryResultSet qrs)
@@ -29,8 +37,10 @@ public class ResultSetViewPane extends BorderPane
                 tableView.getColumns().clear();
                 tableView.getItems().clear();
 
-                for (int i = 0; i < qrs.getColumns().size(); i++)
-                {
+                if (!tabPane.getTabs().contains(resultSetTab))
+                        tabPane.getTabs().add(resultSetTab);
+
+                for (int i = 0; i < qrs.getColumns().size(); i++) {
                         int index = i;
 
                         String colText = qrs.getColumns().get(i);
@@ -50,10 +60,20 @@ public class ResultSetViewPane extends BorderPane
                 );
         }
 
+        public void setOnCloseRequest(EventHandler<Event> value)
+        {
+                resultSetTab.setOnCloseRequest(value);
+        }
+
         private static int calcColWidth(String colText, List<List<String>> values, int index)
         {
                 int V = 12, MAX = 200;
-                int CM = colText.length();
+                int SCALE = 1;
+
+                if (colText.matches(".*[\\u4e00-\\u9fa5].*"))
+                        SCALE = 2;
+
+                int CM = colText.length() * SCALE;
                 int CW = CM * V;
 
                 for (List<String> value : values) {

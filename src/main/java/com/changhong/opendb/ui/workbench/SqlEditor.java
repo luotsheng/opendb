@@ -8,12 +8,18 @@ import com.changhong.opendb.ui.navigator.node.ODBNConnection;
 import com.changhong.opendb.ui.navigator.node.ODBNDatabase;
 import com.changhong.opendb.ui.widgets.VFX;
 import com.changhong.opendb.ui.widgets.VSeparator;
+import com.changhong.opendb.utils.Catcher;
 import com.changhong.opendb.utils.OS;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.util.StringConverter;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParser;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.Statements;
 
 /**
  * @author Luo Tiansheng
@@ -44,6 +50,7 @@ public class SqlEditor extends SplitPane
 
                 setupToolbar();
                 setupTextArea();
+                setupResultSetCloseEvent();
 
                 getItems().addAll(topBorderPane);
         }
@@ -77,24 +84,6 @@ public class SqlEditor extends SplitPane
 
         }
 
-        private void runSelectedScript()
-        {
-                String sql = textArea.getSelectedText();
-
-                ODBNConnection connection = connectionComboBox.getSelectionModel()
-                        .getSelectedItem();
-
-                ODBNDatabase database = connection.getSelectedDatabase();
-                JdbcTemplate jdbcTemplate = connection.getJdbcTemplate();
-
-                QueryResultSet qrs = jdbcTemplate.select(database.getName(), new String[]{sql});
-
-                resultSetTableViewPane.refresh(qrs);
-
-                getItems().remove(resultSetTableViewPane);
-                getItems().add(resultSetTableViewPane);
-        }
-
         public void setupTextArea()
         {
                 if (OS.isMac()) {
@@ -104,6 +93,13 @@ public class SqlEditor extends SplitPane
                 }
 
                 textArea.setText("select * from tra_schedule_from_ai;");
+        }
+
+        private void setupResultSetCloseEvent()
+        {
+                resultSetTableViewPane.setOnCloseRequest(event -> {
+                        getItems().remove(resultSetTableViewPane);
+                });
         }
 
         private ComboBox<ODBNConnection> newConnectionComboBox()
@@ -223,6 +219,40 @@ public class SqlEditor extends SplitPane
                 });
 
                 return database;
+        }
+
+        private void runSelectedScript()
+        {
+                try {
+                        String sql = textArea.getSelectedText();
+
+                        if (sql == null || sql.isEmpty())
+                                sql = textArea.getText();
+
+                        Statements statements = CCJSqlParserUtil.parseStatements(sql);
+
+                        int size = statements.size();
+                        String[] sqlArr = new String[size];
+
+                        for (int i = 0; i < size; i++)
+                                sqlArr[i] = statements.get(i).toString() + ';';
+
+                        ODBNConnection connection = connectionComboBox.getSelectionModel()
+                                .getSelectedItem();
+
+                        ODBNDatabase database = databaseComboBox.getSelectionModel()
+                                .getSelectedItem();
+
+                        JdbcTemplate jdbcTemplate = connection.getJdbcTemplate();
+                        QueryResultSet qrs = jdbcTemplate.select(database.getName(), sqlArr);
+
+                        resultSetTableViewPane.refresh(qrs);
+
+                        getItems().remove(resultSetTableViewPane);
+                        getItems().add(resultSetTableViewPane);
+                } catch (Throwable e) {
+                        Catcher.ithrow(e);
+                }
         }
 
 }
