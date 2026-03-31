@@ -28,6 +28,11 @@ public class QueryInfo
                 return sqlFile.getName();
         }
 
+        public String getDatabaseName()
+        {
+                return database.getName();
+        }
+
         @SuppressWarnings("ResultOfMethodCallIgnored")
         public void delete()
         {

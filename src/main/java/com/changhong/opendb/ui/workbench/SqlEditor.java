@@ -88,12 +88,12 @@ public class SqlEditor extends SplitPane
                 topBorderPane.setTop(toolBar);
                 topBorderPane.setCenter(virtualizedScrollPane);
 
-                ownerTab.setText(name);
                 setSqlFile(sqlFile);
                 setupPane();
                 setupToolbar();
                 setupCodeArea();
                 setupResultSetCloseEvent();
+                setOwnerTabName(name);
 
                 getItems().addAll(topBorderPane);
         }
@@ -368,27 +368,38 @@ public class SqlEditor extends SplitPane
                 return dst;
         }
 
-        @SuppressWarnings("ResultOfMethodCallIgnored")
         public void setSqlFile(File sqlFile)
         {
                 if (sqlFile != null) {
                         this.sqlFile = sqlFile;
-                        ownerTab.setText(sqlFile.getName());
+                        setOwnerTabName(sqlFile.getName());
 
                         StringBuilder builder = new StringBuilder();
                         char[] buf = new char[(int) sqlFile.length()];
 
                         try (FileReader rw = new FileReader(sqlFile)) {
-                                rw.read(buf);
-                                builder.append(buf);
+                                int count = rw.read(buf);
+                                builder.append(buf, 0, count);
                         } catch (Throwable e) {
                                 Catcher.ithrow(e);
                         }
 
                         codeArea.clear();
-                        codeArea.appendText(builder.toString());
+                        codeArea.appendText(builder.toString().trim());
                         applyHighlighting(codeArea);
                 }
+        }
+
+        private void setOwnerTabName(String name)
+        {
+                ODBNDatabase database = null;
+
+                if (databaseComboBox != null)
+                        database = databaseComboBox.getSelectionModel().getSelectedItem();
+
+                String dbName = database == null ? "[ N/A ]" : database.getName();
+
+                ownerTab.setText(name + "@" + dbName);
         }
 
         public boolean sqlFileEquals(File file)
