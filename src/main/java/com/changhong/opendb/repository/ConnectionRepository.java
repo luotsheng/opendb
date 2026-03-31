@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 连接信息
@@ -48,14 +49,21 @@ public class ConnectionRepository
                 }
         }
 
-        public static void updateConnection(String name, String content)
+        @SuppressWarnings("ResultOfMethodCallIgnored")
+        public static void updateConnection(String oldName, String newName, String content)
         {
-                File dir = new File(Users.connectionDir, name);
-                File odbc = new File(dir, ".odbc");
+                File newDir = new File(Users.connectionDir, newName);
+
+                if (!Objects.equals(oldName, newName)) {
+                        File oldDir = new File(Users.connectionDir, oldName);
+                        oldDir.renameTo(newDir);
+                }
+
+                File odbc = new File(newDir, ".odbc");
 
                 FileUtils.forceDelete(odbc);
 
-                saveConnection(name, content);
+                saveConnection(newName, content);
         }
 
         public static List<ConnectionInfo> loadConnections()

@@ -51,7 +51,9 @@ public class ConnectionDialog extends Stage
                         ? newInfo
                         : new ConnectionInfo("MySQL");
 
-                this.oldInfo = JSONUtils.deepCopy(newInfo);
+                this.oldInfo = isUpdate
+                        ? JSONUtils.deepCopy(newInfo)
+                        : null;
 
                 setupTabPane();
                 setupButtonBar();
@@ -124,7 +126,7 @@ public class ConnectionDialog extends Stage
                 String content = JSONUtils.toJSONString(newInfo, SerializationFeature.INDENT_OUTPUT);
 
                 if (isUpdate) {
-                        ConnectionRepository.updateConnection(newInfo.getName(), content);
+                        ConnectionRepository.updateConnection(oldInfo.getName(), newInfo.getName(), content);
                 } else {
                         ConnectionRepository.saveConnection(newInfo.getName(), content);
                 }
