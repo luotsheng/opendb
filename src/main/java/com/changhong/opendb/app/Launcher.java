@@ -39,6 +39,7 @@ public class Launcher extends Application
         {
                 addVFXStylesheet(scene, "/css/vfx-table-view.css");
                 addVFXStylesheet(scene, "/css/vfx-icon-button.css");
+                addVFXStylesheet(scene, "/css/vfx-code-area.css");
         }
 
         private void setupScene(Scene scene)

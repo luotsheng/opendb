@@ -1,0 +1,27 @@
+.vfx-code-area {
+    -fx-font-family: "Monaco", "Menlo", "Consolas", "Courier New";
+    -fx-font-size: 24px;
+}
+
+.vfx-code-area .selection {
+    -fx-fill: #5eacff;
+    -fx-fill: rgba(125, 190, 255, 0.5);
+}
+
+.vfx-code-area .keyword {
+    -fx-fill: #0066cc;
+    -fx-font-weight: bold;
+}
+
+.vfx-code-area .string {
+    -fx-fill: #09902c;
+}
+
+.vfx-code-area .number {
+    -fx-fill: #17a9a9;
+}
+
+.vfx-code-area .comment {
+    -fx-fill: #909090;
+    -fx-font-style: italic;
+}

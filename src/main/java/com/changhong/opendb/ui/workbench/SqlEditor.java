@@ -10,6 +10,7 @@ import com.changhong.opendb.ui.widgets.VFX;
 import com.changhong.opendb.ui.widgets.VSeparator;
 import com.changhong.opendb.utils.Catcher;
 import com.changhong.opendb.utils.OS;
+import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -22,6 +23,17 @@ import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
+
+import java.time.Duration;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Luo Tiansheng
@@ -31,12 +43,21 @@ import net.sf.jsqlparser.statement.Statements;
 public class SqlEditor extends SplitPane
 {
         private final ToolBar toolBar;
-        private final TextArea textArea;
+        private final CodeArea codeArea;
+        private final VirtualizedScrollPane<CodeArea> virtualizedScrollPane;
         private final BorderPane topBorderPane;
         private final ResultSetViewPane resultSetTableViewPane;
 
         private ComboBox<ODBNConnection> connectionComboBox;
         private ComboBox<ODBNDatabase> databaseComboBox;
+
+        static final Pattern PATTERN = Pattern.compile(
+                "(?<KEYWORD>\\b(" + String.join("|", SqlKeyWordDefine.KEYWORDS) + ")\\b)"
+                        + "|(?<STRING>'([^'\\\\]|\\\\.)*')"
+                        + "|(?<COMMENT>--[^\\n]*)"
+                        + "|(?<NUMBER>\\b\\d+(?:\\.\\d+)?\\b)",
+                Pattern.CASE_INSENSITIVE
+        );
 
         public SqlEditor()
         {
@@ -44,14 +65,15 @@ public class SqlEditor extends SplitPane
 
                 topBorderPane = new BorderPane();
                 toolBar = new ToolBar();
-                textArea = new TextArea();
+                codeArea = new CodeArea();
+                virtualizedScrollPane = new VirtualizedScrollPane<>(codeArea);
                 resultSetTableViewPane = new ResultSetViewPane();
 
                 topBorderPane.setTop(toolBar);
-                topBorderPane.setCenter(textArea);
+                topBorderPane.setCenter(virtualizedScrollPane);
 
                 setupToolbar();
-                setupTextArea();
+                setupCodeArea();
                 setupResultSetCloseEvent();
 
                 getItems().addAll(topBorderPane);
@@ -86,15 +108,18 @@ public class SqlEditor extends SplitPane
 
         }
 
-        public void setupTextArea()
+        public void setupCodeArea()
         {
-                if (OS.isMac()) {
-                        textArea.setFont(Font.font("Monaco", 19));
-                } else {
-                        textArea.setFont(Font.font("Consolas", 19));
-                }
+                codeArea.setStyle("""
+                        -fx-font-family: "Monaco", "Consolas", monospace;
+                        -fx-font-size: 19px;
+                        -fx-font-weight: normal;
+                        """);
+                codeArea.getStyleClass().add("vfx-code-area");
 
-                textArea.setOnKeyPressed(event -> {
+                codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+
+                codeArea.setOnKeyPressed(event -> {
                         if ((event.isControlDown() || event.isShortcutDown())
                                 && event.getCode() == KeyCode.R) {
                                 runSelectedScript();
@@ -102,7 +127,37 @@ public class SqlEditor extends SplitPane
                         }
                 });
 
-                textArea.setText("select * from tra_schedule_from_ai;");
+                codeArea.multiPlainChanges()
+                        .successionEnds(Duration.ofMillis(100))
+                        .subscribe(ignore -> applyHighlighting(codeArea));
+
+                codeArea.replaceText("""
+                        -- 每日运维数据统计 --
+                        SET @V_IOS      = '1.1.12';
+                        SET @V_ANDROIID = '7.1.22';
+                        SET @V_PC       = '6.5.55';
+                        SET @V_MAC      = '6.5.55';
+                        
+                        SELECT
+                          (SELECT NOW()) AS DT,
+                          (SELECT COUNT(*) FROM ZK_USER_BASIC_INFO WHERE USERSTATUS = '1') AS A_REG,
+                          (SELECT COUNT(DISTINCT USERACC) FROM YTX_USER_DEVICE_DETAIL) AS A_INSTALL,
+                          (SELECT COUNT(DISTINCT USERACC) FROM YTX_USER_DEVICE_DETAIL WHERE DATE(UPDATE_TIME) = CURRENT_DATE()) AS A_ACTIVE,
+                          (SELECT CONCAT(ROUND(A_ACTIVE / A_INSTALL * 100, 2), '%')) AS ACTIVE_RATIO,
+                          (SELECT COUNT(DISTINCT USERACC) FROM YTX_USER_DEVICE_DETAIL WHERE DEVICEAGENT LIKE '%iOS%') AS A_IOS,
+                          (SELECT COUNT(DISTINCT USERACC) FROM YTX_USER_DEVICE_DETAIL WHERE DEVICEAGENT LIKE '%iOS%' AND APPVERSION = @V_IOS) AS A_IOS_UPGRADE,
+                          (SELECT CONCAT(ROUND(A_IOS_UPGRADE / A_IOS * 100, 2), '%')) AS IOS_UPGRADE_RATIO,
+                          (SELECT COUNT(DISTINCT USERACC) FROM YTX_USER_DEVICE_DETAIL WHERE DEVICEAGENT LIKE '%Android%') AS A_ANDROID,
+                          (SELECT COUNT(DISTINCT USERACC) FROM YTX_USER_DEVICE_DETAIL WHERE DEVICEAGENT LIKE '%Android%' AND APPVERSION = @V_ANDROIID) AS A_ANDROID_UPGRADE,
+                          (SELECT CONCAT(ROUND(A_ANDROID_UPGRADE / A_ANDROID * 100, 2), '%')) AS ANDROID_UPGRADE_RATIO,
+                          (SELECT COUNT(DISTINCT USERACC) FROM YTX_USER_DEVICE_DETAIL WHERE DEVICEAGENT LIKE '%Win%') AS A_PC,
+                          (SELECT COUNT(DISTINCT USERACC) FROM YTX_USER_DEVICE_DETAIL WHERE DEVICEAGENT LIKE '%Win%' AND APPVERSION = @V_PC) AS A_PC_UPGRADE,
+                          (SELECT CONCAT(ROUND(A_PC_UPGRADE / A_PC * 100, 2), '%')) AS PC_UPGRADE_RATIO,
+                          (SELECT COUNT(DISTINCT USERACC) FROM YTX_USER_DEVICE_DETAIL WHERE DEVICEAGENT LIKE '%Mac%') AS A_MAC,
+                          (SELECT COUNT(DISTINCT USERACC) FROM YTX_USER_DEVICE_DETAIL WHERE DEVICEAGENT LIKE '%Mac%' AND APPVERSION = @V_MAC) AS A_MAC_UPGRADE,
+                          (SELECT CONCAT(ROUND(A_MAC_UPGRADE / A_MAC * 100, 2), '%')) AS MAC_UPGRADE_RATIO
+                        ;
+                        """);
         }
 
         private void setupResultSetCloseEvent()
@@ -234,10 +289,10 @@ public class SqlEditor extends SplitPane
         private void runSelectedScript()
         {
                 try {
-                        String sql = textArea.getSelectedText();
+                        String sql = codeArea.getSelectedText();
 
                         if (sql == null || sql.isEmpty())
-                                sql = textArea.getText();
+                                sql = codeArea.getText();
 
                         Statements statements = CCJSqlParserUtil.parseStatements(sql);
 
@@ -265,4 +320,23 @@ public class SqlEditor extends SplitPane
                 }
         }
 
+        private static void applyHighlighting(CodeArea area)
+        {
+                String text = area.getText();
+                area.clearStyle(0, text.length());
+
+                Matcher matcher = PATTERN.matcher(text);
+                while (matcher.find()) {
+                        if (matcher.group("KEYWORD") != null) {
+                                area.setStyleClass(matcher.start(), matcher.end(), "keyword");
+                        } else if (matcher.group("STRING") != null) {
+                                area.setStyleClass(matcher.start(), matcher.end(), "string");
+                        } else if (matcher.group("COMMENT") != null) {
+                                area.setStyleClass(matcher.start(), matcher.end(), "comment");
+                        } else if (matcher.group("NUMBER") != null) {
+                                area.setStyleClass(matcher.start(), matcher.end(), "number");
+                        }
+                }
+        }
 }
+
