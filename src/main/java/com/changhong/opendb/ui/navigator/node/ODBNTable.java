@@ -30,6 +30,12 @@ public class ODBNTable extends ODBNode
         }
 
         @Override
+        public void onSelectedEvent()
+        {
+                database.onSelected();
+        }
+
+        @Override
         public void onMouseDoubleClickEvent(MouseEvent event)
         {
                 EventBus.publish(new NewQueryResultSetPaneEvent(jdbcTemplate, database.getName(), table));

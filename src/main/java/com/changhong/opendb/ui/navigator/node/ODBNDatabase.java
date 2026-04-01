@@ -147,7 +147,7 @@ public class ODBNDatabase extends ODBNode implements EventListener
                 queryInfos.forEach(query -> queryItem.getChildren().add(new ODBNQuery(this, query)));
         }
 
-        private void onSelected()
+        public void onSelected()
         {
                 if (tables != null && openFlag)
                         EventBus.publish(openWorkbenchPaneEvent);

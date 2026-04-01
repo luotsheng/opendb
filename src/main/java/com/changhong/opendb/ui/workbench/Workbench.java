@@ -154,6 +154,7 @@ public class Workbench extends VBox implements EventListener
         private void handleOpenWorkbenchPaneEvent(OpenWorkbenchPaneEvent event)
         {
                 detailTab.setContent(event.getPane());
+                tabPane.select(detailTab);
         }
 
         @SuppressWarnings("unused")
