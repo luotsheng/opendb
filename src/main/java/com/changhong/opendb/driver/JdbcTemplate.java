@@ -9,6 +9,8 @@ import org.w3c.dom.CDATASection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.changhong.opendb.utils.StringUtils.strfmt;
 
@@ -22,6 +24,8 @@ public class JdbcTemplate
         @Getter
         private final String connectionName;
         private final DataSourceProxy ds;
+
+        private final Map<Long, Statement> queue = new ConcurrentHashMap<>();
 
         public JdbcTemplate(String connectionName, DataSourceProxy ds)
         {
@@ -62,7 +66,7 @@ public class JdbcTemplate
                 return qrs;
         }
 
-        public QueryResultSet select(String db, String[] sql)
+        public QueryResultSet select(Long id, String db, String[] sql)
                 throws SQLException
         {
                 QueryResultSet qrs = new QueryResultSet();
@@ -70,14 +74,25 @@ public class JdbcTemplate
                 try (Connection connection = ds.getConnection();
                      Statement statement = ds.use(connection, db)) {
 
+                        queue.put(id, statement);
+
                         for (int i = 0; i < sql.length - 1; i++)
                                 statement.execute(sql[i]);
 
                         ResultSet rs = statement.executeQuery(sql[sql.length - 1]);
+                        queue.remove(id);
                         rs2qrs(rs, qrs);
                 }
 
                 return qrs;
+        }
+
+        public void cancel(Long id)
+        {
+                Catcher.tryCall(() -> {
+                        if (queue.containsKey(id))
+                                queue.get(id).cancel();
+                });
         }
 
         private static void rs2qrs(ResultSet rs, QueryResultSet qrs) throws SQLException

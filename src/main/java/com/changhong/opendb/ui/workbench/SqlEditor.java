@@ -13,6 +13,7 @@ import com.changhong.opendb.ui.widgets.VFX;
 import com.changhong.opendb.ui.widgets.VSeparator;
 import com.changhong.opendb.utils.Catcher;
 import com.changhong.opendb.utils.OS;
+import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -51,9 +52,14 @@ public class SqlEditor extends SplitPane
         private String name;
         @Getter
         private File sqlFile;
+        private JdbcTemplate jdbcTemplate = null;
+        private long currentTaskId = System.currentTimeMillis();
         private boolean saveFlag = true;
         private ComboBox<ODBNConnection> connectionComboBox;
         private ComboBox<ODBNDatabase> databaseComboBox;
+
+        private Button run;
+        private Button stop;
 
         static final Pattern PATTERN = Pattern.compile(
                 "(?<KEYWORD>\\b(" + String.join("|", SqlKeyWordDefine.KEYWORDS) + ")\\b)"
@@ -114,13 +120,14 @@ public class SqlEditor extends SplitPane
                 ODBNStatus instance = ODBNStatus.getInstance();
                 ODBNConnection selectedConnection = instance.getSelectedConnection();
 
-                Button run = VFX.newIconButton("运行已选择", "run0");
+                run = VFX.newIconButton("运行已选择", "run0");
                 run.setText("运行");
-                run.setOnAction(event -> runSelectedScript());
+                run.setOnAction(event -> runTask());
 
-                Button stop = VFX.newIconButton("停止当时运行", "stop");
+                stop = VFX.newIconButton("停止当时运行", "stop");
                 stop.setText("停止");
                 stop.setDisable(true);
+                stop.setOnAction(event -> stopTask());
 
                 connectionComboBox = newConnectionComboBox();
                 databaseComboBox = newDatabaseComboBox();
@@ -162,7 +169,7 @@ public class SqlEditor extends SplitPane
                 codeArea.setOnKeyPressed(event -> {
                         if ((event.isControlDown() || event.isShortcutDown())
                                 && event.getCode() == KeyCode.R) {
-                                runSelectedScript();
+                                runTask();
                                 event.consume();
                         }
                 });
@@ -314,38 +321,64 @@ public class SqlEditor extends SplitPane
                 });
         }
 
-        private void runSelectedScript()
+        /** 开始执行 true，结束执行 false */
+        private void updateButtonForExecuting(boolean value)
         {
-                try {
-                        String sql = codeArea.getSelectedText();
+                run.setDisable(value);
+                stop.setDisable(!value);
+        }
 
-                        if (sql == null || sql.isEmpty())
-                                sql = codeArea.getText();
+        private void runTask()
+        {
+                if (run.isDisable())
+                        return;
 
-                        Statements statements = CCJSqlParserUtil.parseStatements(sql);
+                updateButtonForExecuting(true);
 
-                        int size = statements.size();
-                        String[] sqlArr = new String[size];
+                new Thread(() -> {
+                        try {
+                                String sql = codeArea.getSelectedText();
 
-                        for (int i = 0; i < size; i++)
-                                sqlArr[i] = statements.get(i).toString() + ';';
+                                if (sql == null || sql.isEmpty())
+                                        sql = codeArea.getText();
 
-                        ODBNConnection connection = connectionComboBox.getSelectionModel()
-                                .getSelectedItem();
+                                Statements statements = CCJSqlParserUtil.parseStatements(sql);
 
-                        ODBNDatabase database = databaseComboBox.getSelectionModel()
-                                .getSelectedItem();
+                                int size = statements.size();
+                                String[] sqlArr = new String[size];
 
-                        JdbcTemplate jdbcTemplate = connection.getJdbcTemplate();
-                        QueryResultSet qrs = jdbcTemplate.select(database.getName(), sqlArr);
+                                for (int i = 0; i < size; i++)
+                                        sqlArr[i] = statements.get(i).toString() + ';';
 
-                        resultSetTableViewPane.refresh(qrs);
+                                ODBNConnection connection = connectionComboBox.getSelectionModel()
+                                        .getSelectedItem();
 
-                        if (!getItems().contains(resultSetTableViewPane))
-                                getItems().add(resultSetTableViewPane);
-                } catch (Throwable e) {
-                        Catcher.ithrow(e);
-                }
+                                ODBNDatabase database = databaseComboBox.getSelectionModel()
+                                        .getSelectedItem();
+
+                                jdbcTemplate = connection.getJdbcTemplate();
+
+                                currentTaskId = System.currentTimeMillis();
+                                QueryResultSet qrs = jdbcTemplate.select(currentTaskId, database.getName(), sqlArr);
+
+                                Platform.runLater(() -> {
+                                        resultSetTableViewPane.refresh(qrs);
+
+                                        if (!getItems().contains(resultSetTableViewPane))
+                                                getItems().add(resultSetTableViewPane);
+                                });
+                        } catch (Throwable e) {
+                                Catcher.ithrow(e);
+                        } finally {
+                                Platform.runLater(() -> updateButtonForExecuting(false));
+                        }
+                }).start();
+        }
+
+        private void stopTask()
+        {
+                if (jdbcTemplate != null)
+                        jdbcTemplate.cancel(currentTaskId);
         }
 
         private static void applyHighlighting(CodeArea area)
