@@ -91,7 +91,7 @@ public class ODBNDatabase extends ODBNode implements EventListener
 
                 new Thread(() -> {
                         try {
-                                tables = jdbcTemplate.getTables(name);
+                                tables = jdbcTemplate.tables(name);
 
                                 Platform.runLater(() -> {
                                         getChildren().addAll(tableItem, queryItem);

@@ -59,9 +59,9 @@ public class PreviewTableDataPane extends BorderPane
 
                 new Thread(() -> {
                         try {
-                                QueryResultSet rs = jdbcTemplate.selectByPage(
+                                QueryResultSet rs = jdbcTemplate.select(
                                         database,
-                                        tableInfo.getName(),
+                                        tableInfo,
                                         start,
                                         size);
                                 Platform.runLater(() -> resultSetViewPane.refresh(rs));

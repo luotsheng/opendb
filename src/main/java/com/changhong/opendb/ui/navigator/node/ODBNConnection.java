@@ -2,8 +2,8 @@ package com.changhong.opendb.ui.navigator.node;
 
 import com.changhong.opendb.core.event.EventBus;
 import com.changhong.opendb.driver.JdbcTemplate;
-import com.changhong.opendb.driver.datasource.DataSourceProxy;
-import com.changhong.opendb.driver.datasource.MySQLDataSourceProxy;
+import com.changhong.opendb.driver.datasource.VirtualDataSource;
+import com.changhong.opendb.driver.datasource.MySQLDataSource;
 import com.changhong.opendb.model.ConnectionInfo;
 import com.changhong.opendb.model.ODBNStatus;
 import com.changhong.opendb.resource.Assets;
@@ -32,7 +32,7 @@ public class ODBNConnection extends ODBNode
         private final ConnectionInfo info;
 
         private boolean openFlag = false;
-        private DataSourceProxy dataSource;
+        private VirtualDataSource dataSource;
 
         @Getter
         private JdbcTemplate jdbcTemplate;
@@ -65,9 +65,9 @@ public class ODBNConnection extends ODBNode
 
                 new Thread(() -> {
                         try {
-                                dataSource = new MySQLDataSourceProxy(info);
+                                dataSource = new MySQLDataSource(info);
                                 jdbcTemplate = dataSource.newJdbcTemplate(getName());
-                                setupDatabases(jdbcTemplate.getDatabases());
+                                setupDatabases(jdbcTemplate.databases());
                                 setExpanded(true);
                                 openFlag = true;
                         } catch (Throwable e) {
