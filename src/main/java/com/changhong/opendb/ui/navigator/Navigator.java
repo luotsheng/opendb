@@ -53,6 +53,8 @@ public class Navigator extends VBox implements EventListener
                 setupTreeNodeSelectedEvent();
                 initializeLayout();
                 refreshODBNConnection();
+
+                treeView.getRoot().setExpanded(true);
         }
 
         @Override

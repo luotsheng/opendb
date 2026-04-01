@@ -7,10 +7,8 @@ import com.changhong.opendb.driver.JdbcTemplate;
 import com.changhong.opendb.driver.TableMetadata;
 import com.changhong.opendb.resource.Assets;
 import com.changhong.opendb.ui.navigator.node.ODBNDatabase;
+import com.changhong.opendb.ui.widgets.*;
 import com.changhong.opendb.ui.widgets.DateCell;
-import com.changhong.opendb.ui.widgets.DetailPane;
-import com.changhong.opendb.ui.widgets.VFX;
-import com.changhong.opendb.ui.widgets.VSeparator;
 import com.changhong.opendb.utils.Catcher;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -94,8 +92,11 @@ public class DatabaseDetailPane extends DetailPane
         private void deleteTable()
         {
                 TableMetadata table = tableView.getSelectionModel().getSelectedItem();
-                Catcher.tryCall(() -> database.jdbc().deleteTable(database.getName(), table.getName()));
-                database.refreshTableNode();
+
+                if (ConfirmDialog.showCheckDialog("确认删除：%s？", table.getName())) {
+                        Catcher.tryCall(() -> database.jdbc().deleteTable(database.getName(), table.getName()));
+                        database.refreshTableNode();
+                }
         }
 
         @SuppressWarnings("unchecked")
