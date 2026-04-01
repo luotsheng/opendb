@@ -3,7 +3,9 @@ package com.changhong.opendb.ui.workbench;
 import com.changhong.opendb.driver.JdbcTemplate;
 import com.changhong.opendb.driver.QueryResultSet;
 import com.changhong.opendb.driver.TableInfo;
+import com.changhong.opendb.resource.Assets;
 import com.changhong.opendb.utils.Catcher;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
@@ -36,21 +38,38 @@ public class PreviewTableDataPane extends BorderPane
                 this.tableInfo = tableInfo;
                 this.resultSetViewPane = new ResultSetViewPane();
 
-                update();
                 setCenter(resultSetViewPane);
         }
 
-
-
-        public void update()
+        private void setLoadingIndicator()
         {
-                Catcher.tryCall(() -> {
-                        QueryResultSet rs = jdbcTemplate.selectByPage(
-                                database,
-                                tableInfo.getName(),
-                                start,
-                                size);
-                        resultSetViewPane.refresh(rs);
-                });
+                oldGraphic = ownerTab.getGraphic();
+                ownerTab.setGraphic(Assets.newProgressIndicator());
+        }
+
+        private void removeLoadingIndicator()
+        {
+                ownerTab.setGraphic(oldGraphic);
+        }
+
+
+        public void asyncUpdate()
+        {
+                setLoadingIndicator();
+
+                new Thread(() -> {
+                        try {
+                                QueryResultSet rs = jdbcTemplate.selectByPage(
+                                        database,
+                                        tableInfo.getName(),
+                                        start,
+                                        size);
+                                Platform.runLater(() -> resultSetViewPane.refresh(rs));
+                        } catch (Exception e) {
+                                Catcher.ithrow(e);
+                        } finally {
+                                Platform.runLater(this::removeLoadingIndicator);
+                        }
+                }).start();
         }
 }

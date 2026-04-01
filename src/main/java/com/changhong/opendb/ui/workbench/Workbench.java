@@ -231,5 +231,7 @@ public class Workbench extends VBox implements EventListener
                 tabPane.add(tab);
                 tabPane.select(tab);
                 queryResultTab.put(id, tab);
+
+                pane.asyncUpdate();
         }
 }

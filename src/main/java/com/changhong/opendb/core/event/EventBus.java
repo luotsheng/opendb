@@ -1,5 +1,6 @@
 package com.changhong.opendb.core.event;
 
+import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,16 +35,18 @@ public class EventBus
          */
         public static void publish(Event event)
         {
-                CopyOnWriteArrayList<EventListener> copyOnWriteEventListeners = eventListeners.get(event.getClass());
+                Platform.runLater(() -> {
+                        CopyOnWriteArrayList<EventListener> copyOnWriteEventListeners = eventListeners.get(event.getClass());
 
-                copyOnWriteEventListeners.forEach(listener -> {
-                        try {
-                                if (event.isConsume())
-                                        return;
-                                listener.onEvent(event);
-                        } catch (Throwable e) {
-                                LOG.error("Consume event failed", e);
-                        }
+                        copyOnWriteEventListeners.forEach(listener -> {
+                                try {
+                                        if (event.isConsume())
+                                                return;
+                                        listener.onEvent(event);
+                                } catch (Throwable e) {
+                                        LOG.error("Consume event failed", e);
+                                }
+                        });
                 });
         }
 
