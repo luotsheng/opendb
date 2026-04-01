@@ -4,12 +4,11 @@ import com.changhong.opendb.app.Launcher;
 import com.changhong.opendb.core.event.*;
 import com.changhong.opendb.model.ConnectionInfo;
 import com.changhong.opendb.resource.ResourceManager;
-import com.changhong.opendb.ui.widgets.VFX;
+import com.changhong.opendb.ui.widgets.VTabPane;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
@@ -27,7 +26,7 @@ import static com.changhong.opendb.utils.StringUtils.strfmt;
 @SuppressWarnings("FieldCanBeLocal")
 public class Workbench extends VBox implements EventListener
 {
-        private final TabPane tabPane = new TabPane();
+        private final VTabPane tabPane = new VTabPane();
         private final Tab detailTab = new Tab("详情");
         private final List<SqlEditor> editors = new ArrayList<>();
         private final Map<String, Tab> queryResultTab = new HashMap<>();
@@ -62,7 +61,7 @@ public class Workbench extends VBox implements EventListener
                 tabPane.addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
                         Node node = (Node) event.getTarget();
 
-                        while (node != null && !(node instanceof TabPane)) {
+                        while (node != null && !(node instanceof VTabPane)) {
                                 if (node.getStyleClass().contains("tab")) {
                                         Tab tab = (Tab) node.getProperties().get(Tab.class);
 
@@ -98,35 +97,35 @@ public class Workbench extends VBox implements EventListener
         private void setupDetailTab()
         {
                 detailTab.setClosable(false);
-                tabPane.getTabs().add(detailTab);
+                tabPane.add(detailTab);
         }
 
-        private void showMenu(TabPane tabPane, Tab tab, ContextMenuEvent e)
+        private void showMenu(VTabPane tabPane, Tab tab, ContextMenuEvent e)
         {
                 closeCurrent.setOnAction(ev -> {
-                        tabPane.getTabs().remove(tab);
+                        tabPane.remove(tab);
                 });
 
                 closeAll.setOnAction(ev -> {
-                        tabPane.getTabs().remove(1, tabPane.getTabs().size());
+                        tabPane.remove(1, tabPane.size());
                 });
 
                 closeLeft.setOnAction(ev -> {
-                        int index = tabPane.getTabs().indexOf(tab);
-                        tabPane.getTabs().remove(1, index);
-                        tabPane.getSelectionModel().select(tab);
+                        int index = tabPane.indexOf(tab);
+                        tabPane.remove(1, index);
+                        tabPane.select(tab);
                 });
 
                 closeRight.setOnAction(ev -> {
-                        int index = tabPane.getTabs().indexOf(tab);
-                        tabPane.getTabs().remove(index + 1, tabPane.getTabs().size());
-                        tabPane.getSelectionModel().select(tab);
+                        int index = tabPane.indexOf(tab);
+                        tabPane.remove(index + 1, tabPane.size());
+                        tabPane.select(tab);
                 });
 
                 closeOther.setOnAction(ev -> {
-                        tabPane.getTabs().remove(1, tabPane.getTabs().size());
-                        tabPane.getTabs().add(tab);
-                        tabPane.getSelectionModel().select(tab);
+                        tabPane.remove(1, tabPane.size());
+                        tabPane.add(tab);
+                        tabPane.select(tab);
                 });
 
                 tabPaneContextMenu.show(tabPane, e.getScreenX(), e.getScreenY());
@@ -168,7 +167,7 @@ public class Workbench extends VBox implements EventListener
         {
                 for (SqlEditor editor : editors) {
                         if (editor.sqlFileEquals(event.sqlFile))
-                                tabPane.getTabs().remove(editor.getOwnerTab());
+                                tabPane.remove(editor.getOwnerTab());
                 }
         }
 
@@ -187,8 +186,8 @@ public class Workbench extends VBox implements EventListener
 
                 queryTab.setContent(sqlEditor);
                 editors.add(sqlEditor);
-                tabPane.getTabs().add(queryTab);
-                tabPane.getSelectionModel().select(queryTab);
+                tabPane.add(queryTab);
+                tabPane.select(queryTab);
         }
 
         private void handleNewQueryResultSetPaneEvent(NewQueryResultSetPaneEvent event)
@@ -206,7 +205,7 @@ public class Workbench extends VBox implements EventListener
 
                 if (queryResultTab.containsKey(id)) {
                         Tab tab = queryResultTab.get(id);
-                        tabPane.getSelectionModel().select(tab);
+                        tabPane.select(tab);
                         return;
                 }
 
@@ -218,8 +217,8 @@ public class Workbench extends VBox implements EventListener
                         queryResultTab.remove(closeTab.getText());
                 });
 
-                tabPane.getTabs().add(tab);
-                tabPane.getSelectionModel().select(tab);
+                tabPane.add(tab);
+                tabPane.select(tab);
                 queryResultTab.put(id, tab);
         }
 }
