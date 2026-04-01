@@ -9,8 +9,10 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.layout.BorderPane;
+import net.sf.jsqlparser.schema.Table;
 import org.apache.commons.math3.random.StableRandomGenerator;
 
 import java.util.List;
@@ -28,8 +30,7 @@ public class ResultSetViewPane extends BorderPane
         private final Tab resultSetTab = new Tab();
         private TableView<List<String>> tableView = VFX.newTableView();
 
-        private int startIndex = 0;
-        private int rangeIndex = 0;
+        private TablePosition<?, ?> start;
 
         public ResultSetViewPane()
         {
@@ -38,6 +39,7 @@ public class ResultSetViewPane extends BorderPane
                 setCenter(tabPane);
         }
 
+        @SuppressWarnings({"unchecked", "rawtypes"})
         private void setupTableView()
         {
                 tableView.getStylesheets().add("vfx-table-view");
@@ -46,22 +48,40 @@ public class ResultSetViewPane extends BorderPane
                 tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
                 tableView.setOnMousePressed(event -> {
-                        startIndex = tableView.getSelectionModel().getSelectedIndex();
-                        System.out.printf("startIndex: %s\n", startIndex);
+                        start = getTablePosition(event);
                 });
 
                 tableView.setOnMouseDragged(event -> {
-                        var pick = event.getPickResult();
-                        Node node = pick.getIntersectedNode();
+                       var cur = getTablePosition(event);
 
-                        while (node != null && !(node instanceof TableRow))
-                                node = node.getParent();
-
-                        if (node instanceof TableRow<?> row) {
-                                rangeIndex = row.getIndex();
-                                System.out.printf("rangeIndex: %s\n", rangeIndex);
-                        }
+                       if (start != null && cur != null) {
+                               tableView.getSelectionModel().clearSelection();
+                               tableView.getSelectionModel().selectRange(
+                                       start.getRow(), (TableColumn) start.getTableColumn(),
+                                       cur.getRow(), cur.getTableColumn()
+                               );
+                       }
                 });
+        }
+
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        private TablePosition getTablePosition(MouseEvent event)
+        {
+                var pick = event.getPickResult();
+                Node node = pick.getIntersectedNode();
+
+                while (node != null && !(node instanceof TableCell<?,?>))
+                        node = node.getParent();
+
+                if (node instanceof TableCell cell && !cell.isEmpty()) {
+                        return new TablePosition<>(
+                                tableView,
+                                cell.getIndex(),
+                                cell.getTableColumn()
+                        );
+                }
+
+                return null;
         }
 
         public void refresh(QueryResultSet qrs)
