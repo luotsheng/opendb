@@ -35,7 +35,7 @@ public class ODBNTable extends ODBNode
         @Override
         public void onSelectedEvent()
         {
-                database.onSelected();
+                // database.onSelected();
         }
 
         @Override
