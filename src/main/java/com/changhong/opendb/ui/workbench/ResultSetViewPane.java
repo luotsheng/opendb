@@ -7,11 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.text.Text;
+import org.apache.commons.math3.random.StableRandomGenerator;
 
 import java.util.List;
 
@@ -30,8 +28,17 @@ public class ResultSetViewPane extends BorderPane
 
         public ResultSetViewPane()
         {
+                setupTableView();
                 resultSetTab.setContent(tableView);
                 setCenter(tabPane);
+        }
+
+        private void setupTableView()
+        {
+                tableView.getStylesheets().add("vfx-table-view");
+                tableView.setEditable(true);
+                tableView.getSelectionModel().setCellSelectionEnabled(true);
+                tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         }
 
         public void refresh(QueryResultSet qrs)
@@ -55,6 +62,7 @@ public class ResultSetViewPane extends BorderPane
                         col.setPrefWidth(calcColWidth(colText, qrs.getRows(), i));
                         col.setMaxWidth(1000);
                         col.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().get(index)));
+                        col.setCellFactory(TextFieldTableCell.forTableColumn());
 
                         tableView.getColumns().add(col);
                 }
