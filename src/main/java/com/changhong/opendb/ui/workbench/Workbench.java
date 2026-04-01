@@ -123,7 +123,7 @@ public class Workbench extends VBox implements EventListener
                 });
 
                 closeOther.setOnAction(ev -> {
-                        tabPane.remove(1, tabPane.size());
+                        tabPane.removeExcept(tab, 1, tabPane.size());
                         tabPane.add(tab);
                         tabPane.select(tab);
                 });

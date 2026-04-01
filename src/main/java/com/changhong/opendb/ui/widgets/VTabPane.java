@@ -8,10 +8,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
  * @author Luo Tiansheng
@@ -30,6 +27,14 @@ public class VTabPane extends TabPane implements ObservableList<Tab>
 
         private void callOnCloseRequest(Tab tab)
         {
+                callOnCloseRequest(null, tab);
+        }
+
+        private void callOnCloseRequest(Tab except, Tab tab)
+        {
+                if (Objects.equals(except, tab))
+                        return;
+
                 EventHandler<Event> onCloseRequest = tab.getOnCloseRequest();
                 if (onCloseRequest != null)
                         onCloseRequest.handle(new Event(tab, tab, Tab.TAB_CLOSE_REQUEST_EVENT));
@@ -85,6 +90,13 @@ public class VTabPane extends TabPane implements ObservableList<Tab>
         public void remove(int from, int to)
         {
                 subList(from, to).forEach(this::callOnCloseRequest);
+                getTabs().remove(from, to);
+        }
+
+        /** 范围移除，除了 except */
+        public void removeExcept(Tab except, int from, int to)
+        {
+                subList(from, to).forEach(tab -> this.callOnCloseRequest(except, tab));
                 getTabs().remove(from, to);
         }
 
