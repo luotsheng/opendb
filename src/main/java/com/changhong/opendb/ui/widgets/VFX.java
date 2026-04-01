@@ -13,14 +13,6 @@ import javafx.scene.layout.Pane;
  */
 public class VFX
 {
-        public static ContextMenu tabPaneContextMenu = null;
-
-        private static MenuItem closeCurrent = null;
-        private static MenuItem closeAll = null;
-        private static MenuItem closeLeft = null;
-        private static MenuItem closeRight = null;
-        private static MenuItem closeOther = null;
-
         public static <S> TableView<S> newTableView()
         {
                 TableView<S> table = new TableView<>();
@@ -52,76 +44,5 @@ public class VFX
                 dst.getSelectionModel().select(
                         src.getSelectionModel().getSelectedIndex());
                 return dst;
-        }
-
-        public static TabPane newTabPane()
-        {
-                TabPane tabPane = new TabPane();
-
-                tabPane.addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
-                        Node node = (Node) event.getTarget();
-
-                        while (node != null && !(node instanceof TabPane)) {
-                                if (node.getStyleClass().contains("tab")) {
-                                        Tab tab = (Tab) node.getProperties().get(Tab.class);
-                                        showTabContextMenu(tabPane, tab, event);
-                                        break;
-                                }
-                                node = node.getParent();
-                        }
-                });
-
-                return tabPane;
-        }
-
-        private static void showTabContextMenu(TabPane tabPane, Tab tab, ContextMenuEvent e)
-        {
-                if (tabPaneContextMenu == null) {
-                        tabPaneContextMenu = new ContextMenu();
-                        tabPaneContextMenu.setAutoHide(true);
-                        tabPaneContextMenu.setConsumeAutoHidingEvents(false);
-
-                        closeCurrent = new MenuItem("关闭当前");
-                        closeAll = new MenuItem("关闭所有");
-                        closeLeft = new MenuItem("关闭左侧");
-                        closeRight = new MenuItem("关闭右侧");
-                        closeOther = new MenuItem("关闭其他");
-
-                        tabPaneContextMenu.getItems().addAll(
-                                closeCurrent,
-                                closeAll,
-                                new SeparatorMenuItem(),
-                                closeLeft,
-                                closeRight,
-                                closeOther);
-                }
-
-                closeCurrent.setOnAction(ev -> {
-                        tabPane.getTabs().remove(tab);
-                });
-
-                closeAll.setOnAction(ev -> {
-                        tabPane.getTabs().remove(1, tabPane.getTabs().size());
-                });
-
-                closeLeft.setOnAction(ev -> {
-                        int index = tabPane.getTabs().indexOf(tab);
-                        tabPane.getTabs().remove(1, index);
-                        tabPane.getSelectionModel().select(tab);
-                });
-
-                closeRight.setOnAction(ev -> {
-                        int index = tabPane.getTabs().indexOf(tab);
-                        tabPane.getTabs().remove(index + 1, tabPane.getTabs().size());
-                        tabPane.getSelectionModel().select(tab);
-                });
-
-                closeOther.setOnAction(ev -> {
-                        tabPane.getTabs().remove(1, tabPane.getTabs().size());
-                        tabPane.getTabs().add(tab);
-                        tabPane.getSelectionModel().select(tab);
-                });
-
-                tabPaneContextMenu.show(tabPane, e.getScreenX(), e.getScreenY());
         }
 }

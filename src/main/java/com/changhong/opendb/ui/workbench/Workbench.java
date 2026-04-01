@@ -1,10 +1,14 @@
 package com.changhong.opendb.ui.workbench;
 
+import com.changhong.opendb.app.Launcher;
 import com.changhong.opendb.core.event.*;
 import com.changhong.opendb.model.ConnectionInfo;
+import com.changhong.opendb.resource.ResourceManager;
 import com.changhong.opendb.ui.widgets.VFX;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -23,16 +27,26 @@ import static com.changhong.opendb.utils.StringUtils.strfmt;
 @SuppressWarnings("FieldCanBeLocal")
 public class Workbench extends VBox implements EventListener
 {
-        private final TabPane tabPane = VFX.newTabPane();
+        private final TabPane tabPane = new TabPane();
         private final Tab detailTab = new Tab("详情");
         private final List<SqlEditor> editors = new ArrayList<>();
         private final Map<String, Tab> queryResultTab = new HashMap<>();
+
+        private final ContextMenu tabPaneContextMenu = new ContextMenu();
+        private final MenuItem closeCurrent = new MenuItem("关闭当前");;
+        private final MenuItem closeAll = new MenuItem("关闭所有");;
+        private final MenuItem closeLeft = new MenuItem("关闭左侧");;
+        private final MenuItem closeRight = new MenuItem("关闭右侧");;
+        private final MenuItem closeOther = new MenuItem("关闭其他");;
 
         public Workbench()
         {
                 setStyle("-fx-background-color: #ffffff;");
                 getChildren().add(tabPane);
                 VBox.setVgrow(tabPane, Priority.ALWAYS);
+
+                setupTabPane();
+                setupContextMenu();
                 setupDetailTab();
 
                 // 订阅事件
@@ -43,10 +57,79 @@ public class Workbench extends VBox implements EventListener
                 EventBus.subscribe(RemoveSqlEditorTabEvent.class, this);
         }
 
+        private void setupTabPane()
+        {
+                tabPane.addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
+                        Node node = (Node) event.getTarget();
+
+                        while (node != null && !(node instanceof TabPane)) {
+                                if (node.getStyleClass().contains("tab")) {
+                                        Tab tab = (Tab) node.getProperties().get(Tab.class);
+
+                                        if (tab == detailTab)
+                                                return;
+
+                                        showMenu(tabPane, tab, event);
+                                        break;
+                                }
+                                node = node.getParent();
+                        }
+                });
+        }
+
+        private void setupContextMenu()
+        {
+                tabPaneContextMenu.getItems().addAll(
+                        closeCurrent,
+                        closeAll,
+                        new SeparatorMenuItem(),
+                        closeLeft,
+                        closeRight,
+                        closeOther);
+
+                Launcher.runLater((stage, scene) -> {
+                        scene.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+                                if (tabPaneContextMenu.isShowing())
+                                        tabPaneContextMenu.hide();
+                        });
+                });
+        }
+
         private void setupDetailTab()
         {
                 detailTab.setClosable(false);
                 tabPane.getTabs().add(detailTab);
+        }
+
+        private void showMenu(TabPane tabPane, Tab tab, ContextMenuEvent e)
+        {
+                closeCurrent.setOnAction(ev -> {
+                        tabPane.getTabs().remove(tab);
+                });
+
+                closeAll.setOnAction(ev -> {
+                        tabPane.getTabs().remove(1, tabPane.getTabs().size());
+                });
+
+                closeLeft.setOnAction(ev -> {
+                        int index = tabPane.getTabs().indexOf(tab);
+                        tabPane.getTabs().remove(1, index);
+                        tabPane.getSelectionModel().select(tab);
+                });
+
+                closeRight.setOnAction(ev -> {
+                        int index = tabPane.getTabs().indexOf(tab);
+                        tabPane.getTabs().remove(index + 1, tabPane.getTabs().size());
+                        tabPane.getSelectionModel().select(tab);
+                });
+
+                closeOther.setOnAction(ev -> {
+                        tabPane.getTabs().remove(1, tabPane.getTabs().size());
+                        tabPane.getTabs().add(tab);
+                        tabPane.getSelectionModel().select(tab);
+                });
+
+                tabPaneContextMenu.show(tabPane, e.getScreenX(), e.getScreenY());
         }
 
         static int idx = 0;
@@ -92,6 +175,7 @@ public class Workbench extends VBox implements EventListener
         private void handleNewQueryScriptEvent(NewQueryScriptEvent event)
         {
                 Tab queryTab = new Tab();
+                queryTab.setGraphic(ResourceManager.use("sql"));
                 ConnectionInfo info = event.connectionInfo;
                 SqlEditor sqlEditor;
 
@@ -127,6 +211,7 @@ public class Workbench extends VBox implements EventListener
                 }
 
                 Tab tab = new Tab(id);
+                tab.setGraphic(ResourceManager.use("table"));
                 tab.setContent(pane);
                 tab.setOnCloseRequest(closeEvent -> {
                         Tab closeTab = (Tab) closeEvent.getTarget();

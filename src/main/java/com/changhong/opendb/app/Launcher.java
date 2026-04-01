@@ -11,6 +11,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Luo Tiansheng
@@ -19,6 +21,16 @@ import java.net.URL;
 public class Launcher extends Application
 {
         private static final Class<Launcher> aClass = Launcher.class;
+        private static final List<LauncherRunnable> runnables = new ArrayList<>();
+
+        public interface LauncherRunnable {
+                void run(Stage stage, Scene scene);
+        }
+
+        public static void runLater(LauncherRunnable runnable)
+        {
+                runnables.add(runnable);
+        }
 
         private static void addVFXStylesheet(Scene scene, String path)
         {
@@ -42,26 +54,19 @@ public class Launcher extends Application
                 addVFXStylesheet(scene, "/css/vfx-code-area.css");
         }
 
-        private void setupScene(Scene scene)
-        {
-                scene.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
-                        if (VFX.tabPaneContextMenu != null && VFX.tabPaneContextMenu.isShowing())
-                                VFX.tabPaneContextMenu.hide();
-
-                });
-        }
-
         @Override
         public void start(Stage stage)
         {
                 initialize();
                 Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
                 Scene scene = new Scene(new MainLayout(), 1200, 800);
-                setupScene(scene);
                 initializeVFX(scene);
                 stage.setTitle("数据库可视化工具");
                 stage.setScene(scene);
                 stage.setMaximized(true);
+
+                runnables.forEach(runnable -> runnable.run(stage, scene));
+
                 stage.show();
         }
 
