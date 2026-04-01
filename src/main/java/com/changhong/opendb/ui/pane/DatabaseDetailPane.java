@@ -2,14 +2,18 @@ package com.changhong.opendb.ui.pane;
 
 import com.changhong.opendb.core.event.EventBus;
 import com.changhong.opendb.core.event.NewQueryResultSetPaneEvent;
+import com.changhong.opendb.core.event.RefreshTableNodeEvent;
 import com.changhong.opendb.driver.JdbcTemplate;
-import com.changhong.opendb.driver.TableInfo;
+import com.changhong.opendb.driver.TableMetadata;
 import com.changhong.opendb.resource.Assets;
+import com.changhong.opendb.ui.navigator.node.ODBNDatabase;
 import com.changhong.opendb.ui.widgets.DateCell;
 import com.changhong.opendb.ui.widgets.DetailPane;
 import com.changhong.opendb.ui.widgets.VFX;
 import com.changhong.opendb.ui.widgets.VSeparator;
+import com.changhong.opendb.utils.Catcher;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -28,23 +32,26 @@ import java.util.List;
 @SuppressWarnings("FieldCanBeLocal")
 public class DatabaseDetailPane extends DetailPane
 {
-        private final TableView<TableInfo> table;
+        private final TableView<TableMetadata> tableView;
         private final ToolBar toolBar;
 
-        private JdbcTemplate jdbcTemplate;
-        private String database;
+        private final ODBNDatabase database;
 
-        private TableColumn<TableInfo, String> name;
-        private TableColumn<TableInfo, Date> createTime;
-        private TableColumn<TableInfo, Date> updateTime;
-        private TableColumn<TableInfo, String> engine;
-        private TableColumn<TableInfo, Float> size;
-        private TableColumn<TableInfo, String> rows;
-        private TableColumn<TableInfo, String> comment;
+        private TableColumn<TableMetadata, String> name;
+        private TableColumn<TableMetadata, Date> createTime;
+        private TableColumn<TableMetadata, Date> updateTime;
+        private TableColumn<TableMetadata, String> engine;
+        private TableColumn<TableMetadata, Float> size;
+        private TableColumn<TableMetadata, String> rows;
+        private TableColumn<TableMetadata, String> comment;
 
-        public DatabaseDetailPane()
+        private ObservableList<TableMetadata> obs;
+
+        public DatabaseDetailPane(ODBNDatabase database)
         {
-                table = VFX.newTableView();
+                this.database = database;
+
+                tableView = VFX.newTableView();
                 toolBar = new ToolBar();
 
                 // setup
@@ -53,7 +60,7 @@ public class DatabaseDetailPane extends DetailPane
                 setupCellFactory();
 
                 setTop(toolBar);
-                setCenter(table);
+                setCenter(tableView);
         }
 
         private void setupToolBar()
@@ -63,6 +70,7 @@ public class DatabaseDetailPane extends DetailPane
                 Button modifyTable = VFX.newIconButton("编辑表", "modify");
                 Button newTable = VFX.newIconButton("创建表", "plus");
                 Button delTable = VFX.newIconButton("删除表", "minus");
+                delTable.setOnAction(event -> deleteTable());
 
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -81,6 +89,13 @@ public class DatabaseDetailPane extends DetailPane
                         new VSeparator(),
                         spacer,
                         searchBox);
+        }
+
+        private void deleteTable()
+        {
+                TableMetadata table = tableView.getSelectionModel().getSelectedItem();
+                Catcher.tryCall(() -> database.jdbc().deleteTable(database.getName(), table.getName()));
+                database.refreshTableNode();
         }
 
         @SuppressWarnings("unchecked")
@@ -114,7 +129,7 @@ public class DatabaseDetailPane extends DetailPane
                 comment.setPrefWidth(600);
 
                 // 绑定列
-                table.getColumns().addAll(
+                tableView.getColumns().addAll(
                         name,
                         createTime,
                         updateTime,
@@ -124,14 +139,14 @@ public class DatabaseDetailPane extends DetailPane
                         comment
                 );
 
-                table.setRowFactory(tv -> {
-                        TableRow<TableInfo> row = new TableRow<>();
+                tableView.setRowFactory(tv -> {
+                        TableRow<TableMetadata> row = new TableRow<>();
 
                         row.setOnMouseClicked(e -> {
 
                                 if (e.getClickCount() == 2 && !row.isEmpty()) {
-                                        TableInfo data = row.getItem();
-                                        EventBus.publish(new NewQueryResultSetPaneEvent(jdbcTemplate, database, data));
+                                        TableMetadata data = row.getItem();
+                                        EventBus.publish(new NewQueryResultSetPaneEvent(database.jdbc(), database.getName(), data));
                                 }
 
                         });
@@ -139,7 +154,7 @@ public class DatabaseDetailPane extends DetailPane
                         return row;
                 });
 
-                table.getColumns().forEach(col -> col.setReorderable(false));
+                tableView.getColumns().forEach(col -> col.setReorderable(false));
         }
 
         private void setupCellFactory()
@@ -186,10 +201,14 @@ public class DatabaseDetailPane extends DetailPane
                 updateTime.setCellFactory(col -> new DateCell<>());
         }
 
-        public void update(JdbcTemplate jdbcTemplate, String database, List<TableInfo> tables)
+        public void update(List<TableMetadata> tables)
         {
-                this.jdbcTemplate = jdbcTemplate;
-                this.database = database;
-                table.setItems(FXCollections.observableArrayList(tables));
+                if (obs == null) {
+                        obs = FXCollections.observableArrayList();
+                        tableView.setItems(obs);
+                }
+
+                obs.setAll(tables);
+                tableView.refresh();
         }
 }

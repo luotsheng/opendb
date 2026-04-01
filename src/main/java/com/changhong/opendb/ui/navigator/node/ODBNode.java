@@ -24,7 +24,7 @@ public abstract class ODBNode extends TreeItem<String>
         /**
          * 节点菜单
          */
-        protected final ContextMenu contextMenu;
+        protected ContextMenu contextMenu;
 
         private Node oldGraphic;
 
@@ -67,6 +67,14 @@ public abstract class ODBNode extends TreeItem<String>
         protected ContextMenu registerContextMenu()
         {
                 return null;
+        }
+
+        /**
+         * 设置菜单
+         */
+        public void setContextMenu(ContextMenu contextMenu)
+        {
+                this.contextMenu = contextMenu;
         }
 
         /**

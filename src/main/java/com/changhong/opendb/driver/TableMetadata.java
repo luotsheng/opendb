@@ -1,6 +1,7 @@
 package com.changhong.opendb.driver;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
 
@@ -11,7 +12,8 @@ import java.util.Date;
  * @since 2026/3/27
  */
 @Data
-public class TableInfo
+@ToString
+public class TableMetadata
 {
         /**
          * 数据库名字

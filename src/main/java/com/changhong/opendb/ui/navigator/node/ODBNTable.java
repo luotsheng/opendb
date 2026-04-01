@@ -4,7 +4,7 @@ import com.changhong.opendb.app.Application;
 import com.changhong.opendb.core.event.EventBus;
 import com.changhong.opendb.core.event.NewQueryResultSetPaneEvent;
 import com.changhong.opendb.driver.JdbcTemplate;
-import com.changhong.opendb.driver.TableInfo;
+import com.changhong.opendb.driver.TableMetadata;
 import com.changhong.opendb.resource.Assets;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -19,11 +19,11 @@ public class ODBNTable extends ODBNode
 {
         private final JdbcTemplate jdbcTemplate;
         private final ODBNDatabase database;
-        private final TableInfo table;
+        private final TableMetadata table;
 
         public ODBNTable(JdbcTemplate jdbcTemplate,
                          ODBNDatabase database,
-                         TableInfo table)
+                         TableMetadata table)
         {
                 super(table.getName());
                 this.database = database;

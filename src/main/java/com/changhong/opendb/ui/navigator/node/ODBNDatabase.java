@@ -2,7 +2,7 @@ package com.changhong.opendb.ui.navigator.node;
 
 import com.changhong.opendb.core.event.*;
 import com.changhong.opendb.driver.JdbcTemplate;
-import com.changhong.opendb.driver.TableInfo;
+import com.changhong.opendb.driver.TableMetadata;
 import com.changhong.opendb.model.QueryInfo;
 import com.changhong.opendb.repository.QueryScriptRepository;
 import com.changhong.opendb.resource.Assets;
@@ -14,7 +14,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
+import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +31,7 @@ public class ODBNDatabase extends ODBNode implements EventListener
         private final ODBNConnection connection;
         private final JdbcTemplate jdbcTemplate;
         private boolean openFlag = false;
-        private List<TableInfo> tables;
+        private final List<TableMetadata> tables = new ArrayList<>();
 
         // Tree Items
         final TreeItem<String> tableItem
@@ -42,7 +44,7 @@ public class ODBNDatabase extends ODBNode implements EventListener
         private MenuItem closeMenuItem;
         private MenuItem newQueryMenuItem;
 
-        private final DatabaseDetailPane detailPane = new DatabaseDetailPane();
+        private final DatabaseDetailPane detailPane = new DatabaseDetailPane(this);
         private final OpenWorkbenchPaneEvent openWorkbenchPaneEvent = new OpenWorkbenchPaneEvent(detailPane);
         private final CloseWorkbenchPaneEvent closeWorkbenchPaneEvent = new CloseWorkbenchPaneEvent(detailPane);
 
@@ -75,10 +77,36 @@ public class ODBNDatabase extends ODBNode implements EventListener
                 this.connection = connection;
                 setGraphic(Assets.use("database1"));
                 this.jdbcTemplate = jdbcTemplate;
+
+                setupTableNode();
                 setupListenerEvent();
 
                 EventBus.subscribe(RefreshTableNodeEvent.class, this);
                 EventBus.subscribe(RefreshQueryNodeEvent.class, this);
+        }
+
+        private void setupTableNode()
+        {
+                var node = (ODBNode) tableItem;
+
+                ContextMenu nodeContextMenu = new ContextMenu();
+
+                MenuItem refreshTableItem = new MenuItem("刷新");
+                refreshTableItem.setOnAction(event -> refreshTableNode());
+
+                nodeContextMenu.getItems().addAll(refreshTableItem);
+                node.setContextMenu(nodeContextMenu);
+        }
+
+        private void reloadTableMetadata()
+        {
+                tables.clear();
+                tables.addAll(jdbcTemplate.tables(name));
+        }
+
+        public final JdbcTemplate jdbc()
+        {
+                return jdbcTemplate;
         }
 
         @SuppressWarnings("unchecked")
@@ -91,16 +119,15 @@ public class ODBNDatabase extends ODBNode implements EventListener
 
                 new Thread(() -> {
                         try {
-                                tables = jdbcTemplate.tables(name);
+                                reloadTableMetadata();
 
                                 Platform.runLater(() -> {
                                         getChildren().addAll(tableItem, queryItem);
 
-                                        refreshTableNode(tables);
+                                        refreshTableNode();
                                         refreshQueryNode();
 
                                         setExpanded(true);
-                                        detailPane.update(jdbcTemplate, getName(), tables);
                                         onSelectedEvent();
 
                                         openFlag = true;
@@ -125,19 +152,19 @@ public class ODBNDatabase extends ODBNode implements EventListener
                 openFlag = false;
         }
 
-        private void refreshTableNode()
+        public void refreshTableNode()
         {
-                refreshTableNode(tables);
-        }
+                reloadTableMetadata();
 
-        private void refreshTableNode(List<TableInfo> tables)
-        {
                 tableItem.getChildren().clear();
-                for (TableInfo table : tables) {
+
+                for (TableMetadata table : tables) {
                         ODBNTable tableNode = new ODBNTable(jdbcTemplate, this, table);
                         tableNode.setSelectedEvent(this::onSelected);
                         tableItem.getChildren().add(tableNode);
                 }
+
+                detailPane.update(tables);
         }
 
         private void refreshQueryNode()

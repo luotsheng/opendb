@@ -93,12 +93,13 @@ public class SaveQueryScriptDialog extends DetailPane
                                 textField.getText(),
                                 sqlEditor.getCodeAreaContent()
                         );
+
+                        sqlEditor.setSqlFile(sqlFile);
                 } else {
                         QueryScriptRepository.saveQueryScript(sqlFile, sqlEditor.getCodeAreaContent());
                 }
 
                 EventBus.publish(new RefreshQueryNodeEvent());
-                sqlEditor.setSqlFile(sqlFile);
                 sqlEditor.markSaveFlag();
 
                 cancel();

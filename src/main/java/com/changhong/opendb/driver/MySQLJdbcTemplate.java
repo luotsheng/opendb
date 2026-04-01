@@ -52,7 +52,7 @@ public class MySQLJdbcTemplate extends JdbcTemplate
         }
 
         @Override
-        public List<TableInfo> tables(String db)
+        public List<TableMetadata> tables(String db)
         {
                 String sql = strfmt("""
                     SELECT
@@ -72,12 +72,21 @@ public class MySQLJdbcTemplate extends JdbcTemplate
                 try (Connection connection = ds.getConnection();
                      Statement statement = ds.use(connection, db)) {
                         ResultSet rs = statement.executeQuery(sql);
-                        return ResultSetUtils.rs2jlist(rs, TableInfo.class);
+                        return ResultSetUtils.rs2jlist(rs, TableMetadata.class);
                 } catch (SQLException e) {
                         EventBus.publish(e);
                 }
 
                 return List.of();
+        }
+
+        @Override
+        public void deleteTable(String db, String name) throws SQLException
+        {
+                try (Connection connection = ds.getConnection();
+                     Statement statement = ds.use(connection, db)) {
+                        statement.execute(strfmt("DROP TABLE `%s`;", name));
+                }
         }
 
         public QueryResultSet select(Long id, String db, String[] sql)
@@ -101,7 +110,7 @@ public class MySQLJdbcTemplate extends JdbcTemplate
                 return qrs;
         }
 
-        public QueryResultSet select(String db, TableInfo table, int start, int size)
+        public QueryResultSet select(String db, TableMetadata table, int start, int size)
                 throws SQLException
         {
                 return select(db, table.getName(), start, size);

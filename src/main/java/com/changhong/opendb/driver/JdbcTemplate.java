@@ -1,7 +1,6 @@
 package com.changhong.opendb.driver;
 
 import com.changhong.opendb.driver.datasource.VirtualDataSource;
-import lombok.Getter;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -64,7 +63,16 @@ public abstract class JdbcTemplate
          *
          * @throws IllegalArgumentException 如果数据库名称无效或不存在
          */
-        public abstract List<TableInfo> tables(String db);
+        public abstract List<TableMetadata> tables(String db);
+
+        /**
+         * 删除指定数据库中的表
+         * 
+         * @param db 数据库名称，不能为 null 或空字符串
+         * @param name 表名称，不能为 null 或空字符串
+         * @throws SQLException  当 SQL 语法错误、执行失败或查询被取消时抛出
+         */
+        public abstract void deleteTable(String db, String name) throws SQLException;
 
         /**
          * 执行自定义 SQL 查询语句序列（支持多条语句，最后一条必须为查询语句）
@@ -74,7 +82,7 @@ public abstract class JdbcTemplate
          * @param sql SQL 语句数组，前 n-1 条可为更新/DDL 语句，最后一条必须为 SELECT 语句
          * @return 查询结果集，包含列元数据及数据行
          *
-         * @throws SQLException             当 SQL 语法错误、执行失败或查询被取消时抛出
+         * @throws SQLException 当 SQL 语法错误、执行失败或查询被取消时抛出
          * @throws IllegalArgumentException 如果 sql 数组为空或最后一条不是 SELECT 语句
          */
         public abstract QueryResultSet select(Long id, String db, String[] sql)
@@ -89,10 +97,10 @@ public abstract class JdbcTemplate
          * @param size  每页返回的行数（必须大于 0）
          * @return 分页查询结果集，包含指定范围的数据行
          *
-         * @throws SQLException             当查询执行失败时抛出
+         * @throws SQLException 当查询执行失败时抛出
          * @throws IllegalArgumentException 如果 start < 0 或 size <= 0
          */
-        public abstract QueryResultSet select(String db, TableInfo table, int start, int size)
+        public abstract QueryResultSet select(String db, TableMetadata table, int start, int size)
                 throws SQLException;
 
         /**
@@ -104,7 +112,7 @@ public abstract class JdbcTemplate
          * @param size  每页返回的行数（必须大于 0）
          * @return 分页查询结果集，包含指定范围的数据行
          *
-         * @throws SQLException             当查询执行失败时抛出
+         * @throws SQLException 当查询执行失败时抛出
          * @throws IllegalArgumentException 如果表名无效、start < 0 或 size <= 0
          */
         public abstract QueryResultSet select(String db, String table, int start, int size)

@@ -96,7 +96,9 @@ public class SqlEditor extends SplitPane
                 topBorderPane.setTop(toolBar);
                 topBorderPane.setCenter(virtualizedScrollPane);
 
-                setSqlFile(queryInfo.getSqlFile());
+                if (queryInfo != null)
+                        setSqlFile(queryInfo.getSqlFile());
+
                 setupPane();
                 setupToolbar();
                 setupCodeArea();
@@ -161,13 +163,13 @@ public class SqlEditor extends SplitPane
                 codeArea.setStyle("-fx-font-weight: normal;");
 
                 if (OS.isMac())
-                        codeArea.setStyle("-fx-font-family: 'Monaco'; -fx-font-size: 22px;");
+                        codeArea.setStyle("-fx-font-family: 'Monaco'; -fx-font-size: 19px;");
 
                 if (OS.isWindows())
-                        codeArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 22px;");
+                        codeArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 19px;");
 
                 if (OS.isLinux())
-                        codeArea.setStyle("-fx-font-family: 'DejaVu Sans Mono'; -fx-font-size: 22px;");
+                        codeArea.setStyle("-fx-font-family: 'DejaVu Sans Mono'; -fx-font-size: 19px;");
 
                 codeArea.getStyleClass().add("vfx-code-area");
                 codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));

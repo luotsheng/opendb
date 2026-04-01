@@ -1,7 +1,7 @@
 package com.changhong.opendb.core.event;
 
 import com.changhong.opendb.driver.JdbcTemplate;
-import com.changhong.opendb.driver.TableInfo;
+import com.changhong.opendb.driver.TableMetadata;
 import lombok.AllArgsConstructor;
 
 /**
@@ -13,5 +13,5 @@ public class NewQueryResultSetPaneEvent extends Event
 {
         public JdbcTemplate jdbcTemplate;
         public String database;
-        public TableInfo info;
+        public TableMetadata info;
 }

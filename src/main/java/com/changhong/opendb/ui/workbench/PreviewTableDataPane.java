@@ -2,7 +2,7 @@ package com.changhong.opendb.ui.workbench;
 
 import com.changhong.opendb.driver.JdbcTemplate;
 import com.changhong.opendb.driver.QueryResultSet;
-import com.changhong.opendb.driver.TableInfo;
+import com.changhong.opendb.driver.TableMetadata;
 import com.changhong.opendb.resource.Assets;
 import com.changhong.opendb.utils.Catcher;
 import javafx.application.Platform;
@@ -24,13 +24,13 @@ public class PreviewTableDataPane extends BorderPane
         private final Tab ownerTab;
         private final JdbcTemplate jdbcTemplate;
         private final String database;
-        private final TableInfo tableInfo;
+        private final TableMetadata tableInfo;
         private final ResultSetViewPane resultSetViewPane;
 
         public PreviewTableDataPane(Tab ownerTab,
                                     JdbcTemplate jdbcTemplate,
                                     String database,
-                                    TableInfo tableInfo)
+                                    TableMetadata tableInfo)
         {
                 this.ownerTab = ownerTab;
                 this.jdbcTemplate = jdbcTemplate;
