@@ -13,6 +13,8 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.changhong.opendb.utils.StringUtils.strfmt;
+
 /**
  * @author Luo Tiansheng
  * @since 2026/3/26
@@ -44,7 +46,7 @@ public class ConfirmDialog
                 stage.showAndWait();
         }
 
-        public static boolean showDialog(String message)
+        public static boolean showDialog(String fmt, Object... args)
         {
                 Stage stage = new Stage();
 
@@ -64,7 +66,7 @@ public class ConfirmDialog
                         stage.close();
                 });
 
-                openDialog(stage, message, ok, cancel);
+                openDialog(stage, strfmt(fmt, args), ok, cancel);
 
                 return flag.get();
         }

@@ -47,6 +47,7 @@ public class JdbcTemplate
 
         @SuppressWarnings("SqlSourceToSinkFlow")
         public QueryResultSet selectByPage(String database, String table, int start, int size)
+                throws SQLException
         {
                 QueryResultSet qrs = new QueryResultSet();
 
@@ -56,14 +57,13 @@ public class JdbcTemplate
                      Statement statement = ds.use(connection, database);
                      ResultSet rs = statement.executeQuery(sql)) {
                         rs2qrs(rs, qrs);
-                } catch (Throwable e) {
-                        Catcher.ithrow(e);
                 }
 
                 return qrs;
         }
 
         public QueryResultSet select(String db, String[] sql)
+                throws SQLException
         {
                 QueryResultSet qrs = new QueryResultSet();
 
@@ -75,8 +75,6 @@ public class JdbcTemplate
 
                         ResultSet rs = statement.executeQuery(sql[sql.length - 1]);
                         rs2qrs(rs, qrs);
-                } catch (Throwable e) {
-                        Catcher.ithrow(e);
                 }
 
                 return qrs;

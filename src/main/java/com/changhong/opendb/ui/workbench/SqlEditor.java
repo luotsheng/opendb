@@ -1,7 +1,5 @@
 package com.changhong.opendb.ui.workbench;
 
-import com.changhong.opendb.core.event.EventBus;
-import com.changhong.opendb.core.event.RemoveSqlEditorTabEvent;
 import com.changhong.opendb.driver.JdbcTemplate;
 import com.changhong.opendb.driver.QueryResultSet;
 import com.changhong.opendb.model.ODBNStatus;
@@ -9,6 +7,7 @@ import com.changhong.opendb.model.QueryInfo;
 import com.changhong.opendb.resource.ResourceManager;
 import com.changhong.opendb.ui.navigator.node.ODBNConnection;
 import com.changhong.opendb.ui.navigator.node.ODBNDatabase;
+import com.changhong.opendb.ui.widgets.ConfirmDialog;
 import com.changhong.opendb.ui.widgets.SaveQueryScriptDialog;
 import com.changhong.opendb.ui.widgets.VFX;
 import com.changhong.opendb.ui.widgets.VSeparator;
@@ -52,6 +51,7 @@ public class SqlEditor extends SplitPane
         private String name;
         @Getter
         private File sqlFile;
+        private boolean saveFlag = true;
         private ComboBox<ODBNConnection> connectionComboBox;
         private ComboBox<ODBNDatabase> databaseComboBox;
 
@@ -104,7 +104,7 @@ public class SqlEditor extends SplitPane
                 addEventHandler(KeyEvent.KEY_PRESSED, event -> {
                         if ((event.isControlDown() || event.isShortcutDown())
                                 && event.getCode() == KeyCode.S) {
-                                SaveQueryScriptDialog.showDialog(this);
+                                save();
                         }
                 });
         }
@@ -156,9 +156,7 @@ public class SqlEditor extends SplitPane
                 if (OS.isLinux())
                         codeArea.setStyle("-fx-font-family: 'DejaVu Sans Mono'; -fx-font-size: 19px;");
 
-
                 codeArea.getStyleClass().add("vfx-code-area");
-
                 codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
                 codeArea.setOnKeyPressed(event -> {
@@ -172,6 +170,13 @@ public class SqlEditor extends SplitPane
                 codeArea.multiPlainChanges()
                         .successionEnds(Duration.ofMillis(200))
                         .subscribe(ignore -> applyHighlighting(codeArea));
+
+                codeArea.textProperty().addListener((obs, oldVal, newVal) -> {
+                        if (saveFlag) {
+                                ownerTab.setText("* " + ownerTab.getText());
+                                saveFlag = false;
+                        }
+                });
         }
 
         private void setupResultSetCloseEvent()
@@ -410,9 +415,30 @@ public class SqlEditor extends SplitPane
                 if (databaseComboBox != null)
                         database = databaseComboBox.getSelectionModel().getSelectedItem();
 
-                String dbName = database == null ? "[ N/A ]" : database.getName();
+                String tail = database == null
+                        ? ""
+                        : "@" + database.getName();
 
-                ownerTab.setText(name + "@" + dbName);
+                ownerTab.setText(name + tail);
+        }
+
+        private void save()
+        {
+                SaveQueryScriptDialog.showDialog(this);
+        }
+
+        public boolean isSave()
+        {
+                return saveFlag;
+        }
+
+        public void markSaveFlag()
+        {
+                saveFlag = true;
+
+                var text = ownerTab.getText();
+                if (text.startsWith("* "))
+                        ownerTab.setText(text.substring(2));
         }
 
         public boolean sqlFileEquals(File file)
@@ -421,6 +447,14 @@ public class SqlEditor extends SplitPane
                         return false;
 
                 return sqlFile.getAbsolutePath().equals(file.getAbsolutePath());
+        }
+
+        public void close()
+        {
+                if (!saveFlag) {
+                        if (ConfirmDialog.showDialog("%s 未保存，是否保存？", ownerTab.getText()))
+                                save();
+                }
         }
 }
 

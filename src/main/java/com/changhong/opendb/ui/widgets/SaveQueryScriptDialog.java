@@ -99,6 +99,7 @@ public class SaveQueryScriptDialog extends DetailPane
 
                 EventBus.publish(new RefreshQueryNodeEvent());
                 sqlEditor.setSqlFile(sqlFile);
+                sqlEditor.markSaveFlag();
 
                 cancel();
         }

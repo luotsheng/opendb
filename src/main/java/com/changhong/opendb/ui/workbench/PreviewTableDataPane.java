@@ -3,6 +3,7 @@ package com.changhong.opendb.ui.workbench;
 import com.changhong.opendb.driver.JdbcTemplate;
 import com.changhong.opendb.driver.QueryResultSet;
 import com.changhong.opendb.driver.TableInfo;
+import com.changhong.opendb.utils.Catcher;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -33,11 +34,13 @@ public class PreviewTableDataPane extends BorderPane
 
         public void update()
         {
-                QueryResultSet rs = jdbcTemplate.selectByPage(
-                        database,
-                        tableInfo.getName(),
-                        start,
-                        size);
-                resultSetViewPane.refresh(rs);
+                Catcher.tryCall(() -> {
+                        QueryResultSet rs = jdbcTemplate.selectByPage(
+                                database,
+                                tableInfo.getName(),
+                                start,
+                                size);
+                        resultSetViewPane.refresh(rs);
+                });
         }
 }

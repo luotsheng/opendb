@@ -11,7 +11,6 @@ import static com.changhong.opendb.utils.StringUtils.strfmt;
  */
 public class Catcher
 {
-
         public interface $CatcherRunnable
         {
                 void run() throws Throwable;

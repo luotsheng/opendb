@@ -5,6 +5,7 @@ import com.changhong.opendb.core.event.*;
 import com.changhong.opendb.model.ConnectionInfo;
 import com.changhong.opendb.resource.ResourceManager;
 import com.changhong.opendb.ui.widgets.VTabPane;
+import javafx.event.EventTarget;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
@@ -185,6 +186,12 @@ public class Workbench extends VBox implements EventListener
                 }
 
                 queryTab.setContent(sqlEditor);
+                queryTab.setOnCloseRequest(e -> {
+                        if (queryTab.getContent() instanceof SqlEditor editor) {
+                                editor.close();
+                        }
+                });
+
                 editors.add(sqlEditor);
                 tabPane.add(queryTab);
                 tabPane.select(queryTab);
