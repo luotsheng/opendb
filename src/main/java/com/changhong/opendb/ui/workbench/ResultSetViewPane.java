@@ -6,8 +6,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.PickResult;
 import javafx.scene.layout.BorderPane;
 import org.apache.commons.math3.random.StableRandomGenerator;
 
@@ -26,6 +28,9 @@ public class ResultSetViewPane extends BorderPane
         private final Tab resultSetTab = new Tab();
         private TableView<List<String>> tableView = VFX.newTableView();
 
+        private int startIndex = 0;
+        private int rangeIndex = 0;
+
         public ResultSetViewPane()
         {
                 setupTableView();
@@ -39,6 +44,24 @@ public class ResultSetViewPane extends BorderPane
                 tableView.setEditable(true);
                 tableView.getSelectionModel().setCellSelectionEnabled(true);
                 tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+                tableView.setOnMousePressed(event -> {
+                        startIndex = tableView.getSelectionModel().getSelectedIndex();
+                        System.out.printf("startIndex: %s\n", startIndex);
+                });
+
+                tableView.setOnMouseDragged(event -> {
+                        var pick = event.getPickResult();
+                        Node node = pick.getIntersectedNode();
+
+                        while (node != null && !(node instanceof TableRow))
+                                node = node.getParent();
+
+                        if (node instanceof TableRow<?> row) {
+                                rangeIndex = row.getIndex();
+                                System.out.printf("rangeIndex: %s\n", rangeIndex);
+                        }
+                });
         }
 
         public void refresh(QueryResultSet qrs)
