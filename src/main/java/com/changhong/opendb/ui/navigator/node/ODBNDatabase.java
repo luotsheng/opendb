@@ -40,8 +40,7 @@ public class ODBNDatabase extends ODBNode implements EventListener
                 = new ODBInternalNode(this, "查询脚本", Assets.use("sql"));;
 
         // Menu Items
-        private MenuItem openMenuItem;
-        private MenuItem closeMenuItem;
+        private MenuItem openOrCloseMenuItem;
         private MenuItem newQueryMenuItem;
 
         private final DatabaseDetailPane detailPane = new DatabaseDetailPane(this);
@@ -207,18 +206,14 @@ public class ODBNDatabase extends ODBNode implements EventListener
         {
                 ContextMenu menu = new ContextMenu();
 
-                openMenuItem = new MenuItem("打开数据库");
-                openMenuItem.setOnAction(event -> openDatabase());
-
-                closeMenuItem = new MenuItem("关闭数据库");
-                closeMenuItem.setOnAction(event -> closeDatabase());
+                openOrCloseMenuItem = new MenuItem("打开数据库");
+                openOrCloseMenuItem.setOnAction(event -> openDatabase());
 
                 newQueryMenuItem = new MenuItem("新建查询");
                 newQueryMenuItem.setOnAction(event -> newQueryScript());
 
                 menu.getItems().addAll(
-                        openMenuItem,
-                        closeMenuItem,
+                        openOrCloseMenuItem,
                         new SeparatorMenuItem(),
                         newQueryMenuItem
                 );
@@ -230,11 +225,11 @@ public class ODBNDatabase extends ODBNode implements EventListener
         public void showContextMenu(Node node, double x, double y)
         {
                 if (openFlag) {
-                        openMenuItem.setDisable(true);
-                        closeMenuItem.setDisable(false);
+                        openOrCloseMenuItem.setText("关闭数据库");
+                        openOrCloseMenuItem.setOnAction(event -> closeDatabase());
                 } else {
-                        openMenuItem.setDisable(false);
-                        closeMenuItem.setDisable(true);
+                        openOrCloseMenuItem.setText("打开数据库");
+                        openOrCloseMenuItem.setOnAction(event -> openDatabase());
                 }
 
                 super.showContextMenu(node, x, y);
