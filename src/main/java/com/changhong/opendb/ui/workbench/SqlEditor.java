@@ -33,11 +33,13 @@ import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.changhong.opendb.utils.StringUtils.strfmt;
+
 /**
  * @author Luo Tiansheng
  * @since 2026/3/29
  */
-@SuppressWarnings("FieldCanBeLocal")
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class SqlEditor extends SplitPane
 {
         @Getter
@@ -52,11 +54,14 @@ public class SqlEditor extends SplitPane
         private String name;
         @Getter
         private File sqlFile;
+        private QueryInfo queryInfo;
         private JdbcTemplate jdbcTemplate = null;
         private long currentTaskId = System.currentTimeMillis();
         private boolean saveFlag = true;
         private ComboBox<ODBNConnection> connectionComboBox;
         private ComboBox<ODBNDatabase> databaseComboBox;
+
+        private static int numberCount = 0;
 
         private Button run;
         private Button stop;
@@ -69,19 +74,15 @@ public class SqlEditor extends SplitPane
                 Pattern.CASE_INSENSITIVE
         );
 
-        public SqlEditor(String name, Tab ownerTab)
-        {
-                this(name, null, ownerTab);
-        }
 
         public SqlEditor(QueryInfo queryInfo, Tab ownerTab)
         {
-                this(queryInfo.getName(), queryInfo.getSqlFile(), ownerTab);
-        }
+                this.queryInfo = queryInfo;
 
-        public SqlEditor(String name, File sqlFile, Tab ownerTab)
-        {
-                this.name = name;
+                this.name = queryInfo != null
+                        ? queryInfo.getName()
+                        : strfmt("查询脚本_%s.sql@[ N/A ]", (numberCount++));
+
                 this.ownerTab = ownerTab;
 
                 setOrientation(Orientation.VERTICAL);
@@ -115,10 +116,15 @@ public class SqlEditor extends SplitPane
                 });
         }
 
-        public void setupToolbar()
+        private static ODBNConnection getSelectionConnection(ODBNStatus instance, QueryInfo info)
+        {
+                return info != null ? info.getConnection() : instance.getSelectedConnection();
+        }
+
+        private void setupToolbar()
         {
                 ODBNStatus instance = ODBNStatus.getInstance();
-                ODBNConnection selectedConnection = instance.getSelectedConnection();
+                ODBNConnection selectedConnection = getSelectionConnection(instance, queryInfo);
 
                 run = VFX.newIconButton("运行已选择", "run0");
                 run.setText("运行");

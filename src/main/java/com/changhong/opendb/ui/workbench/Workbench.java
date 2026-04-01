@@ -131,13 +131,6 @@ public class Workbench extends VBox implements EventListener
                 tabPaneContextMenu.show(tabPane, e.getScreenX(), e.getScreenY());
         }
 
-        static int idx = 0;
-
-        private static String queryName(ConnectionInfo info)
-        {
-                return strfmt("查询脚本@%s_%d.sql", info == null ? "[ N/A ]" : info.getName(), (idx++));
-        }
-
         @Override
         public void onEvent(Event event)
         {
@@ -176,13 +169,12 @@ public class Workbench extends VBox implements EventListener
         {
                 Tab queryTab = new Tab();
                 queryTab.setGraphic(Assets.use("sql"));
-                ConnectionInfo info = event.connectionInfo;
                 SqlEditor sqlEditor;
 
                 if (event.queryInfo != null) {
                         sqlEditor = new SqlEditor(event.queryInfo, queryTab);
                 } else {
-                        sqlEditor = new SqlEditor(queryName(info), queryTab);
+                        sqlEditor = new SqlEditor(null, queryTab);
                 }
 
                 queryTab.setContent(sqlEditor);
