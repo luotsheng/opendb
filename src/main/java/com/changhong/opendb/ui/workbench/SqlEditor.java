@@ -23,7 +23,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.util.StringConverter;
 import lombok.Getter;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
+import net.sf.jsqlparser.statement.delete.Delete;
+import net.sf.jsqlparser.statement.insert.Insert;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.update.Update;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -43,6 +48,9 @@ import static com.changhong.opendb.utils.StringUtils.strfmt;
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class SqlEditor extends SplitPane
 {
+        static final int QUERY_RESULT_SET_FIRST = 0;
+        static final int QUERY_MESSAGE_LOG_FIRST = 1;
+
         @Getter
         private final Tab ownerTab;
         private final ToolBar toolBar;
@@ -50,6 +58,8 @@ public class SqlEditor extends SplitPane
         private final VirtualizedScrollPane<CodeArea> virtualizedScrollPane;
         private final BorderPane topBorderPane;
         private final ResultSetViewPane resultSetTableViewPane;
+        private final Tab sqlMessageTab;
+        private final SqlMessagePane sqlMessagePane;
 
         @Getter
         private String name;
@@ -94,6 +104,12 @@ public class SqlEditor extends SplitPane
                 codeArea = new CodeArea();
                 virtualizedScrollPane = new VirtualizedScrollPane<>(codeArea);
                 resultSetTableViewPane = new ResultSetViewPane();
+                sqlMessagePane = new SqlMessagePane();
+
+                // 绑定日志标签
+                sqlMessageTab = new Tab("日志");
+                sqlMessageTab.setContent(sqlMessagePane);
+                resultSetTableViewPane.addTab(sqlMessageTab);
 
                 topBorderPane.setTop(toolBar);
                 topBorderPane.setCenter(virtualizedScrollPane);
@@ -349,6 +365,17 @@ public class SqlEditor extends SplitPane
                 ownerTab.setGraphic(oldGraphic);
         }
 
+        private void showResultSetTableViewPane(int flag)
+        {
+                switch (flag) {
+                        case QUERY_RESULT_SET_FIRST -> resultSetTableViewPane.selectResultSetFirst();
+                        case QUERY_MESSAGE_LOG_FIRST -> resultSetTableViewPane.select(sqlMessageTab);
+                }
+
+                if (!getItems().contains(resultSetTableViewPane))
+                        getItems().add(resultSetTableViewPane);
+        }
+
         private void runTask()
         {
                 if (run.isDisable())
@@ -359,18 +386,12 @@ public class SqlEditor extends SplitPane
 
                 new Thread(() -> {
                         try {
-                                String sql = codeArea.getSelectedText();
+                                String scriptText = codeArea.getSelectedText();
 
-                                if (sql == null || sql.isEmpty())
-                                        sql = codeArea.getText();
+                                if (scriptText == null || scriptText.isEmpty())
+                                        scriptText = codeArea.getText();
 
-                                Statements statements = CCJSqlParserUtil.parseStatements(sql);
-
-                                int size = statements.size();
-                                String[] sqlArr = new String[size];
-
-                                for (int i = 0; i < size; i++)
-                                        sqlArr[i] = statements.get(i).toString() + ';';
+                                Statements statements = CCJSqlParserUtil.parseStatements(scriptText);
 
                                 ODBNConnection connection = connectionComboBox.getSelectionModel()
                                         .getSelectedItem();
@@ -381,16 +402,36 @@ public class SqlEditor extends SplitPane
                                 jdbcTemplate = connection.getJdbcTemplate();
 
                                 currentTaskId = System.currentTimeMillis();
-                                QueryResultSet qrs = jdbcTemplate.select(currentTaskId, database.getName(), sqlArr);
 
-                                Platform.runLater(() -> {
-                                        resultSetTableViewPane.refresh(qrs);
+                                QueryResultSet qrs = null;
 
-                                        if (!getItems().contains(resultSetTableViewPane))
-                                                getItems().add(resultSetTableViewPane);
-                                });
+                                for (Statement statement : statements) {
+                                        String db = database.getName();
+                                        String sql = statement.toString();
+
+                                        if (statement instanceof Select) {
+                                                qrs = jdbcTemplate.select(currentTaskId, db, new String[]{sql});
+                                                Platform.runLater(() -> sqlMessagePane.appendInfo(sql));
+                                        } else {
+                                                jdbcTemplate.execute(currentTaskId, db, new String[]{sql});
+                                                Platform.runLater(() -> sqlMessagePane.appendInfo(sql));
+                                        }
+                                }
+
+                                if (qrs != null) {
+                                        QueryResultSet copyQrs = qrs;
+                                        Platform.runLater(() -> {
+                                                resultSetTableViewPane.refresh(copyQrs);
+                                                showResultSetTableViewPane(QUERY_RESULT_SET_FIRST);
+                                        });
+                                } else {
+                                        Platform.runLater(() -> showResultSetTableViewPane(QUERY_MESSAGE_LOG_FIRST));
+                                }
                         } catch (Throwable e) {
-                                Catcher.ithrow(e);
+                                Platform.runLater(() -> {
+                                        sqlMessagePane.appendError(e.getMessage());
+                                        showResultSetTableViewPane(QUERY_MESSAGE_LOG_FIRST);
+                                });
                         } finally {
                                 Platform.runLater(() -> {
                                         updateButtonForExecuting(false);

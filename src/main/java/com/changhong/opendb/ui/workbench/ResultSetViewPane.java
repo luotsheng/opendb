@@ -10,10 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.PickResult;
 import javafx.scene.layout.BorderPane;
-import net.sf.jsqlparser.schema.Table;
-import org.apache.commons.math3.random.StableRandomGenerator;
 
 import java.util.List;
 
@@ -84,13 +81,28 @@ public class ResultSetViewPane extends BorderPane
                 return null;
         }
 
+        public void selectResultSetFirst()
+        {
+                select(resultSetTab);
+        }
+
+        public void select(Tab tab)
+        {
+                tabPane.getSelectionModel().select(tab);
+        }
+
+        public void addTab(Tab tab)
+        {
+                tabPane.getTabs().addLast(tab);
+        }
+
         public void refresh(QueryResultSet qrs)
         {
                 tableView.getColumns().clear();
                 tableView.getItems().clear();
 
                 if (!tabPane.getTabs().contains(resultSetTab))
-                        tabPane.getTabs().add(resultSetTab);
+                        tabPane.getTabs().addFirst(resultSetTab);
 
                 resultSetTab.setText(strfmt("查询结果集 (%d条)", qrs.getRows().size()));
 

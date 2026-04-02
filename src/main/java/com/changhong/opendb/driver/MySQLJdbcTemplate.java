@@ -89,6 +89,26 @@ public class MySQLJdbcTemplate extends JdbcTemplate
                 }
         }
 
+        @Override
+        @SuppressWarnings("resource")
+        public boolean execute(Long id, String db, String[] sql) throws SQLException
+        {
+                try (Connection connection = ds.getConnection();
+                     Statement statement = ds.use(connection, db)) {
+
+                        queue.put(id, statement);
+
+                        for (int i = 0; i < sql.length - 1; i++)
+                                statement.execute(sql[i]);
+
+                        boolean ret = statement.execute(sql[sql.length - 1]);
+                        queue.remove(id);
+
+                        return ret;
+                }
+        }
+
+        @SuppressWarnings("resource")
         public QueryResultSet select(Long id, String db, String[] sql)
                 throws SQLException
         {
