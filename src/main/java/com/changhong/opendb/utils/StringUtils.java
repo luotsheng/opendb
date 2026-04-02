@@ -6,6 +6,11 @@ package com.changhong.opendb.utils;
  */
 public class StringUtils
 {
+        public static boolean strempty(String value)
+        {
+                return value == null || value.isEmpty();
+        }
+
         public static String strfmt(String fmt, Object ...args)
         {
                 return String.format(fmt, args);

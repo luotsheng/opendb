@@ -1,9 +1,13 @@
 package com.changhong.opendb.ui.widgets;
 
+import com.changhong.opendb.app.Application;
 import com.changhong.opendb.ui.workbench.SqlKeyWordDefine;
 import com.changhong.opendb.utils.OS;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.Clipboard;
+import javafx.stage.WindowEvent;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
@@ -12,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.changhong.opendb.utils.StringUtils.strempty;
 
 /**
  * @author Luo Tiansheng
@@ -31,11 +37,21 @@ public class VCodeArea extends CodeArea
                 void apply(VCodeArea area);
         }
 
-        private final List<HighlightingListener> highlightings = new ArrayList<>();
+        public interface ShowingMenuListener {
+                void apply(WindowEvent event);
+        }
+
+        private final List<HighlightingListener> highlightingListeners = new ArrayList<>();
+        private final List<ShowingMenuListener> showingMenuListeners = new ArrayList<>();
 
         private final ContextMenu contextMenu = new ContextMenu();
 
         public VCodeArea()
+        {
+                this(new VCodeAreaConfig());
+        }
+
+        public VCodeArea(VCodeAreaConfig config)
         {
                 setStyle("-fx-font-weight: normal;");
 
@@ -58,23 +74,49 @@ public class VCodeArea extends CodeArea
                 /* 配置菜单 */
                 contextMenu.setStyle("-fx-font-size: 13px");
 
-                MenuItem copyTextItem = new MenuItem("复制");
-                copyTextItem.setOnAction(event -> copy());
+                if (config.enableCopy) {
+                        MenuItem copyTextItem = new MenuItem("复制");
+                        copyTextItem.setOnAction(event -> copy());
+                        contextMenu.getItems().add(copyTextItem);
+                }
 
-                MenuItem pasteTextItem = new MenuItem("粘贴");
-                pasteTextItem.setOnAction(event -> paste());
+                if (config.enablePaste) {
+                        MenuItem pasteTextItem = new MenuItem("粘贴");
+                        pasteTextItem.setOnAction(event -> paste());
+                        contextMenu.getItems().add(pasteTextItem);
+                }
 
-                contextMenu.getItems().addAll(
-                        copyTextItem,
-                        pasteTextItem
-                );
+                showingMenuListeners.add(event -> {
+                        contextMenu.getItems().forEach(menu -> {
+                                if (menu.getText().equals("复制")) {
+                                        menu.setDisable(strempty(getSelectedText()));
+                                } else if (menu.getText().equals("粘贴"))
+                                        menu.setDisable(!Clipboard.getSystemClipboard().hasString());
+                        });
+                });
+
+                contextMenu.setOnShowing(event -> showingMenuListeners.forEach(listener -> listener.apply(event)));
 
                 setContextMenu(contextMenu);
         }
 
+        public void addContextMenuGroup(MenuItem... items)
+        {
+                contextMenu.getItems().add(new SeparatorMenuItem());
+
+                for (MenuItem item : items) {
+                        contextMenu.getItems().add(item);
+                }
+        }
+
         public void addHighlightingListener(HighlightingListener listener)
         {
-                highlightings.add(listener);
+                highlightingListeners.add(listener);
+        }
+
+        public void addShowingMenuListener(ShowingMenuListener showingMenuListener)
+        {
+                showingMenuListeners.add(showingMenuListener);
         }
 
         public void applyHighlighting()
@@ -95,6 +137,6 @@ public class VCodeArea extends CodeArea
                         }
                 }
 
-                highlightings.forEach(listener -> listener.apply(this));
+                highlightingListeners.forEach(listener -> listener.apply(this));
         }
 }

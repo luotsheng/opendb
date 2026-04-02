@@ -1,6 +1,7 @@
 package com.changhong.opendb.ui.workbench;
 
 import com.changhong.opendb.ui.widgets.VCodeArea;
+import com.changhong.opendb.ui.widgets.VCodeAreaConfig;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 
 import java.util.regex.Matcher;
@@ -22,7 +23,7 @@ public class SqlMessagePane extends VirtualizedScrollPane<VCodeArea>
 
         public SqlMessagePane()
         {
-                super(new VCodeArea());
+                super(new VCodeArea(new VCodeAreaConfig(true, false)));
                 codeArea = getContent();
                 codeArea.setEditable(false);
                 codeArea.addHighlightingListener(SqlMessagePane::applyHighlighting);
