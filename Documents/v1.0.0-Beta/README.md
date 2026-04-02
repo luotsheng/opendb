@@ -20,7 +20,10 @@
 - 修复打开 SQL 脚本时连接和数据库选择错误问题。
 - 修复 `关闭其他标签` 时会调用当前聚焦标签关闭事件问题。
 - 修复刷新预览表格出现幽灵行问题。
+- 修复`执行器日志`标签关闭不可打开问题。
 
 ## 🔨 构建工具
 
-- 新增 `slf4j` 和 `logback` 依赖。
+- 新增 `org.slf4j:slf4j-api:2.0.16` 依赖
+- 新增 `ch.qos.logback:logback-classic:1.5.32` 依赖
+- 新增 `com.github.vertical-blank:sql-formatter:2.0.5` 依赖
