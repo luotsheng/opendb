@@ -15,6 +15,7 @@ import com.changhong.opendb.utils.Catcher;
 import com.changhong.opendb.utils.OS;
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -54,6 +55,7 @@ public class SqlEditor extends SplitPane
         private String name;
         @Getter
         private File sqlFile;
+        private Node oldGraphic;
         private QueryInfo queryInfo;
         private JdbcTemplate jdbcTemplate = null;
         private long currentTaskId = System.currentTimeMillis();
@@ -336,12 +338,24 @@ public class SqlEditor extends SplitPane
                 stop.setDisable(!value);
         }
 
+        private void setLoadingIndicator()
+        {
+                oldGraphic = ownerTab.getGraphic();
+                ownerTab.setGraphic(Assets.newProgressIndicator());
+        }
+
+        private void removeLoadingIndicator()
+        {
+                ownerTab.setGraphic(oldGraphic);
+        }
+
         private void runTask()
         {
                 if (run.isDisable())
                         return;
 
                 updateButtonForExecuting(true);
+                setLoadingIndicator();
 
                 new Thread(() -> {
                         try {
@@ -378,7 +392,10 @@ public class SqlEditor extends SplitPane
                         } catch (Throwable e) {
                                 Catcher.ithrow(e);
                         } finally {
-                                Platform.runLater(() -> updateButtonForExecuting(false));
+                                Platform.runLater(() -> {
+                                        updateButtonForExecuting(false);
+                                        removeLoadingIndicator();
+                                });
                         }
                 }).start();
         }
