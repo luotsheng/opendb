@@ -9,6 +9,7 @@ import com.changhong.opendb.ui.navigator.node.ODBNConnection;
 import com.changhong.opendb.ui.navigator.node.ODBNDatabase;
 import com.changhong.opendb.ui.widgets.*;
 import com.changhong.opendb.utils.Catcher;
+import com.changhong.opendb.utils.StringUtils;
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -349,6 +350,7 @@ public class SqlEditor extends SplitPane
                 setLoadingIndicator();
 
                 new Thread(() -> {
+                        StringBuilder currentSqlBuilder = new StringBuilder();
                         try {
                                 String scriptText = codeArea.getSelectedText();
 
@@ -372,6 +374,9 @@ public class SqlEditor extends SplitPane
                                 for (Statement statement : statements) {
                                         String db = database.getName();
                                         String sql = statement.toString();
+
+                                        currentSqlBuilder.delete(0, currentSqlBuilder.length());
+                                        currentSqlBuilder.append(sql);
 
                                         if (statement instanceof Select || statement instanceof ExplainStatement) {
                                                 qrs = jdbcTemplate.select(currentTaskId, db, new String[]{sql});
@@ -399,6 +404,7 @@ public class SqlEditor extends SplitPane
                                 }
                         } catch (Throwable e) {
                                 Platform.runLater(() -> {
+                                        sqlMessagePane.appendError(currentSqlBuilder.toString());
                                         sqlMessagePane.appendError(e.getMessage());
                                         showResultSetTableViewPane(QUERY_MESSAGE_LOG_FIRST);
                                         Catcher.ithrow(e);
