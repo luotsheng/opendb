@@ -94,7 +94,8 @@ public class ResultSetViewPane extends BorderPane
 
         public void addTab(Tab tab)
         {
-                tabPane.getTabs().addLast(tab);
+                if (!tabPane.getTabs().contains(tab))
+                        tabPane.getTabs().addLast(tab);
         }
 
         public void refresh(QueryResultSet qrs)

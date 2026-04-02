@@ -9,6 +9,7 @@ import com.changhong.opendb.utils.Catcher;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.changhong.opendb.utils.StringUtils.strfmt;
@@ -67,6 +68,8 @@ public class QueryScriptRepository
 
                 for (File file : files)
                         queryInfos.add(new QueryInfo(connection, database, file));
+
+                queryInfos.sort(Comparator.comparing(QueryInfo::getName));
 
                 return queryInfos;
         }

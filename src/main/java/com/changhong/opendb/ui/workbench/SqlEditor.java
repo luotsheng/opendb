@@ -9,7 +9,6 @@ import com.changhong.opendb.ui.navigator.node.ODBNConnection;
 import com.changhong.opendb.ui.navigator.node.ODBNDatabase;
 import com.changhong.opendb.ui.widgets.*;
 import com.changhong.opendb.utils.Catcher;
-import com.changhong.opendb.utils.StringUtils;
 import com.github.vertical_blank.sqlformatter.SqlFormatter;
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
@@ -24,7 +23,6 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.ExplainStatement;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
@@ -91,11 +89,11 @@ public class SqlEditor extends SplitPane
                 virtualizedScrollPane = new VirtualizedScrollPane<>(codeArea);
                 resultSetTableViewPane = new ResultSetViewPane();
                 sqlMessagePane = new SqlMessagePane();
+                virtualizedScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 
                 // 绑定日志标签
                 sqlMessageTab = new Tab("日志");
                 sqlMessageTab.setContent(sqlMessagePane);
-                resultSetTableViewPane.addTab(sqlMessageTab);
 
                 topBorderPane.setTop(toolBar);
                 topBorderPane.setCenter(virtualizedScrollPane);
@@ -340,6 +338,8 @@ public class SqlEditor extends SplitPane
 
         private void showResultSetTableViewPane(int flag)
         {
+                resultSetTableViewPane.addTab(sqlMessageTab);
+
                 switch (flag) {
                         case QUERY_RESULT_SET_FIRST -> resultSetTableViewPane.selectResultSetFirst();
                         case QUERY_MESSAGE_LOG_FIRST -> resultSetTableViewPane.select(sqlMessageTab);
