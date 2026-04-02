@@ -1,7 +1,10 @@
 package com.changhong.opendb.driver;
 
+import com.changhong.opendb.core.exception.CatcherException;
 import com.changhong.opendb.utils.Catcher;
 import lombok.Getter;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.*;
 import net.sf.jsqlparser.statement.alter.Alter;
 import net.sf.jsqlparser.statement.create.index.CreateIndex;
@@ -30,15 +33,34 @@ import java.util.Set;
 public class SQLParsedStatement
 {
         @Getter
-        private final String script;
+        private String script;
         @Getter
-        private final SQLCommandType type;
+        private SQLCommandType type;
         @Getter
-        private final boolean last;
+        private boolean last;
 
         private final Set<String> tables = new HashSet<>();
 
+        public SQLParsedStatement(String text)
+        {
+                try {
+                        Statements statements = CCJSqlParserUtil.parseStatements(text);
+
+                        if (statements.size() > 1)
+                                throw new CatcherException("jsqlparser: parse statements size > 1");
+
+                        initialize(statements.getFirst(), true);
+                } catch (Exception e) {
+                        Catcher.ithrow(e);
+                }
+        }
+
         public SQLParsedStatement(Statement statement, boolean last)
+        {
+                initialize(statement, last);
+        }
+
+        private void initialize(Statement statement, boolean last)
         {
                 this.script = statement.toString();
                 this.type = toType(statement);

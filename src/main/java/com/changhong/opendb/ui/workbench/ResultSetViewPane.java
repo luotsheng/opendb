@@ -1,6 +1,7 @@
 package com.changhong.opendb.ui.workbench;
 
 import com.changhong.opendb.app.Application;
+import com.changhong.opendb.driver.ColumnMetaData;
 import com.changhong.opendb.driver.QueryResultSet;
 import com.changhong.opendb.ui.widgets.VFX;
 import javafx.beans.property.SimpleStringProperty;
@@ -192,12 +193,26 @@ public class ResultSetViewPane extends BorderPane
                 for (int i = 0; i < qrs.getColumns().size(); i++) {
                         int index = i;
 
-                        String colText = qrs.getColumns().get(i).getLabel();
+                        ColumnMetaData columnMetaData = qrs.getColumns().get(i);
+                        StringBuilder labelBuilder = new StringBuilder(columnMetaData.getLabel());
+
+                        if (qrs.isEditable()) {
+                                labelBuilder.append("\n# ")
+                                        .append(columnMetaData.getType())
+                                        .append('(')
+                                        .append(columnMetaData.getLength())
+                                        .append(')');
+
+                                if (columnMetaData.isPrimary())
+                                        labelBuilder.append(" ").append("PK");
+                        }
+
+                        String label = labelBuilder.toString();
 
                         TableColumn<List<String>, String> col =
-                                new TableColumn<>(colText);
+                                new TableColumn<>(label);
 
-                        col.setPrefWidth(calcColWidth(colText, qrs.getRows(), i));
+                        col.setPrefWidth(calcColWidth(label, qrs.getRows(), i));
                         col.setMaxWidth(1000);
                         col.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().get(index)));
                         col.setCellFactory(TextFieldTableCell.forTableColumn());

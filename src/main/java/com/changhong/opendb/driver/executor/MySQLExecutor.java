@@ -6,6 +6,7 @@ import com.changhong.opendb.driver.*;
 import com.changhong.opendb.driver.datasource.VirtualDataSource;
 import com.changhong.opendb.utils.Catcher;
 import com.changhong.opendb.utils.ResultSetUtils;
+import net.sf.jsqlparser.JSQLParserException;
 
 import java.sql.*;
 import java.util.*;
@@ -91,7 +92,7 @@ public class MySQLExecutor extends SQLExecutor
 
                 Map<String, ColumnMetaData> colMetas = new LinkedHashMap<>();
 
-                for (int i = 1; i < rsMeta.getColumnCount(); i++) {
+                for (int i = 1; i <= rsMeta.getColumnCount(); i++) {
 
                         ColumnMetaData c = new ColumnMetaData();
 
@@ -256,7 +257,7 @@ public class MySQLExecutor extends SQLExecutor
 
                 try (Connection connection = ds.getConnection();
                      Statement statement = ds.use(connection, db)) {
-                        qrs = executeQuery(connection, statement, db, sql, null);
+                        qrs = executeQuery(connection, statement, db, sql, new SQLParsedStatement(sql));
                 }
 
                 return qrs;
