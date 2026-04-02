@@ -1,10 +1,12 @@
 package com.changhong.opendb.ui.workbench;
 
+import com.changhong.opendb.app.Application;
 import com.changhong.opendb.driver.QueryResultSet;
 import com.changhong.opendb.ui.widgets.VFX;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -17,6 +19,7 @@ import javafx.scene.layout.BorderPane;
 
 import java.util.List;
 
+import static com.changhong.opendb.utils.StringUtils.strempty;
 import static com.changhong.opendb.utils.StringUtils.strfmt;
 
 /**
@@ -70,15 +73,44 @@ public class ResultSetViewPane extends BorderPane
                 });
         }
 
-        @SuppressWarnings("rawtypes")
+        @SuppressWarnings({"rawtypes", "unchecked"})
         private void copyTableViewSelectedCell()
         {
                 ObservableList<TablePosition> cells =
                         tableView.getSelectionModel().getSelectedCells();
 
-                for (TablePosition cell : cells) {
-                        System.out.println();
+                if (cells == null || cells.isEmpty())
+                        return;
+
+                int start = cells.getFirst().getRow();
+                int rows = start + Math.toIntExact(cells.stream().map(TablePosition::getRow).distinct().count());
+
+                FilteredList<TablePosition> filtered = new FilteredList<>(cells, predicate -> true);
+
+                StringBuilder builder = new StringBuilder();
+
+                for (int i = start; i < rows; i++) {
+                        int ROW = i;
+                        filtered.setPredicate(cell -> cell.getRow() == ROW);
+
+                        filtered.forEach(cell -> {
+                                List<String> tableRow = (List<String>) cell.getTableView()
+                                        .getItems().get(ROW);
+                                String text = tableRow.get(cell.getColumn());
+
+                                if (!strempty(text))
+                                        builder.append(text);
+
+                                builder.append("\t");
+                        });
+
+                        builder.deleteCharAt(builder.length() - 1);
+                        builder.append("\n");
                 }
+
+                builder.deleteCharAt(builder.length() - 1);
+
+                Application.copyToClipboard(builder.toString());
         }
 
         @SuppressWarnings({"rawtypes", "unchecked"})
