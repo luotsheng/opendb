@@ -19,7 +19,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.util.converter.DefaultStringConverter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.changhong.opendb.utils.StringUtils.strempty;
@@ -44,6 +46,7 @@ public class ResultSetViewPane extends BorderPane
         private final Button cross = VFX.newIconButton("取消更改", "cross");
         private final Button reload = VFX.newIconButton("刷新", "reload");
 
+        private QueryResultSet qrs;
         private TablePosition<?, ?> start;
 
         public ResultSetViewPane()
@@ -58,7 +61,8 @@ public class ResultSetViewPane extends BorderPane
                 resultSetTab.setContent(vContainer);
 
                 setCenter(tabPane);
-                setEnableToolBar(false, false);
+
+                setupToolAction();
         }
 
         private void setEnableToolBar(boolean addable, boolean editable)
@@ -91,6 +95,15 @@ public class ResultSetViewPane extends BorderPane
                 check.setDisable(true);
                 cross.setDisable(true);
                 reload.setDisable(true);
+        }
+
+        private void setupToolAction()
+        {
+                plus.setOnAction(event -> {
+                        qrs.addEmptyRow();
+                        tableView.getItems().setAll(qrs.getRows());
+                        tableView.refresh();
+                });
         }
 
         @SuppressWarnings({"unchecked", "rawtypes"})
@@ -203,6 +216,8 @@ public class ResultSetViewPane extends BorderPane
 
         public void refresh(QueryResultSet qrs)
         {
+                this.qrs = qrs;
+
                 tableView.getColumns().clear();
                 tableView.getItems().clear();
 
@@ -235,10 +250,58 @@ public class ResultSetViewPane extends BorderPane
                         TableColumn<List<String>, String> col =
                                 new TableColumn<>(label);
 
+                        col.setEditable(true);
                         col.setPrefWidth(calcColWidth(label, qrs.getRows(), i));
                         col.setMaxWidth(1000);
                         col.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().get(index)));
-                        col.setCellFactory(TextFieldTableCell.forTableColumn());
+
+                        col.setCellFactory(c -> new TextFieldTableCell<>(new MyStringConverter()) {
+
+                                @Override
+                                @SuppressWarnings("CssDeprecatedValue")
+                                public void updateItem(String item, boolean empty)
+                                {
+                                        super.updateItem(item, empty);
+
+                                        if (empty) {
+                                                setText(null);
+                                                setStyle("");
+                                                return;
+                                        }
+
+                                        if (item == null) {
+                                                setText("(NULL)");
+                                                setStyle("-fx-text-fill: gray;");
+                                                return;
+                                        }
+
+                                        if (item.isEmpty()) {
+                                                setText("(EMPY)");
+                                                setStyle("-fx-text-fill: gray;");
+                                                return;
+                                        }
+
+                                        setText(item);
+                                }
+
+                                @Override
+                                public void startEdit()
+                                {
+                                        super.startEdit();
+                                }
+
+                                @Override
+                                public void cancelEdit()
+                                {
+                                        super.cancelEdit();
+                                }
+
+                                @Override
+                                public void commitEdit(String newValue)
+                                {
+                                        super.commitEdit(newValue);
+                                }
+                        });
 
                         tableView.getColumns().add(col);
                 }

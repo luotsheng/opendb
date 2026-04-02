@@ -23,4 +23,12 @@ public class QueryResultSet
                 this.columns = columns;
                 this.rows = rows;
         }
+
+        public void addEmptyRow()
+        {
+                List<String> emptyRow = new ArrayList<>();
+                for (ColumnMetaData ignored : columns)
+                        emptyRow.add(null);
+                rows.addLast(emptyRow);
+        }
 }
