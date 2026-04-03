@@ -2,7 +2,8 @@ package com.changhong.opendb.ui.workbench;
 
 import com.changhong.opendb.app.Application;
 import com.changhong.opendb.driver.ColumnMetaData;
-import com.changhong.opendb.driver.QueryResultSet;
+import com.changhong.opendb.driver.Row;
+import com.changhong.opendb.driver.ShittyMutableDataGrid;
 import com.changhong.opendb.ui.widgets.VFX;
 import javafx.animation.FadeTransition;
 import javafx.beans.property.SimpleStringProperty;
@@ -36,7 +37,7 @@ public class ResultSetViewPane extends BorderPane
 {
         private final TabPane tabPane = new TabPane();
         private final Tab resultSetTab = new Tab();
-        private final TableView<List<String>> tableView = VFX.newTableView();
+        private final TableView<Row> tableView = VFX.newTableView();
         private final ToolBar toolBar = new ToolBar();
         private final VBox vContainer;
 
@@ -46,7 +47,7 @@ public class ResultSetViewPane extends BorderPane
         private final Button cross = VFX.newIconButton("取消更改", "cross");
         private final Button reload = VFX.newIconButton("刷新", "reload");
 
-        private QueryResultSet qrs;
+        private ShittyMutableDataGrid grid;
         private TablePosition<?, ?> start;
 
         public ResultSetViewPane()
@@ -97,8 +98,8 @@ public class ResultSetViewPane extends BorderPane
         private void setupToolAction()
         {
                 plus.setOnAction(event -> {
-                        qrs.addEmptyRow();
-                        tableView.getItems().setAll(qrs.getRows());
+                        grid.addEmptyRow();
+                        tableView.getItems().setAll(grid.getRows());
                         tableView.refresh();
                 });
 
@@ -107,9 +108,9 @@ public class ResultSetViewPane extends BorderPane
 
         private void reloadAndBlinkTable()
         {
-                qrs.refresh();
+                grid.refresh();
 
-                refresh(qrs);
+                refresh(grid);
 
                 FadeTransition ft = new FadeTransition(Duration.millis(200), tableView);
                 ft.setFromValue(0.5);
@@ -230,9 +231,9 @@ public class ResultSetViewPane extends BorderPane
                         tabPane.getTabs().addLast(tab);
         }
 
-        public void refresh(QueryResultSet qrs)
+        public void refresh(ShittyMutableDataGrid grid)
         {
-                this.qrs = qrs;
+                this.grid = grid;
 
                 tableView.getColumns().clear();
                 tableView.getItems().clear();
@@ -240,17 +241,17 @@ public class ResultSetViewPane extends BorderPane
                 if (!tabPane.getTabs().contains(resultSetTab))
                         tabPane.getTabs().addFirst(resultSetTab);
 
-                setEnableToolBar(qrs.isAddable(), qrs.isEditable());
+                setEnableToolBar(grid.isAddable(), grid.isEditable());
 
-                resultSetTab.setText(strfmt("查询结果集 (%d条)", qrs.getRows().size()));
+                resultSetTab.setText(strfmt("查询结果集 (%d条)", grid.getRows().size()));
 
-                for (int i = 0; i < qrs.getColumns().size(); i++) {
+                for (int i = 0; i < grid.getColumns().size(); i++) {
                         int index = i;
 
-                        ColumnMetaData columnMetaData = qrs.getColumns().get(i);
+                        ColumnMetaData columnMetaData = grid.getColumns().get(i);
                         StringBuilder labelBuilder = new StringBuilder(columnMetaData.getLabel());
 
-                        if (qrs.isEditable()) {
+                        if (grid.isEditable()) {
                                 labelBuilder.append("\n# ")
                                         .append(columnMetaData.getType())
                                         .append('(')
@@ -263,11 +264,11 @@ public class ResultSetViewPane extends BorderPane
 
                         String label = labelBuilder.toString();
 
-                        TableColumn<List<String>, String> col =
+                        TableColumn<Row, String> col =
                                 new TableColumn<>(label);
 
                         col.setEditable(true);
-                        col.setPrefWidth(calcColWidth(label, qrs.getRows(), i));
+                        col.setPrefWidth(calcColWidth(label, grid.getRows(), i));
                         col.setMaxWidth(1000);
                         col.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().get(index)));
 
@@ -323,7 +324,7 @@ public class ResultSetViewPane extends BorderPane
                 }
 
                 tableView.setItems(
-                        FXCollections.observableArrayList(qrs.getRows())
+                        FXCollections.observableArrayList(grid.getRows())
                 );
         }
 
@@ -332,7 +333,7 @@ public class ResultSetViewPane extends BorderPane
                 resultSetTab.setOnCloseRequest(value);
         }
 
-        private static int calcColWidth(String colText, List<List<String>> values, int index)
+        private static int calcColWidth(String colText, List<Row> values, int index)
         {
                 int V = 12, MAX = 200;
                 int SCALE = 1;

@@ -1,7 +1,8 @@
 package com.changhong.opendb.utils;
 
 import com.changhong.opendb.driver.ColumnMetaData;
-import com.changhong.opendb.driver.QueryResultSet;
+import com.changhong.opendb.driver.Row;
+import com.changhong.opendb.driver.ShittyMutableDataGrid;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -22,7 +23,7 @@ import java.util.Map;
  * @author Luo Tiansheng
  * @since 2026/3/30
  */
-public class ResultSetUtils
+public class ResultSets
 {
         private static final String TIME_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
@@ -31,7 +32,7 @@ public class ResultSetUtils
         /**
          * 结果集转 Java 集合
          */
-        public static <T> List<T> rs2jlist(ResultSet rs, Class<T> aClass)
+        public static <T> List<T> toJavaList(ResultSet rs, Class<T> aClass)
         {
                 try {
                         List<Map<String, Object>> rows = new ArrayList<>();
@@ -70,17 +71,17 @@ public class ResultSetUtils
         /**
          * 结果集转 QueryResultSet 对象
          */
-        public static void rs2qrs(List<ColumnMetaData> columns,
-                                            ResultSet rs, QueryResultSet dst)
+        public static void toMutableDataGird(List<ColumnMetaData> columns,
+                                            ResultSet rs, ShittyMutableDataGrid dst)
                 throws SQLException
         {
                 SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT_PATTERN);
 
-                List<List<String>> rows = new ArrayList<>();
+                List<Row> rows = new ArrayList<>();
 
                 while (rs.next()) {
 
-                        List<String> row = new ArrayList<>();
+                        Row row = new Row();
 
                         for (int i = 1; i <= columns.size(); i++)
                                 row.add(stringify(rs.getObject(i), sdf));

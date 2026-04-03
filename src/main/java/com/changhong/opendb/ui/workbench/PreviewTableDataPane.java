@@ -1,7 +1,7 @@
 package com.changhong.opendb.ui.workbench;
 
 import com.changhong.opendb.driver.executor.SQLExecutor;
-import com.changhong.opendb.driver.QueryResultSet;
+import com.changhong.opendb.driver.ShittyMutableDataGrid;
 import com.changhong.opendb.driver.TableMetadata;
 import com.changhong.opendb.resource.Assets;
 import com.changhong.opendb.utils.Catcher;
@@ -58,7 +58,7 @@ public class PreviewTableDataPane extends BorderPane
 
                 new Thread(() -> {
                         try {
-                                QueryResultSet rs = sqlExecutor.select(
+                                ShittyMutableDataGrid rs = sqlExecutor.select(
                                         database,
                                         tableInfo,
                                         start,

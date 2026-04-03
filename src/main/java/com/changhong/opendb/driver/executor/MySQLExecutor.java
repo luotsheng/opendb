@@ -5,8 +5,7 @@ import com.changhong.opendb.core.exception.CatcherException;
 import com.changhong.opendb.driver.*;
 import com.changhong.opendb.driver.datasource.VirtualDataSource;
 import com.changhong.opendb.utils.Catcher;
-import com.changhong.opendb.utils.ResultSetUtils;
-import net.sf.jsqlparser.JSQLParserException;
+import com.changhong.opendb.utils.ResultSets;
 
 import java.sql.*;
 import java.util.*;
@@ -71,7 +70,7 @@ public class MySQLExecutor extends SQLExecutor
                 try (Connection connection = ds.getConnection();
                      Statement statement = ds.use(connection, db)) {
                         ResultSet rs = statement.executeQuery(sql);
-                        return ResultSetUtils.rs2jlist(rs, TableMetadata.class);
+                        return ResultSets.toJavaList(rs, TableMetadata.class);
                 } catch (SQLException e) {
                         EventBus.publish(e);
                 }
@@ -79,10 +78,10 @@ public class MySQLExecutor extends SQLExecutor
                 return List.of();
         }
 
-        private QueryResultSet builtInExecuteQuery(Connection connection,
-                                            Statement statement,
-                                            SQL sql,
-                                            SQLParsedStatement pm) throws SQLException
+        private ShittyMutableDataGrid builtInExecuteQuery(Connection connection,
+                                                          Statement statement,
+                                                          SQL sql,
+                                                          SQLParsedStatement pm) throws SQLException
         {
                 ResultSet rs = statement.executeQuery(pm.getScript());
 
@@ -184,11 +183,11 @@ public class MySQLExecutor extends SQLExecutor
 
                 }
 
-                QueryResultSet qrs = new QueryResultSet(sql, this);
-                ResultSetUtils.rs2qrs(List.copyOf(colMetas.values()), rs, qrs);
-                qrs.setEditable(editable);
+                ShittyMutableDataGrid grid = new ShittyMutableDataGrid(sql, this);
+                ResultSets.toMutableDataGird(List.copyOf(colMetas.values()), rs, grid);
+                grid.setEditable(editable);
 
-                return qrs;
+                return grid;
         }
 
         @Override
@@ -202,7 +201,7 @@ public class MySQLExecutor extends SQLExecutor
 
         @Override
         @SuppressWarnings("resource")
-        public QueryResultSet execute(SQL sql, ExecuteCallback callback)
+        public ShittyMutableDataGrid execute(SQL sql, ExecuteCallback callback)
         {
                 SQLParsedStatement current = null;
 
@@ -219,7 +218,7 @@ public class MySQLExecutor extends SQLExecutor
                                 /* DQL 并且必须是最后一个 SQL 语句才执行查询 */
                                 if (stat.getType() == SQLCommandType.DQL && stat.isLast()) {
 
-                                        QueryResultSet qrs = builtInExecuteQuery(
+                                        ShittyMutableDataGrid grid = builtInExecuteQuery(
                                                 connection,
                                                 statement,
                                                 sql,
@@ -228,7 +227,7 @@ public class MySQLExecutor extends SQLExecutor
 
                                         callback.doCallback(stat.getScript(), SQLExecutorStatus.OK);
 
-                                        return qrs;
+                                        return grid;
 
                                 }
 
@@ -254,10 +253,10 @@ public class MySQLExecutor extends SQLExecutor
                 return null;
         }
 
-        public QueryResultSet select(String db, TableMetadata tbMeta, int start, int size)
+        public ShittyMutableDataGrid select(String db, TableMetadata tbMeta, int start, int size)
                 throws SQLException
         {
-                QueryResultSet qrs;
+                ShittyMutableDataGrid grid;
 
                 String text = strfmt("SELECT * FROM %s LIMIT %d OFFSET %d;", tbMeta.getName(), size, start);
 
@@ -265,13 +264,13 @@ public class MySQLExecutor extends SQLExecutor
 
                 try (Connection connection = ds.getConnection();
                      Statement statement = ds.use(connection, db)) {
-                        qrs = builtInExecuteQuery(connection, statement, sql, sql.iterator().next());
+                        grid = builtInExecuteQuery(connection, statement, sql, sql.iterator().next());
                 }
 
-                qrs.setEditable(true);
-                qrs.setAddable(true);
+                grid.setEditable(true);
+                grid.setAddable(true);
 
-                return qrs;
+                return grid;
         }
 
         @Override
