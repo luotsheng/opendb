@@ -1,6 +1,6 @@
 package com.changhong.opendb.driver.executor;
 
-import com.changhong.opendb.driver.ShittyMutableDataGrid;
+import com.changhong.opendb.driver.MutableDataGrid;
 import com.changhong.opendb.driver.SQL;
 import com.changhong.opendb.driver.TableMetadata;
 import com.changhong.opendb.driver.datasource.VirtualDataSource;
@@ -66,13 +66,13 @@ public abstract class SQLExecutor
 
         public abstract void drop(String db, String name) throws SQLException;
 
-        public ShittyMutableDataGrid execute(SQL sql) {
+        public MutableDataGrid execute(SQL sql) {
               return execute(sql, new DefaultExecutorCallback());
         }
 
-        public abstract ShittyMutableDataGrid execute(SQL sql, ExecuteCallback callback);
+        public abstract MutableDataGrid execute(SQL sql, ExecuteCallback callback);
 
-        public abstract ShittyMutableDataGrid select(String db, TableMetadata table, int start, int size)
+        public abstract MutableDataGrid select(String db, TableMetadata table, int start, int size)
                 throws SQLException;
 
         public abstract void cancel(Long id);

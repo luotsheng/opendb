@@ -23,7 +23,7 @@ import static com.changhong.opendb.utils.StringUtils.strfmt;
         "SqlSourceToSinkFlow",
         "SqlDialectInspection",
         "SqlNoDataSourceInspection"
-})
+        , "RedundantSuppression"})
 public class MySQLExecutor extends SQLExecutor
 {
         private static final Logger LOG = LoggerFactory.getLogger(MySQLExecutor.class);
@@ -83,10 +83,10 @@ public class MySQLExecutor extends SQLExecutor
                 return List.of();
         }
 
-        private ShittyMutableDataGrid builtInExecuteQuery(Connection connection,
-                                                          Statement statement,
-                                                          SQL sql,
-                                                          SQLParsedStatement ps) throws SQLException
+        private MutableDataGrid builtInExecuteQuery(Connection connection,
+                                                    Statement statement,
+                                                    SQL sql,
+                                                    SQLParsedStatement ps) throws SQLException
         {
                 ResultSet rs = statement.executeQuery(ps.getScript());
 
@@ -188,7 +188,7 @@ public class MySQLExecutor extends SQLExecutor
 
                 }
 
-                ShittyMutableDataGrid grid = new ShittyMutableDataGrid(sql, this);
+                MutableDataGrid grid = new MutableDataGrid(sql, this);
                 ResultSets.toMutableDataGird(List.copyOf(colMetas.values()), rs, grid);
                 grid.setEditable(editable);
 
@@ -206,7 +206,7 @@ public class MySQLExecutor extends SQLExecutor
 
         @Override
         @SuppressWarnings("resource")
-        public ShittyMutableDataGrid execute(SQL sql, ExecuteCallback callback)
+        public MutableDataGrid execute(SQL sql, ExecuteCallback callback)
         {
                 SQLParsedStatement current = null;
 
@@ -225,7 +225,7 @@ public class MySQLExecutor extends SQLExecutor
                                 /* DQL 并且必须是最后一个 SQL 语句才执行查询 */
                                 if (ps.getType() == SQLCommandType.DQL && ps.isLast()) {
 
-                                        ShittyMutableDataGrid grid = builtInExecuteQuery(
+                                        MutableDataGrid grid = builtInExecuteQuery(
                                                 connection,
                                                 statement,
                                                 sql,
@@ -238,8 +238,11 @@ public class MySQLExecutor extends SQLExecutor
 
                                 }
                                 
-                                if (ps.getType() == SQLCommandType.DML)
+                                if (ps.getType() == SQLCommandType.DML) {
                                         statement.executeUpdate(ps.getScript());
+                                        callback.doCallback(ps.getScript(), SQLExecutorStatus.OK);
+                                        continue;
+                                }
 
                                 if (ps.getType() == SQLCommandType.DQL)
                                         skip = true;
@@ -272,10 +275,10 @@ public class MySQLExecutor extends SQLExecutor
                 return null;
         }
 
-        public ShittyMutableDataGrid select(String db, TableMetadata tbMeta, int start, int size)
+        public MutableDataGrid select(String db, TableMetadata tbMeta, int start, int size)
                 throws SQLException
         {
-                ShittyMutableDataGrid grid;
+                MutableDataGrid grid;
 
                 String text = strfmt("SELECT * FROM %s LIMIT %d OFFSET %d;", tbMeta.getName(), size, start);
 

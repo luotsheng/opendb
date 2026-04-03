@@ -1,29 +1,31 @@
 package com.changhong.opendb.driver;
 
 import com.changhong.opendb.driver.executor.SQLExecutor;
+import com.changhong.opendb.ui.widgets.ConfirmDialog;
 import lombok.Getter;
 import lombok.Setter;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.update.Update;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Luo Tiansheng
  * @since 2026/3/30
  */
-public class ShittyMutableDataGrid
+public class MutableDataGrid
 {
-        @Setter
         @Getter
         private List<ColumnMetaData> columns;
+
+        private List<ColumnMetaData> pks;
 
         @Setter
         @Getter
@@ -50,17 +52,26 @@ public class ShittyMutableDataGrid
         @Setter
         private UpdateListener updateListener;
 
-        public ShittyMutableDataGrid(SQL origin, SQLExecutor executor)
+        public MutableDataGrid(SQL origin, SQLExecutor executor)
         {
                 this.origin = origin;
                 this.executor = executor;
+        }
+
+        public void setColumns(List<ColumnMetaData> columns)
+        {
+                this.columns = columns;
+
+                pks = columns.stream()
+                        .filter(ColumnMetaData::isPrimary)
+                        .toList();
         }
 
         public void reload()
         {
                 if (executor != null && origin != null) {
 
-                        ShittyMutableDataGrid grid = executor.execute(origin);
+                        MutableDataGrid grid = executor.execute(origin);
 
                         columns = grid.columns;
                         rows = grid.rows;
@@ -73,6 +84,20 @@ public class ShittyMutableDataGrid
         public void addEmptyRow()
         {
                 rows.addLast(new Row(columns.size()));
+        }
+
+        public boolean remove(List<Integer> indices)
+        {
+                if (indices == null || indices.isEmpty())
+                        return false;
+
+                if (ConfirmDialog.showCheckDialog("选中%s条数据，是否删除？", indices.size())) {
+                        SQL sql = toDeleteSQL(indices);
+                        executor.execute(sql);
+                        return true;
+                }
+
+                return false;
         }
 
         public void addUpdateRow(int colIndex, int rowIndex, String newValue)
@@ -97,7 +122,7 @@ public class ShittyMutableDataGrid
 
         }
 
-        public boolean isUpdate()
+        public boolean isUpdatable()
         {
                 return !updateRowBuffer.isEmpty();
         }
@@ -110,9 +135,9 @@ public class ShittyMutableDataGrid
         /**
          * 刷新行更新缓冲区
          */
-        public void flushUpdateBuffer()
+        public void update()
         {
-                if (isUpdate()) {
+                if (isUpdatable()) {
 
                         try {
 
@@ -126,6 +151,69 @@ public class ShittyMutableDataGrid
 
                         }
                 }
+        }
+
+        private SQL toDeleteSQL(List<Integer> indices)
+        {
+                List<Delete> deletes = new ArrayList<>();
+
+                indices.forEach(index -> {
+
+                        var delete = new Delete();
+
+                        var table = new Table(origin.getOnlyTable());
+                        delete.setTable(table);
+
+                        if (!pks.isEmpty()) {
+
+                                pks.forEach(pk -> {
+
+                                        var c = new Column(pk.getName());
+                                        var v = new StringValue(rows.get(index).get(pk.getIndex()));
+                                        var w = new EqualsTo();
+
+                                        w.setLeftExpression(c);
+                                        w.setRightExpression(v);
+
+                                        delete.setWhere(w);
+
+                                });
+
+                        } else {
+
+                                List<EqualsTo> equals = new ArrayList<>();
+
+                                columns.forEach(col -> {
+
+                                        var c = new Column(col.getName());
+                                        var v = new StringValue(rows.get(index).get(col.getIndex()));
+                                        var w = new EqualsTo();
+
+                                        w.setLeftExpression(c);
+                                        w.setRightExpression(v);
+
+                                        equals.add(w);
+
+                                });
+
+                                Expression exp = equals.getFirst();
+
+                                for (int i = 1; i < equals.size(); i++)
+                                        exp = new AndExpression(exp, equals.get(i));
+
+                                delete.setWhere(exp);
+
+                        }
+
+                        deletes.add(delete);
+                });
+
+                StringBuilder builder = new StringBuilder();
+
+                for (Delete delete : deletes)
+                        builder.append(delete.toString()).append(";");
+
+                return new SQL(-1L, origin.getDb(), builder.toString());
         }
 
         private SQL toUpdateSQL()
@@ -161,10 +249,6 @@ public class ShittyMutableDataGrid
                                 }
 
                         }
-
-                        List<ColumnMetaData> pks = columns.stream()
-                                .filter(ColumnMetaData::isPrimary)
-                                .toList();
 
                         for (ColumnMetaData pk : pks) {
 

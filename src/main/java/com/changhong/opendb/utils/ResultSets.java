@@ -2,7 +2,7 @@ package com.changhong.opendb.utils;
 
 import com.changhong.opendb.driver.ColumnMetaData;
 import com.changhong.opendb.driver.Row;
-import com.changhong.opendb.driver.ShittyMutableDataGrid;
+import com.changhong.opendb.driver.MutableDataGrid;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -72,7 +72,7 @@ public class ResultSets
          * 结果集转 QueryResultSet 对象
          */
         public static void toMutableDataGird(List<ColumnMetaData> columns,
-                                            ResultSet rs, ShittyMutableDataGrid dst)
+                                            ResultSet rs, MutableDataGrid dst)
                 throws SQLException
         {
                 SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT_PATTERN);

@@ -2,6 +2,7 @@ package com.changhong.opendb.ui.workbench;
 
 import com.changhong.opendb.ui.widgets.VCodeArea;
 import com.changhong.opendb.ui.widgets.VCodeAreaConfig;
+import javafx.scene.control.MenuItem;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 
 import java.util.regex.Matcher;
@@ -27,9 +28,24 @@ public class SqlMessagePane extends VirtualizedScrollPane<VCodeArea>
         public SqlMessagePane()
         {
                 super(new VCodeArea(new VCodeAreaConfig(true, false)));
+
                 codeArea = getContent();
                 codeArea.setEditable(false);
                 codeArea.addHighlightingListener(SqlMessagePane::applyHighlighting);
+
+                setupContextMenu();
+        }
+
+        private void setupContextMenu()
+        {
+                MenuItem clearItem = new MenuItem("清空内容");
+                clearItem.setOnAction(event -> clearAll());
+                codeArea.addContextMenuGroup(clearItem);
+        }
+
+        private void clearAll()
+        {
+                codeArea.replaceText("");
         }
 
         public static void applyHighlighting(VCodeArea area)
@@ -50,17 +66,24 @@ public class SqlMessagePane extends VirtualizedScrollPane<VCodeArea>
 
         public void appendInfo(String text)
         {
-                codeArea.appendText(strfmt("[  OK  ] %s\n", text));
+                appendText(strfmt("[  OK  ] %s\n", text));
         }
 
         public void appendSkip(String text)
         {
-                codeArea.appendText(strfmt("[ SKIP ] %s\n", text));
+                appendText(strfmt("[ SKIP ] %s\n", text));
         }
 
         public void appendError(String text)
         {
-                codeArea.appendText(strfmt("[ FAIL ] %s\n", text));
+                appendText(strfmt("[ FAIL ] %s\n", text));
+        }
+
+        private void appendText(String text)
+        {
+                codeArea.appendText(text);
+                codeArea.moveTo(codeArea.getLength());
+                codeArea.requestFollowCaret();
         }
 
 }

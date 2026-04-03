@@ -3,7 +3,7 @@ package com.changhong.opendb.ui.workbench;
 import com.changhong.opendb.app.Application;
 import com.changhong.opendb.driver.ColumnMetaData;
 import com.changhong.opendb.driver.Row;
-import com.changhong.opendb.driver.ShittyMutableDataGrid;
+import com.changhong.opendb.driver.MutableDataGrid;
 import com.changhong.opendb.resource.Assets;
 import com.changhong.opendb.ui.widgets.EditingTableCell;
 import com.changhong.opendb.ui.widgets.VFX;
@@ -53,7 +53,7 @@ public class MutableDataGridViewPane extends BorderPane
 
         private final Node progressIndicator = Assets.newProgressIndicator();
 
-        private ShittyMutableDataGrid grid;
+        private MutableDataGrid grid;
         private TablePosition<?, ?> start;
 
         public interface ReloadProgressListener
@@ -110,7 +110,7 @@ public class MutableDataGridViewPane extends BorderPane
 
         private void updateCheckCross()
         {
-                boolean disable = (grid == null || !grid.isUpdate());
+                boolean disable = (grid == null || !grid.isUpdatable());
 
                 check.setDisable(disable);
                 cross.setDisable(disable);
@@ -118,11 +118,9 @@ public class MutableDataGridViewPane extends BorderPane
 
         private void setupToolButtonAction()
         {
-                plus.setOnAction(event -> {
-                        grid.addEmptyRow();
-                        tableView.getItems().setAll(grid.getRows());
-                        tableView.refresh();
-                });
+                plus.setOnAction(event -> applyPlus());
+
+                minus.setOnAction(event -> applyMinus());
 
                 check.setOnAction(event -> applyCheck());
                 cross.setOnAction(event -> applyCross());
@@ -130,9 +128,25 @@ public class MutableDataGridViewPane extends BorderPane
                 reload.setOnAction(event -> reloadAndBlinkTable());
         }
 
+        private void applyPlus()
+        {
+                grid.addEmptyRow();
+                tableView.getItems().setAll(grid.getRows());
+                tableView.refresh();
+        }
+
+        private void applyMinus()
+        {
+                var indices = tableView.getSelectionModel().getSelectedIndices();
+
+                if (grid.remove(List.copyOf(indices)))
+                        reloadAndBlinkTable();
+        }
+
+
         private void applyCheck()
         {
-                grid.flushUpdateBuffer();
+                grid.update();
                 updateCheckCross();
                 render(grid);
         }
@@ -213,7 +227,7 @@ public class MutableDataGridViewPane extends BorderPane
                 tableView.setOnKeyPressed(event -> {
                         if ((event.isControlDown() || event.isShortcutDown())
                                 && event.getCode() == KeyCode.S) {
-                                if (grid.isUpdate())
+                                if (grid.isUpdatable())
                                         applyCheck();
                                 event.consume();
                         }
@@ -315,7 +329,7 @@ public class MutableDataGridViewPane extends BorderPane
                 grid.addUpdateRow(cell.getColumnIndex(), cell.getRowIndex(), cell.getNewValue());
         }
 
-        public void render(ShittyMutableDataGrid grid)
+        public void render(MutableDataGrid grid)
         {
                 if (this.grid != grid) {
                         this.grid = grid;

@@ -1,6 +1,5 @@
 package com.changhong.opendb.ui.widgets;
 
-import com.changhong.opendb.app.Application;
 import com.changhong.opendb.ui.workbench.SqlKeyWordDefine;
 import com.changhong.opendb.utils.OS;
 import javafx.scene.control.ContextMenu;
@@ -88,10 +87,14 @@ public class VCodeArea extends CodeArea
 
                 showingMenuListeners.add(event -> {
                         contextMenu.getItems().forEach(menu -> {
+                                if (menu.getText() == null)
+                                        return;
+
                                 if (menu.getText().equals("复制")) {
                                         menu.setDisable(strempty(getSelectedText()));
-                                } else if (menu.getText().equals("粘贴"))
+                                } else if (menu.getText().equals("粘贴")) {
                                         menu.setDisable(!Clipboard.getSystemClipboard().hasString());
+                                }
                         });
                 });
 
@@ -123,6 +126,9 @@ public class VCodeArea extends CodeArea
         {
                 String text = getText();
                 clearStyle(0, text.length());
+
+                if (text.split("\n").length > 5000)
+                        return;
 
                 Matcher matcher = PATTERN.matcher(text);
                 while (matcher.find()) {

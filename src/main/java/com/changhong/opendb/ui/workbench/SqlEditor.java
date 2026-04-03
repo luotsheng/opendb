@@ -2,7 +2,7 @@ package com.changhong.opendb.ui.workbench;
 
 import com.changhong.opendb.driver.SQL;
 import com.changhong.opendb.driver.executor.SQLExecutor;
-import com.changhong.opendb.driver.ShittyMutableDataGrid;
+import com.changhong.opendb.driver.MutableDataGrid;
 import com.changhong.opendb.model.ODBNStatus;
 import com.changhong.opendb.model.QueryInfo;
 import com.changhong.opendb.resource.Assets;
@@ -381,7 +381,7 @@ public class SqlEditor extends SplitPane
                                 String db = database.getName();
                                 SQL sql = new  SQL(currentTaskId, db, scriptText);
 
-                                ShittyMutableDataGrid grid = sqlExecutor.execute(sql, (info, status) -> {
+                                MutableDataGrid grid = sqlExecutor.execute(sql, (info, status) -> {
                                         Platform.runLater(() -> {
                                                 switch (status) {
                                                         case OK -> sqlMessagePane.appendInfo(info);
