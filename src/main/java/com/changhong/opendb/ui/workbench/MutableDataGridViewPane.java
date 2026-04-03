@@ -79,6 +79,15 @@ public class MutableDataGridViewPane extends BorderPane
                 VBox.setVgrow(tableView, Priority.ALWAYS);
                 dataGridTab.setContent(vContainer);
 
+                tableView.setOnKeyPressed(event -> {
+                        if ((event.isControlDown() || event.isShortcutDown())
+                                && event.getCode() == KeyCode.S) {
+                                if (grid.isUpdate())
+                                        applyCheck();
+                                event.consume();
+                        }
+                });
+
                 setCenter(tabPane);
 
                 updateCheckCross();
@@ -110,8 +119,7 @@ public class MutableDataGridViewPane extends BorderPane
 
         private void updateCheckCross()
         {
-                boolean disable = (grid == null ||
-                        !grid.isEmptyUpdateBuffer());
+                boolean disable = (grid == null || !grid.isUpdate());
 
                 check.setDisable(disable);
                 cross.setDisable(disable);

@@ -97,7 +97,7 @@ public class ShittyMutableDataGrid
 
         }
 
-        public boolean isEmptyUpdateBuffer()
+        public boolean isUpdate()
         {
                 return !updateRowBuffer.isEmpty();
         }
@@ -112,7 +112,7 @@ public class ShittyMutableDataGrid
          */
         public void flushUpdateBuffer()
         {
-                if (isEmptyUpdateBuffer()) {
+                if (isUpdate()) {
 
                         try {
 
