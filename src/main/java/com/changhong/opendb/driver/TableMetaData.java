@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @ToString
-public class TableMetadata
+public class TableMetaData
 {
         /**
          * 数据库名字
@@ -49,4 +49,9 @@ public class TableMetadata
          * 表注释
          */
         private String comment;
+
+        /**
+         * 所属数据库
+         */
+        private String database;
 }

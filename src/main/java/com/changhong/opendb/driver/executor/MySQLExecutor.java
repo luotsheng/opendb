@@ -55,7 +55,7 @@ public class MySQLExecutor extends SQLExecutor
         }
 
         @Override
-        public List<TableMetadata> tables(String db)
+        public List<TableMetaData> tables(String db)
         {
                 String sql = strfmt("""
                     SELECT
@@ -75,7 +75,9 @@ public class MySQLExecutor extends SQLExecutor
                 try (Connection connection = ds.getConnection();
                      Statement statement = ds.use(connection, db)) {
                         ResultSet rs = statement.executeQuery(sql);
-                        return ResultSets.toJavaList(rs, TableMetadata.class);
+                        List<TableMetaData> metas = ResultSets.toJavaList(rs, TableMetaData.class);
+                        metas.forEach(e -> e.setDatabase(db));
+                        return metas;
                 } catch (SQLException e) {
                         EventBus.publish(e);
                 }
@@ -83,10 +85,130 @@ public class MySQLExecutor extends SQLExecutor
                 return List.of();
         }
 
-        private MutableDataGrid builtInExecuteQuery(Connection connection,
-                                                    Statement statement,
-                                                    SQL sql,
-                                                    SQLParsedStatement ps) throws SQLException
+        @Override
+        public List<ColumnMetaData> getColumns(TableMetaData table)
+        {
+                try {
+                        return select(table, 0, 0).getColumns();
+                } catch (Exception e) {
+                        Catcher.ithrow(e);
+                        return List.of();
+                }
+        }
+
+        @Override
+        public void drop(String db, String name) throws SQLException
+        {
+                try (Connection connection = ds.getConnection();
+                     Statement statement = ds.use(connection, db)) {
+                        statement.execute(strfmt("DROP TABLE `%s`;", name));
+                }
+        }
+
+        @Override
+        @SuppressWarnings("resource")
+        public MutableDataGrid execute(SQL sql, ExecuteCallback callback)
+        {
+                SQLParsedStatement current = null;
+
+                try (Connection connection = ds.getConnection();
+                     Statement statement = ds.use(connection, sql.getDb())) {
+
+                        queue.put(sql.getTaskId(), statement);
+
+                        for (SQLParsedStatement ps : sql) {
+
+                                current = ps;
+                                boolean skip = false;
+
+                                LOG.info("Execute sql: \n{}", SqlFormatter.format(ps.getScript()));
+                                
+                                /* DQL 并且必须是最后一个 SQL 语句才执行查询 */
+                                if (ps.getType() == SQLCommandType.DQL && ps.isLast()) {
+
+                                        MutableDataGrid grid = executeQueryGrid(
+                                                connection,
+                                                statement,
+                                                sql,
+                                                ps
+                                        );
+
+                                        callback.doCallback(ps.getScript(), SQLExecutorStatus.OK);
+
+                                        return grid;
+
+                                }
+                                
+                                if (ps.getType() == SQLCommandType.DML) {
+                                        statement.executeUpdate(ps.getScript());
+                                        callback.doCallback(ps.getScript(), SQLExecutorStatus.OK);
+                                        continue;
+                                }
+
+                                if (ps.getType() == SQLCommandType.DQL)
+                                        skip = true;
+
+                                statement.execute(ps.getScript());
+
+                                callback.doCallback(ps.getScript(), skip ? SQLExecutorStatus.SKIP : SQLExecutorStatus.OK);
+                        }
+
+                        queue.remove(sql.getTaskId());
+
+                } catch (SQLException e) {
+
+                        LOG.error("MySQLExecutor execute error", e);
+
+                        if (callback instanceof DefaultExecutorCallback) {
+
+                                callback.doCallback(e.getMessage(), SQLExecutorStatus.ERROR);
+                                return null;
+
+                        }
+
+                        if (current != null)
+                                callback.doCallback(current.getScript(), SQLExecutorStatus.ERROR);
+
+                        throw new CatcherException(e);
+
+                }
+
+                return null;
+        }
+
+        public MutableDataGrid select(TableMetaData tbMeta, int start, int size)
+                throws SQLException
+        {
+                MutableDataGrid grid;
+
+                String text = strfmt("SELECT * FROM %s LIMIT %d OFFSET %d;", tbMeta.getName(), size, start);
+
+                SQL sql = new SQL(0L, tbMeta.getDatabase() , text);
+
+                try (Connection connection = ds.getConnection();
+                     Statement statement = ds.use(connection, tbMeta.getDatabase())) {
+                        grid = executeQueryGrid(connection, statement, sql, sql.iterator().next());
+                }
+
+                grid.setEditable(true);
+                grid.setAddable(true);
+
+                return grid;
+        }
+
+        @Override
+        public void cancel(Long id)
+        {
+                Catcher.tryCall(() -> {
+                        if (queue.containsKey(id))
+                                queue.get(id).cancel();
+                });
+        }
+
+        private MutableDataGrid executeQueryGrid(Connection connection,
+                                                 Statement statement,
+                                                 SQL sql,
+                                                 SQLParsedStatement ps) throws SQLException
         {
                 ResultSet rs = statement.executeQuery(ps.getScript());
 
@@ -193,114 +315,5 @@ public class MySQLExecutor extends SQLExecutor
                 grid.setEditable(editable);
 
                 return grid;
-        }
-
-        @Override
-        public void drop(String db, String name) throws SQLException
-        {
-                try (Connection connection = ds.getConnection();
-                     Statement statement = ds.use(connection, db)) {
-                        statement.execute(strfmt("DROP TABLE `%s`;", name));
-                }
-        }
-
-        @Override
-        @SuppressWarnings("resource")
-        public MutableDataGrid execute(SQL sql, ExecuteCallback callback)
-        {
-                SQLParsedStatement current = null;
-
-                try (Connection connection = ds.getConnection();
-                     Statement statement = ds.use(connection, sql.getDb())) {
-
-                        queue.put(sql.getTaskId(), statement);
-
-                        for (SQLParsedStatement ps : sql) {
-
-                                current = ps;
-                                boolean skip = false;
-
-                                LOG.info("Execute sql: \n{}", SqlFormatter.format(ps.getScript()));
-                                
-                                /* DQL 并且必须是最后一个 SQL 语句才执行查询 */
-                                if (ps.getType() == SQLCommandType.DQL && ps.isLast()) {
-
-                                        MutableDataGrid grid = builtInExecuteQuery(
-                                                connection,
-                                                statement,
-                                                sql,
-                                                ps
-                                        );
-
-                                        callback.doCallback(ps.getScript(), SQLExecutorStatus.OK);
-
-                                        return grid;
-
-                                }
-                                
-                                if (ps.getType() == SQLCommandType.DML) {
-                                        statement.executeUpdate(ps.getScript());
-                                        callback.doCallback(ps.getScript(), SQLExecutorStatus.OK);
-                                        continue;
-                                }
-
-                                if (ps.getType() == SQLCommandType.DQL)
-                                        skip = true;
-
-                                statement.execute(ps.getScript());
-
-                                callback.doCallback(ps.getScript(), skip ? SQLExecutorStatus.SKIP : SQLExecutorStatus.OK);
-                        }
-
-                        queue.remove(sql.getTaskId());
-
-                } catch (SQLException e) {
-
-                        LOG.error("MySQLExecutor execute error", e);
-
-                        if (callback instanceof DefaultExecutorCallback) {
-
-                                callback.doCallback(e.getMessage(), SQLExecutorStatus.ERROR);
-                                return null;
-
-                        }
-
-                        if (current != null)
-                                callback.doCallback(current.getScript(), SQLExecutorStatus.ERROR);
-
-                        throw new CatcherException(e);
-
-                }
-
-                return null;
-        }
-
-        public MutableDataGrid select(String db, TableMetadata tbMeta, int start, int size)
-                throws SQLException
-        {
-                MutableDataGrid grid;
-
-                String text = strfmt("SELECT * FROM %s LIMIT %d OFFSET %d;", tbMeta.getName(), size, start);
-
-                SQL sql = new SQL(0L, db , text);
-
-                try (Connection connection = ds.getConnection();
-                     Statement statement = ds.use(connection, db)) {
-                        grid = builtInExecuteQuery(connection, statement, sql, sql.iterator().next());
-                }
-
-                grid.setEditable(true);
-                grid.setAddable(true);
-
-                return grid;
-        }
-
-        @Override
-        public void cancel(Long id)
-        {
-                Catcher.tryCall(() -> {
-                        if (queue.containsKey(id))
-                                queue.get(id).cancel();
-                });
         }
 }

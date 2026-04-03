@@ -12,6 +12,7 @@ import com.changhong.opendb.ui.pane.MutableDataGridViewPane;
 import com.changhong.opendb.ui.pane.SqlMessagePane;
 import com.changhong.opendb.ui.widgets.*;
 import com.changhong.opendb.utils.Catcher;
+import com.changhong.opendb.utils.Causes;
 import com.github.vertical_blank.sqlformatter.SqlFormatter;
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
@@ -405,7 +406,7 @@ public class SqlEditor extends SplitPane
                         } catch (Throwable e) {
 
                                 Platform.runLater(() -> {
-                                        sqlMessagePane.appendError(e.getCause().getMessage());
+                                        sqlMessagePane.appendError(Causes.message(e));
                                         showResultSetTableViewPane(QUERY_MESSAGE_LOG_FIRST);
                                         LOG.error("run task error", e);
                                 });

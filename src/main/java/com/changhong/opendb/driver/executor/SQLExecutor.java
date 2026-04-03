@@ -1,8 +1,9 @@
 package com.changhong.opendb.driver.executor;
 
+import com.changhong.opendb.driver.ColumnMetaData;
 import com.changhong.opendb.driver.MutableDataGrid;
 import com.changhong.opendb.driver.SQL;
-import com.changhong.opendb.driver.TableMetadata;
+import com.changhong.opendb.driver.TableMetaData;
 import com.changhong.opendb.driver.datasource.VirtualDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,9 @@ public abstract class SQLExecutor
 
         public abstract List<String> databases();
 
-        public abstract List<TableMetadata> tables(String db);
+        public abstract List<TableMetaData> tables(String db);
+
+        public abstract List<ColumnMetaData> getColumns(TableMetaData table);
 
         public abstract void drop(String db, String name) throws SQLException;
 
@@ -72,7 +75,7 @@ public abstract class SQLExecutor
 
         public abstract MutableDataGrid execute(SQL sql, ExecuteCallback callback);
 
-        public abstract MutableDataGrid select(String db, TableMetadata table, int start, int size)
+        public abstract MutableDataGrid select(TableMetaData table, int start, int size)
                 throws SQLException;
 
         public abstract void cancel(Long id);

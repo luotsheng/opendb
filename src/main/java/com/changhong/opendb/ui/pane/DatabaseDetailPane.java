@@ -2,7 +2,7 @@ package com.changhong.opendb.ui.pane;
 
 import com.changhong.opendb.core.event.EventBus;
 import com.changhong.opendb.core.event.NewMutableDataGridPaneEvent;
-import com.changhong.opendb.driver.TableMetadata;
+import com.changhong.opendb.driver.TableMetaData;
 import com.changhong.opendb.resource.Assets;
 import com.changhong.opendb.ui.navigator.node.ODBNDatabase;
 import com.changhong.opendb.ui.widgets.*;
@@ -28,20 +28,20 @@ import java.util.List;
 @SuppressWarnings("FieldCanBeLocal")
 public class DatabaseDetailPane extends DetailPane
 {
-        private final TableView<TableMetadata> tableView;
+        private final TableView<TableMetaData> tableView;
         private final ToolBar toolBar;
 
         private final ODBNDatabase database;
 
-        private TableColumn<TableMetadata, String> name;
-        private TableColumn<TableMetadata, Date> createTime;
-        private TableColumn<TableMetadata, Date> updateTime;
-        private TableColumn<TableMetadata, String> engine;
-        private TableColumn<TableMetadata, Float> size;
-        private TableColumn<TableMetadata, String> rows;
-        private TableColumn<TableMetadata, String> comment;
+        private TableColumn<TableMetaData, String> name;
+        private TableColumn<TableMetaData, Date> createTime;
+        private TableColumn<TableMetaData, Date> updateTime;
+        private TableColumn<TableMetaData, String> engine;
+        private TableColumn<TableMetaData, Float> size;
+        private TableColumn<TableMetaData, String> rows;
+        private TableColumn<TableMetaData, String> comment;
 
-        private ObservableList<TableMetadata> obs;
+        private ObservableList<TableMetaData> obs;
 
         public DatabaseDetailPane(ODBNDatabase database)
         {
@@ -89,7 +89,7 @@ public class DatabaseDetailPane extends DetailPane
 
         private void deleteTable()
         {
-                TableMetadata table = tableView.getSelectionModel().getSelectedItem();
+                TableMetaData table = tableView.getSelectionModel().getSelectedItem();
 
                 if (ConfirmDialog.showCheckDialog("确认删除：%s？", table.getName())) {
                         Catcher.tryCall(() -> database.drop(table));
@@ -139,12 +139,12 @@ public class DatabaseDetailPane extends DetailPane
                 );
 
                 tableView.setRowFactory(tv -> {
-                        TableRow<TableMetadata> row = new TableRow<>();
+                        TableRow<TableMetaData> row = new TableRow<>();
 
                         row.setOnMouseClicked(e -> {
 
                                 if (e.getClickCount() == 2 && !row.isEmpty()) {
-                                        TableMetadata data = row.getItem();
+                                        TableMetaData data = row.getItem();
                                         EventBus.publish(new NewMutableDataGridPaneEvent(database.getSqlExecutor(), database.getName(), data));
                                 }
 
@@ -200,7 +200,7 @@ public class DatabaseDetailPane extends DetailPane
                 updateTime.setCellFactory(col -> new DateCell<>());
         }
 
-        public void update(List<TableMetadata> tables)
+        public void update(List<TableMetaData> tables)
         {
                 if (obs == null) {
                         obs = FXCollections.observableArrayList();

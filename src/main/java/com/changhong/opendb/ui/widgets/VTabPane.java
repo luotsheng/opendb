@@ -40,6 +40,12 @@ public class VTabPane extends TabPane implements ObservableList<Tab>
                         onCloseRequest.handle(new Event(tab, tab, Tab.TAB_CLOSE_REQUEST_EVENT));
         }
 
+        public void addAndSelect(Tab tab)
+        {
+                add(tab);
+                select(tab);
+        }
+
         /// ///////////////////////////////////////////////////////////
         /// ObservableList
         /// ///////////////////////////////////////////////////////////

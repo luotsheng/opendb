@@ -6,6 +6,7 @@ import com.changhong.opendb.driver.datasource.MySQLDataSource;
 import com.changhong.opendb.driver.datasource.VirtualDataSource;
 import com.changhong.opendb.model.ConnectionInfo;
 import com.changhong.opendb.repository.ConnectionRepository;
+import com.changhong.opendb.utils.Causes;
 import com.changhong.opendb.utils.JSONUtils;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.geometry.Insets;
@@ -116,7 +117,7 @@ public class ConnectionDialog extends Stage
                         status.setText("Connected successfully...");
                         status.setStyle("-fx-text-fill: #28a745;");
                 } catch (Exception e) {
-                        status.setText(e.getCause().getMessage());
+                        status.setText(Causes.message(e));
                         status.setStyle("-fx-text-fill: #b8312b;");
                 }
         }

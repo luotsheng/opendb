@@ -2,6 +2,7 @@ package com.changhong.opendb.ui.workbench;
 
 import com.changhong.opendb.app.Application;
 import com.changhong.opendb.core.event.*;
+import com.changhong.opendb.driver.TableMetaData;
 import com.changhong.opendb.resource.Assets;
 import com.changhong.opendb.ui.pane.PreviewTableDataPane;
 import com.changhong.opendb.ui.widgets.VTabPane;
@@ -29,7 +30,9 @@ public class Workbench extends VBox implements EventListener
         private final VTabPane tabPane = new VTabPane();
         private final Tab detailTab = new Tab("详情");
         private final List<SqlEditor> editors = new ArrayList<>();
-        private final Map<String, Tab> queryResultTab = new HashMap<>();
+        
+        private final Map<String, Tab> mutableDataGridMgr = new HashMap<>();
+        private final Map<TableMetaData, Tab> tableMetaDataMgr = new HashMap<>();
 
         private final ContextMenu tabPaneContextMenu = new ContextMenu();
         private final MenuItem closeCurrent = new MenuItem("关闭当前");;
@@ -54,6 +57,7 @@ public class Workbench extends VBox implements EventListener
                 EventBus.subscribe(NewQueryScriptEvent.class, this);
                 EventBus.subscribe(NewMutableDataGridPaneEvent.class, this);
                 EventBus.subscribe(RemoveSqlEditorTabEvent.class, this);
+                EventBus.subscribe(OpenDesignTablePaneEvent.class, this);
         }
 
         private void setupTabPane()
@@ -140,6 +144,7 @@ public class Workbench extends VBox implements EventListener
                         case RemoveSqlEditorTabEvent e     -> handleRemoveSqlEditorTabEvent(e);
                         case NewQueryScriptEvent e         -> handleNewQueryScriptEvent(e);
                         case NewMutableDataGridPaneEvent e -> handleNewMutableDataGridPaneEvent(e);
+                        case OpenDesignTablePaneEvent e    -> handleOpenDesignTablePaneEvent(e);
                         default -> {}
                 }
         }
@@ -198,8 +203,8 @@ public class Workbench extends VBox implements EventListener
 
                 Tab tab;
 
-                if (queryResultTab.containsKey(id)) {
-                        tab = queryResultTab.get(id);
+                if (mutableDataGridMgr.containsKey(id)) {
+                        tab = mutableDataGridMgr.get(id);
                         tabPane.select(tab);
                         return;
                 } else {
@@ -217,13 +222,19 @@ public class Workbench extends VBox implements EventListener
                 tab.setContent(pane);
                 tab.setOnCloseRequest(closeEvent -> {
                         Tab closeTab = (Tab) closeEvent.getTarget();
-                        queryResultTab.remove(closeTab.getText());
+                        mutableDataGridMgr.remove(closeTab.getText());
                 });
 
-                tabPane.add(tab);
-                tabPane.select(tab);
-                queryResultTab.put(id, tab);
+                tabPane.addAndSelect(tab);
+                mutableDataGridMgr.put(id, tab);
 
                 pane.asyncUpdate();
+        }
+
+        private void handleOpenDesignTablePaneEvent(OpenDesignTablePaneEvent e)
+        {
+                Tab tab = new Tab(e.id());
+                tabPane.addAndSelect(tab);
+                tableMetaDataMgr.put(e.table, tab);
         }
 }

@@ -2,7 +2,7 @@ package com.changhong.opendb.ui.pane;
 
 import com.changhong.opendb.driver.executor.SQLExecutor;
 import com.changhong.opendb.driver.MutableDataGrid;
-import com.changhong.opendb.driver.TableMetadata;
+import com.changhong.opendb.driver.TableMetaData;
 import com.changhong.opendb.resource.Assets;
 import com.changhong.opendb.utils.Catcher;
 import javafx.application.Platform;
@@ -24,13 +24,13 @@ public class PreviewTableDataPane extends BorderPane
         private final Tab ownerTab;
         private final SQLExecutor sqlExecutor;
         private final String database;
-        private final TableMetadata tableInfo;
+        private final TableMetaData tableInfo;
         private final MutableDataGridViewPane mutableDataGridViewPane;
 
         public PreviewTableDataPane(Tab ownerTab,
                                     SQLExecutor sqlExecutor,
                                     String database,
-                                    TableMetadata tableInfo)
+                                    TableMetaData tableInfo)
         {
                 this.ownerTab = ownerTab;
                 this.sqlExecutor = sqlExecutor;
@@ -74,7 +74,6 @@ public class PreviewTableDataPane extends BorderPane
                 new Thread(() -> {
                         try {
                                 MutableDataGrid rs = sqlExecutor.select(
-                                        database,
                                         tableInfo,
                                         start,
                                         size);

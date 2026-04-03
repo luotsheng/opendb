@@ -1,7 +1,7 @@
 package com.changhong.opendb.core.event;
 
 import com.changhong.opendb.driver.executor.SQLExecutor;
-import com.changhong.opendb.driver.TableMetadata;
+import com.changhong.opendb.driver.TableMetaData;
 import lombok.AllArgsConstructor;
 
 /**
@@ -13,5 +13,5 @@ public class NewMutableDataGridPaneEvent extends Event
 {
         public SQLExecutor sqlExecutor;
         public String database;
-        public TableMetadata info;
+        public TableMetaData info;
 }

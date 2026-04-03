@@ -64,7 +64,7 @@ public class ResultSets
                         return JSONUtils.toJavaList(jsonArray, aClass);
                 } catch (Exception e) {
                         Catcher.ithrow(e);
-                        return null;
+                        return List.of();
                 }
         }
 

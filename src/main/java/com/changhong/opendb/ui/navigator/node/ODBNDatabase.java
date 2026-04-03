@@ -2,7 +2,7 @@ package com.changhong.opendb.ui.navigator.node;
 
 import com.changhong.opendb.core.event.*;
 import com.changhong.opendb.driver.executor.SQLExecutor;
-import com.changhong.opendb.driver.TableMetadata;
+import com.changhong.opendb.driver.TableMetaData;
 import com.changhong.opendb.model.QueryInfo;
 import com.changhong.opendb.repository.QueryScriptRepository;
 import com.changhong.opendb.resource.Assets;
@@ -29,11 +29,12 @@ import java.util.List;
 })
 public class ODBNDatabase extends ODBNode implements EventListener
 {
+        @Getter
         private final ODBNConnection connection;
         @Getter
         private final SQLExecutor sqlExecutor;
         private boolean openFlag = false;
-        private final List<TableMetadata> tables = new ArrayList<>();
+        private final List<TableMetaData> tables = new ArrayList<>();
 
         // Tree Items
         final TreeItem<String> tableItem
@@ -105,7 +106,7 @@ public class ODBNDatabase extends ODBNode implements EventListener
                 tables.addAll(sqlExecutor.tables(name));
         }
 
-        public final void drop(TableMetadata tbMetaData) throws SQLException
+        public final void drop(TableMetaData tbMetaData) throws SQLException
         {
                 sqlExecutor.drop(name, tbMetaData.getName());
         }
@@ -159,7 +160,7 @@ public class ODBNDatabase extends ODBNode implements EventListener
 
                 tableItem.getChildren().clear();
 
-                for (TableMetadata table : tables) {
+                for (TableMetaData table : tables) {
                         ODBNTable tableNode = new ODBNTable(sqlExecutor, this, table);
                         tableNode.setSelectedEvent(this::onSelected);
                         tableItem.getChildren().add(tableNode);

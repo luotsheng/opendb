@@ -35,7 +35,8 @@ public class Catcher
                         e = new CatcherException(throwable);
                 }
 
-                EventBus.publish(e);
+                CatcherException copy = e;
+                Platform.runLater(() -> EventBus.publish(copy));
 
                 throw e;
         }

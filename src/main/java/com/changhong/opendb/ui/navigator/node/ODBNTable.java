@@ -3,12 +3,16 @@ package com.changhong.opendb.ui.navigator.node;
 import com.changhong.opendb.app.Application;
 import com.changhong.opendb.core.event.EventBus;
 import com.changhong.opendb.core.event.NewMutableDataGridPaneEvent;
+import com.changhong.opendb.core.event.OpenDesignTablePaneEvent;
+import com.changhong.opendb.driver.ColumnMetaData;
 import com.changhong.opendb.driver.executor.SQLExecutor;
-import com.changhong.opendb.driver.TableMetadata;
+import com.changhong.opendb.driver.TableMetaData;
 import com.changhong.opendb.resource.Assets;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
+
+import java.util.List;
 
 /**
  * @author Luo Tiansheng
@@ -19,11 +23,11 @@ public class ODBNTable extends ODBNode
 {
         private final SQLExecutor sqlExecutor;
         private final ODBNDatabase database;
-        private final TableMetadata table;
+        private final TableMetaData table;
 
         public ODBNTable(SQLExecutor sqlExecutor,
                          ODBNDatabase database,
-                         TableMetadata table)
+                         TableMetaData table)
         {
                 super(table.getName());
                 this.database = database;
@@ -48,7 +52,18 @@ public class ODBNTable extends ODBNode
                         Application.copyToClipboard(getName());
                 });
 
-                contextMenu.getItems().addAll(copyTableNameItem);
+                MenuItem designTableItem = new MenuItem("设计表");
+                designTableItem.setOnAction(event -> {
+                        List<ColumnMetaData> columns = sqlExecutor.getColumns(table);
+                        EventBus.publish(new OpenDesignTablePaneEvent(database.getConnection().getName(),
+                                table,
+                                columns));
+                });
+
+                contextMenu.getItems().addAll(
+                        copyTableNameItem,
+                        designTableItem
+                );
 
                 return contextMenu;
         }
