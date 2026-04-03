@@ -88,18 +88,13 @@ public class MutableDataGrid
                 rows.addLast(new Row(columns.size()));
         }
 
-        public boolean remove(List<Integer> indices)
+        public void remove(List<Integer> indices)
         {
                 if (indices == null || indices.isEmpty())
-                        return false;
+                        return;
 
-                if (ConfirmDialog.showCheckDialog("选中%s条数据，是否删除？", indices.size())) {
-                        SQL sql = toDeleteSQL(indices);
-                        executor.execute(sql);
-                        return true;
-                }
-
-                return false;
+                SQL sql = toDeleteSQL(indices);
+                executor.execute(sql);
         }
 
         public void addUpdateRow(int colIndex, int rowIndex, String newValue)

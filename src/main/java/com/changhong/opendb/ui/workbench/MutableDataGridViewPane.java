@@ -4,7 +4,9 @@ import com.changhong.opendb.app.Application;
 import com.changhong.opendb.driver.ColumnMetaData;
 import com.changhong.opendb.driver.Row;
 import com.changhong.opendb.driver.MutableDataGrid;
+import com.changhong.opendb.driver.SQL;
 import com.changhong.opendb.resource.Assets;
+import com.changhong.opendb.ui.widgets.ConfirmDialog;
 import com.changhong.opendb.ui.widgets.EditingTableCell;
 import com.changhong.opendb.ui.widgets.VFX;
 import com.changhong.opendb.ui.widgets.VSeparator;
@@ -125,7 +127,7 @@ public class MutableDataGridViewPane extends BorderPane
                 check.setOnAction(event -> applyCheck());
                 cross.setOnAction(event -> applyCross());
 
-                reload.setOnAction(event -> reloadAndBlinkTable());
+                reload.setOnAction(event -> reloadAndBlinkTable(true));
         }
 
         private void applyPlus()
@@ -139,10 +141,23 @@ public class MutableDataGridViewPane extends BorderPane
         {
                 var indices = tableView.getSelectionModel().getSelectedIndices();
 
-                if (grid.remove(List.copyOf(indices)))
-                        reloadAndBlinkTable();
-        }
+                if (indices == null || indices.isEmpty())
+                        return;
 
+                if (!ConfirmDialog.showCheckDialog("选中%s条数据，是否删除？", indices.size()))
+                        return;
+
+                setProgressIndicator();
+
+                new Thread(() -> {
+                        try {
+                                grid.remove(List.copyOf(indices));
+                                reloadAndBlinkTable(false);
+                        } finally {
+                                removeProgressIndicator();
+                        }
+                }).start();
+        }
 
         private void applyCheck()
         {
@@ -158,15 +173,30 @@ public class MutableDataGridViewPane extends BorderPane
                 render(grid);
         }
 
-        private void reloadAndBlinkTable()
+        public void setProgressIndicator()
+        {
+                if (reloadProgressListener != null) {
+                        Platform.runLater(reloadProgressListener::start);
+                } else {
+                        Platform.runLater(() -> dataGridTab.setGraphic(progressIndicator));
+                }
+        }
+
+        public void removeProgressIndicator()
+        {
+                if (reloadProgressListener != null) {
+                        Platform.runLater(reloadProgressListener::end);
+                } else {
+                        Platform.runLater(() -> dataGridTab.setGraphic(null));
+                }
+        }
+
+        private void reloadAndBlinkTable(boolean enableProgressIndicator)
         {
                 reload.setDisable(true);
 
-                if (reloadProgressListener != null) {
-                        reloadProgressListener.start();
-                } else {
-                        dataGridTab.setGraphic(progressIndicator);
-                }
+                if (enableProgressIndicator)
+                        setProgressIndicator();
 
                 new Thread(() -> {
                         try {
@@ -183,11 +213,8 @@ public class MutableDataGridViewPane extends BorderPane
 
                                 ft.play();
 
-                                if (reloadProgressListener != null) {
-                                        Platform.runLater(reloadProgressListener::end);
-                                } else {
-                                        Platform.runLater(() -> dataGridTab.setGraphic(null));
-                                }
+                                if (enableProgressIndicator)
+                                        removeProgressIndicator();
 
                                 reload.setDisable(false);
                         }
