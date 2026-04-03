@@ -4,6 +4,7 @@ import com.changhong.opendb.app.Application;
 import com.changhong.opendb.driver.ColumnMetaData;
 import com.changhong.opendb.driver.Row;
 import com.changhong.opendb.driver.ShittyMutableDataGrid;
+import com.changhong.opendb.ui.widgets.EditingTableCell;
 import com.changhong.opendb.ui.widgets.VFX;
 import javafx.animation.FadeTransition;
 import javafx.beans.property.SimpleStringProperty;
@@ -272,53 +273,7 @@ public class MutableDataGridViewPane extends BorderPane
                         col.setMaxWidth(1000);
                         col.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().get(index)));
 
-                        col.setCellFactory(c -> new TextFieldTableCell<>(new MyStringConverter()) {
-
-                                @Override
-                                @SuppressWarnings("CssDeprecatedValue")
-                                public void updateItem(String item, boolean empty)
-                                {
-                                        super.updateItem(item, empty);
-
-                                        if (empty) {
-                                                setText(null);
-                                                setStyle("");
-                                                return;
-                                        }
-
-                                        if (item == null) {
-                                                setText("(NULL)");
-                                                setStyle("-fx-text-fill: gray;");
-                                                return;
-                                        }
-
-                                        if (item.isEmpty()) {
-                                                setText("(EMPY)");
-                                                setStyle("-fx-text-fill: gray;");
-                                                return;
-                                        }
-
-                                        setText(item);
-                                }
-
-                                @Override
-                                public void startEdit()
-                                {
-                                        super.startEdit();
-                                }
-
-                                @Override
-                                public void cancelEdit()
-                                {
-                                        super.cancelEdit();
-                                }
-
-                                @Override
-                                public void commitEdit(String newValue)
-                                {
-                                        super.commitEdit(newValue);
-                                }
-                        });
+                        col.setCellFactory(c -> new EditingTableCell<>());
 
                         tableView.getColumns().add(col);
                 }

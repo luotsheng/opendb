@@ -32,10 +32,6 @@ public class EditingTableCell<S> extends TextFieldTableCell<S, String>
         @SuppressWarnings("CssDeprecatedValue")
         public void updateItem(String item, boolean empty)
         {
-                System.out.println("updateItem");
-                System.out.printf("  旧值：%s\n", oldValue);
-                System.out.printf("  新值：%s\n", item);
-
                 super.updateItem(item, empty);
 
                 if (empty) {
@@ -64,7 +60,6 @@ public class EditingTableCell<S> extends TextFieldTableCell<S, String>
         public void startEdit()
         {
                 oldValue = getItem();
-                System.out.printf("startEdit: %s\n", oldValue);
 
                 if (!isEmpty()) {
                         createTextField();
@@ -91,7 +86,6 @@ public class EditingTableCell<S> extends TextFieldTableCell<S, String>
         @Override
         public void cancelEdit()
         {
-                System.out.println("cancelEdit");
                 tf.setText(oldValue);
                 setGraphic(null);
                 updateItem(getItem(), false);
@@ -100,7 +94,6 @@ public class EditingTableCell<S> extends TextFieldTableCell<S, String>
         @Override
         public void commitEdit(String newValue)
         {
-                System.out.printf("commitEdit: %s\n", newValue);
                 super.commitEdit(newValue);
         }
 
