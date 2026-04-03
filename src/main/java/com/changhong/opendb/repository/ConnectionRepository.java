@@ -12,9 +12,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.text.Collator;
+import java.util.*;
 
 /**
  * 连接信息
@@ -90,6 +89,9 @@ public class ConnectionRepository
                                 Catcher.ithrow(e);
                         }
                 }
+
+                Collator collator = Collator.getInstance(Locale.CHINA);
+                ret.sort(Comparator.comparing(ConnectionInfo::getName, collator));
 
                 return ret;
         }
