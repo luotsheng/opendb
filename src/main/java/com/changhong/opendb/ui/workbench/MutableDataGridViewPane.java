@@ -79,15 +79,6 @@ public class MutableDataGridViewPane extends BorderPane
                 VBox.setVgrow(tableView, Priority.ALWAYS);
                 dataGridTab.setContent(vContainer);
 
-                tableView.setOnKeyPressed(event -> {
-                        if ((event.isControlDown() || event.isShortcutDown())
-                                && event.getCode() == KeyCode.S) {
-                                if (grid.isUpdate())
-                                        applyCheck();
-                                event.consume();
-                        }
-                });
-
                 setCenter(tabPane);
 
                 updateCheckCross();
@@ -158,24 +149,16 @@ public class MutableDataGridViewPane extends BorderPane
                 reload.setDisable(true);
 
                 if (reloadProgressListener != null) {
-
                         reloadProgressListener.start();
-
                 } else {
-
                         dataGridTab.setGraphic(progressIndicator);
-
                 }
 
                 new Thread(() -> {
-
                         try {
                                 grid.reload();
-
                                 Platform.runLater(() -> render(grid));
-
                         } finally {
-
                                 FadeTransition ft = new FadeTransition(Duration.millis(200), tableView);
                                 ft.setFromValue(0.1);
                                 ft.setToValue(1.0);
@@ -187,19 +170,13 @@ public class MutableDataGridViewPane extends BorderPane
                                 ft.play();
 
                                 if (reloadProgressListener != null) {
-
                                         Platform.runLater(reloadProgressListener::end);
-
                                 } else {
-
                                         Platform.runLater(() -> dataGridTab.setGraphic(null));
-
                                 }
 
                                 reload.setDisable(false);
-
                         }
-
                 }).start();
         }
 
@@ -231,6 +208,22 @@ public class MutableDataGridViewPane extends BorderPane
                         if ((event.isControlDown() || event.isShortcutDown())
                                 && event.getCode() == KeyCode.C)
                                 copyTableViewSelectedCell();
+                });
+
+                tableView.setOnKeyPressed(event -> {
+                        if ((event.isControlDown() || event.isShortcutDown())
+                                && event.getCode() == KeyCode.S) {
+                                if (grid.isUpdate())
+                                        applyCheck();
+                                event.consume();
+                        }
+                });
+
+                tableView.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
+                        if (event.getCode() == KeyCode.ALT || event.getCode() == KeyCode.ALT_GRAPH) {
+                                var indices = tableView.getSelectionModel().getSelectedIndices();
+                                tableView.getSelectionModel().selectRange(indices.getFirst(), indices.getLast() + 1);
+                        }
                 });
         }
 
