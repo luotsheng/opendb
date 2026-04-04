@@ -22,6 +22,13 @@ public class VFX
                 return new TableColumn<>(name);
         }
 
+        public static <S, T> TableColumn<S, T> newEditableTableColumn(String name)
+        {
+                TableColumn<S, T> c = newTableColumn(name);
+                c.setEditable(true);
+                return c;
+        }
+
         public static Button newIconButton(String tip, String icon)
         {
                 Button button = new Button();

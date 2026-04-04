@@ -6,7 +6,7 @@ import com.changhong.opendb.app.driver.Row;
 import com.changhong.opendb.app.driver.MutableDataGrid;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.widgets.ConfirmDialog;
-import com.changhong.opendb.app.ui.widgets.EditingTableCell;
+import com.changhong.opendb.app.ui.widgets.VStringEditingTableCell;
 import com.changhong.opendb.app.ui.widgets.VFX;
 import com.changhong.opendb.app.ui.widgets.VSeparator;
 import com.changhong.opendb.app.ui.workbench.ModifyCell;
@@ -400,7 +400,7 @@ public class MutableDataGridViewPane extends BorderPane
                         col.setMaxWidth(1000);
                         col.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().get(index)));
 
-                        col.setCellFactory(c -> new EditingTableCell<>(this::commit));
+                        col.setCellFactory(c -> new VStringEditingTableCell<>(this::commit));
 
                         tableView.getColumns().add(col);
                 }

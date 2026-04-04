@@ -4,6 +4,7 @@ import com.changhong.opendb.app.Application;
 import com.changhong.opendb.app.core.event.*;
 import com.changhong.opendb.app.driver.TableMetaData;
 import com.changhong.opendb.app.resource.Assets;
+import com.changhong.opendb.app.ui.pane.DesignTablePane;
 import com.changhong.opendb.app.ui.pane.PreviewTableDataPane;
 import com.changhong.opendb.app.ui.widgets.VTabPane;
 import javafx.scene.Node;
@@ -234,6 +235,7 @@ public class Workbench extends VBox implements EventListener
         private void handleOpenDesignTablePaneEvent(OpenDesignTablePaneEvent e)
         {
                 Tab tab = new Tab(e.id());
+                tab.setContent(new DesignTablePane(e.table, e.columns));
                 tabPane.addAndSelect(tab);
                 tableMetaDataMgr.put(e.table, tab);
         }
