@@ -55,7 +55,7 @@ public class EventBus
          */
         public static void publish(Throwable e)
         {
-                publish(new CauseEvent(e));
+                publish(new ThrowableEvent(e));
         }
 
 }

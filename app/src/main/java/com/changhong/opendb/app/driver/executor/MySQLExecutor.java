@@ -1,5 +1,6 @@
 package com.changhong.opendb.app.driver.executor;
 
+import com.changhong.collection.Lists;
 import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.exception.CatcherException;
 import com.changhong.opendb.app.driver.*;
@@ -12,8 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.changhong.opendb.app.utils.StringUtils.strfmt;
+import static com.changhong.utils.Transformer.atobool;
+import static com.changhong.utils.Transformer.atoi;
 
 /**
  * @author Luo Tiansheng
@@ -58,19 +62,19 @@ public class MySQLExecutor extends SQLExecutor
         public List<TableMetaData> tables(String db)
         {
                 String sql = strfmt("""
-                    SELECT
-                    	`TABLE_NAME` AS `name`,
-                    	`CREATE_TIME` AS `createTime`,
-                    	`UPDATE_TIME` AS `updateTime`,
-                    	`ENGINE` AS `engine`,
-                    	ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024, 2) AS `size`,
-                    	`TABLE_ROWS` AS `rows`,
-                    	`TABLE_COMMENT` AS `comment`
-                    FROM
-                    	information_schema.TABLES
-                    WHERE
-                    	TABLE_SCHEMA = '%s'
-                """, db);
+                            SELECT
+                            	`TABLE_NAME` AS `name`,
+                            	`CREATE_TIME` AS `createTime`,
+                            	`UPDATE_TIME` AS `updateTime`,
+                            	`ENGINE` AS `engine`,
+                            	ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024, 2) AS `size`,
+                            	`TABLE_ROWS` AS `rows`,
+                            	`TABLE_COMMENT` AS `comment`
+                            FROM
+                            	information_schema.TABLES
+                            WHERE
+                            	TABLE_SCHEMA = '%s'
+                        """, db);
 
                 try (Connection connection = ds.getConnection();
                      Statement statement = ds.use(connection, db)) {
@@ -94,6 +98,50 @@ public class MySQLExecutor extends SQLExecutor
                         Catcher.ithrow(e);
                         return List.of();
                 }
+        }
+
+        @Override
+        public List<TableIndexMetaData> getIndexes(TableMetaData table)
+        {
+                SQL sql = new SQL(table.getDatabase(),
+                        "SHOW INDEX FROM %s;",
+                        table.getName());
+
+                MutableDataGrid dataGrid = execute(sql);
+
+                Map<String, TableIndexMetaData> indexes = new LinkedHashMap<>();
+
+                for (int i = 0; i < dataGrid.size(); i++) {
+
+                        String keyName = dataGrid.getRowValue("Key_name", i);
+                        String columnName = dataGrid.getRowValue("Column_name", i);
+
+                        TableIndexColumn indexColumn = new TableIndexColumn();
+                        indexColumn.setName(columnName);
+                        indexColumn.setOrder(atoi(dataGrid.getRowValue("Seq_in_index", i)));
+                        indexColumn.setPrefixLength(atoi(dataGrid.getRowValue("Sub_part", i)));
+
+                        if (indexes.containsKey(keyName)) {
+                                TableIndexMetaData tableIndexMetaData = indexes.get(keyName);
+                                tableIndexMetaData.getColumnMetaDatas().add(indexColumn);
+                                continue;
+                        }
+
+                        TableIndexMetaData index = new TableIndexMetaData();
+                        index.setName(keyName);
+                        index.setType(dataGrid.getRowValue("Index_type", i));
+                        index.setVisible(atobool(dataGrid.getRowValue("Visible", i)));
+                        index.getColumnMetaDatas().add(indexColumn);
+
+                        indexes.put(index.getName(), index);
+
+                }
+
+                List<TableIndexMetaData> ret = Lists.newArrayList(indexes.values());
+
+                ret.forEach(TableIndexMetaData::generateColumnText);
+
+                return ret;
         }
 
         @Override
@@ -122,7 +170,7 @@ public class MySQLExecutor extends SQLExecutor
                                 boolean skip = false;
 
                                 LOG.info("Execute sql: \n{}", SqlFormatter.format(ps.getScript()));
-                                
+
                                 /* DQL 并且必须是最后一个 SQL 语句才执行查询 */
                                 if (ps.getType() == SQLCommandType.DQL && ps.isLast()) {
 
@@ -138,7 +186,7 @@ public class MySQLExecutor extends SQLExecutor
                                         return grid;
 
                                 }
-                                
+
                                 if (ps.getType() == SQLCommandType.DML) {
                                         statement.executeUpdate(ps.getScript());
                                         callback.doCallback(ps.getScript(), SQLExecutorStatus.OK);
@@ -183,7 +231,7 @@ public class MySQLExecutor extends SQLExecutor
 
                 String text = strfmt("SELECT * FROM %s LIMIT %d OFFSET %d;", tbMeta.getName(), size, start);
 
-                SQL sql = new SQL(0L, tbMeta.getDatabase() , text);
+                SQL sql = new SQL(0L, tbMeta.getDatabase(), text);
 
                 try (Connection connection = ds.getConnection();
                      Statement statement = ds.use(connection, tbMeta.getDatabase())) {

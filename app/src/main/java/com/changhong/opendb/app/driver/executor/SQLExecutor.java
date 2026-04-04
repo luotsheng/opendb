@@ -1,9 +1,6 @@
 package com.changhong.opendb.app.driver.executor;
 
-import com.changhong.opendb.app.driver.ColumnMetaData;
-import com.changhong.opendb.app.driver.MutableDataGrid;
-import com.changhong.opendb.app.driver.SQL;
-import com.changhong.opendb.app.driver.TableMetaData;
+import com.changhong.opendb.app.driver.*;
 import com.changhong.opendb.app.driver.datasource.VirtualDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +63,8 @@ public abstract class SQLExecutor
         public abstract List<TableMetaData> tables(String db);
 
         public abstract List<ColumnMetaData> getColumns(TableMetaData table);
+
+        public abstract List<TableIndexMetaData> getIndexes(TableMetaData table);
 
         public abstract void drop(String db, String name) throws SQLException;
 

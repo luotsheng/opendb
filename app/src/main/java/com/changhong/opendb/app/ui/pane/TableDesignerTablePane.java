@@ -2,7 +2,9 @@ package com.changhong.opendb.app.ui.pane;
 
 import atlantafx.base.util.IntegerStringConverter;
 import com.changhong.opendb.app.driver.ColumnMetaData;
+import com.changhong.opendb.app.driver.TableIndexMetaData;
 import com.changhong.opendb.app.driver.TableMetaData;
+import com.changhong.opendb.app.driver.executor.SQLExecutor;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.widgets.VStringEditingTableCell;
 import com.changhong.opendb.app.ui.widgets.VCheckBoxTableCell;
@@ -12,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
+import javafx.util.converter.BooleanStringConverter;
 
 import java.util.List;
 
@@ -20,21 +23,29 @@ import java.util.List;
  * @since 2026/4/3
  */
 @SuppressWarnings({"FieldCanBeLocal", "unchecked"})
-public class DesignTablePane extends DetailPane
+public class TableDesignerTablePane extends DetailPane
 {
+        private final SQLExecutor executor;
         private final TableMetaData tableMetaData;
         private final List<ColumnMetaData> columnMetaDatas;
+        private final List<TableIndexMetaData> indexes;
         private final TableView<ColumnMetaData> structureView = VFX.newTableView();
+        private final TableView<TableIndexMetaData> indexView = VFX.newTableView();
         private final ToolBar toolBar = new ToolBar();
         private final TabPane tabPane = new TabPane();
 
-        public DesignTablePane(TableMetaData tableMetaData, List<ColumnMetaData> columnMetaDatas)
+        public TableDesignerTablePane(SQLExecutor executor,
+                                      TableMetaData tableMetaData,
+                                      List<ColumnMetaData> columnMetaDatas)
         {
+                this.executor = executor;
                 this.tableMetaData = tableMetaData;
                 this.columnMetaDatas = columnMetaDatas;
+                this.indexes = executor.getIndexes(tableMetaData);
 
                 setupToolBar();
                 setupStructureView();
+                setupIndexView();
 
                 Tab tableStruct = new Tab("表结构");
                 tableStruct.setClosable(false);
@@ -46,6 +57,7 @@ public class DesignTablePane extends DetailPane
 
                 Tab indexStruct = new Tab("索引");
                 indexStruct.setClosable(false);
+                indexStruct.setContent(indexView);
                 indexStruct.setGraphic(Assets.use("index0"));
 
                 tabPane.getTabs().addAll(
@@ -130,14 +142,14 @@ public class DesignTablePane extends DetailPane
 
                 // 初始化宽度
                 name.setPrefWidth(150);
-                type.setPrefWidth(100);
-                length.setPrefWidth(100);
-                scale.setPrefWidth(100);
+                type.setPrefWidth(150);
+                length.setPrefWidth(120);
+                scale.setPrefWidth(80);
                 defaultValue.setPrefWidth(200);
                 nullable.setPrefWidth(120);
-                primary.setPrefWidth(100);
+                primary.setPrefWidth(50);
                 autoIncrement.setPrefWidth(100);
-                comment.setPrefWidth(200);
+                comment.setPrefWidth(280);
 
                 structureView.getColumns().addAll(
                         name,
@@ -152,5 +164,35 @@ public class DesignTablePane extends DetailPane
                 );
 
                 structureView.getItems().addAll(FXCollections.observableArrayList(columnMetaDatas));
+        }
+
+        private void setupIndexView()
+        {
+                indexView.setEditable(true);
+                indexView.getSelectionModel().setCellSelectionEnabled(true);
+                indexView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+                TableColumn<TableIndexMetaData, String> name = VFX.newEditableTableColumn("名称");
+                TableColumn<TableIndexMetaData, String> columns = VFX.newEditableTableColumn("索引列");
+                TableColumn<TableIndexMetaData, String> type = VFX.newEditableTableColumn("类型");
+                TableColumn<TableIndexMetaData, Boolean> visible = VFX.newEditableTableColumn("是否可见");
+
+                name.setCellValueFactory(new PropertyValueFactory<>("name"));
+                columns.setCellValueFactory(new PropertyValueFactory<>("columnsText"));
+                type.setCellValueFactory(new PropertyValueFactory<>("type"));
+                visible.setCellValueFactory(new PropertyValueFactory<>("visible"));
+
+                name.setCellFactory(c -> new VStringEditingTableCell<>());
+                columns.setCellFactory(c -> new VStringEditingTableCell<>());
+                type.setCellFactory(c -> new VStringEditingTableCell<>());
+                visible.setCellFactory(c -> new VCheckBoxTableCell<>());
+
+                name.setPrefWidth(150);
+                columns.setPrefWidth(200);
+                type.setPrefWidth(100);
+                visible.setPrefWidth(120);
+
+                indexView.getColumns().addAll(name, columns, type, visible);
+                indexView.getItems().addAll(FXCollections.observableArrayList(indexes));
         }
 }

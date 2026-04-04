@@ -264,13 +264,12 @@ public class Transformer {
      * @return 转换后的 int 类型数据。
      */
     public static Integer atoi(Object obj) {
-        if (obj == null)
-            return null;
-        if (obj instanceof Integer)
-            return (Integer) obj;
-        if (obj instanceof byte[])
-            return atoi((byte[]) obj);
-        return Integer.parseInt(atos(obj));
+            return switch (obj) {
+                    case null -> null;
+                    case Integer i -> i;
+                    case byte[] bytes -> atoi(bytes);
+                    default -> Integer.parseInt(atos(obj));
+            };
     }
 
     /**

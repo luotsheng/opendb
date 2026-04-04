@@ -9,6 +9,8 @@ import net.sf.jsqlparser.statement.*;
 
 import java.util.*;
 
+import static com.changhong.string.StringUtils.strwfmt;
+
 /**
  * SQL 脚本
  *
@@ -24,8 +26,15 @@ public class SQL implements Iterable<SQLParsedStatement>
 
         private final List<SQLParsedStatement> sqlStatements = new ArrayList<>();
 
-        public SQL(Long taskId, String db, String sqlText)
+        public SQL(String db, String sqlText, Object... args)
         {
+                this(-1L, db, sqlText, args);
+        }
+
+        public SQL(Long taskId, String db, String sqlText, Object... args)
+        {
+                sqlText = strwfmt(sqlText, args);
+
                 try {
                         this.taskId = taskId;
                         this.db = db;

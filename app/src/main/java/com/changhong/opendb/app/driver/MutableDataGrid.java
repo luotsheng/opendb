@@ -1,5 +1,6 @@
 package com.changhong.opendb.app.driver;
 
+import com.changhong.collection.Maps;
 import com.changhong.opendb.app.driver.executor.SQLExecutor;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,8 @@ public class MutableDataGrid
 {
         @Getter
         private List<ColumnMetaData> columns;
+
+        private final Map<String, Integer> columnIndices = Maps.newHashMap();
 
         private List<ColumnMetaData> pks;
 
@@ -53,10 +56,18 @@ public class MutableDataGrid
         @Setter
         private UpdateListener updateListener;
 
+        /**
+         * 构造器
+         */
         public MutableDataGrid(SQL origin, SQLExecutor executor)
         {
                 this.origin = origin;
                 this.executor = executor;
+        }
+
+        public int size()
+        {
+                return rows.size();
         }
 
         public void setColumns(List<ColumnMetaData> columns)
@@ -66,6 +77,9 @@ public class MutableDataGrid
                 pks = columns.stream()
                         .filter(ColumnMetaData::isPrimary)
                         .toList();
+
+                for (int i = 0; i < columns.size(); i++)
+                        columnIndices.put(columns.get(i).getName(), i);
         }
 
         public void reload()
@@ -274,6 +288,18 @@ public class MutableDataGrid
                         builder.append(update.toString()).append(";");
 
                 return new SQL(-1L, origin.getDb(), builder.toString());
+        }
+
+        /**
+         * 根据列名获取指定行数据
+         *
+         * @param columnName 字段名
+         * @param index 行索引
+         * @return 对应行列值
+         */
+        public String getRowValue(String columnName, int index)
+        {
+                return rows.get(index).get(columnIndices.get(columnName));
         }
 
 }

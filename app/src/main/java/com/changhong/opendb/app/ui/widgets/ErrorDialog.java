@@ -3,7 +3,7 @@ package com.changhong.opendb.app.ui.widgets;
 import com.changhong.opendb.app.core.event.Event;
 import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.event.EventListener;
-import com.changhong.opendb.app.core.event.CauseEvent;
+import com.changhong.opendb.app.core.event.ThrowableEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -29,13 +29,13 @@ public class ErrorDialog
         {
                 ErrorListener()
                 {
-                        EventBus.subscribe(CauseEvent.class, this);
+                        EventBus.subscribe(ThrowableEvent.class, this);
                 }
 
                 @Override
                 public void onEvent(Event event)
                 {
-                        showDialog(((CauseEvent) event).message);
+                        showDialog(((ThrowableEvent) event).message);
                 }
         }
 
