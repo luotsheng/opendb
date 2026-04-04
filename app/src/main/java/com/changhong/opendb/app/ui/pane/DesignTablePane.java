@@ -3,6 +3,7 @@ package com.changhong.opendb.app.ui.pane;
 import atlantafx.base.util.IntegerStringConverter;
 import com.changhong.opendb.app.driver.ColumnMetaData;
 import com.changhong.opendb.app.driver.TableMetaData;
+import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.widgets.VStringEditingTableCell;
 import com.changhong.opendb.app.ui.widgets.VCheckBoxTableCell;
 import com.changhong.opendb.app.ui.widgets.VFX;
@@ -10,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.BorderPane;
 
 import java.util.List;
 
@@ -22,8 +24,9 @@ public class DesignTablePane extends DetailPane
 {
         private final TableMetaData tableMetaData;
         private final List<ColumnMetaData> columnMetaDatas;
-        private final TableView<ColumnMetaData> tableView = VFX.newTableView();
+        private final TableView<ColumnMetaData> structureView = VFX.newTableView();
         private final ToolBar toolBar = new ToolBar();
+        private final TabPane tabPane = new TabPane();
 
         public DesignTablePane(TableMetaData tableMetaData, List<ColumnMetaData> columnMetaDatas)
         {
@@ -31,17 +34,39 @@ public class DesignTablePane extends DetailPane
                 this.columnMetaDatas = columnMetaDatas;
 
                 setupToolBar();
-                setupTableView();
+                setupStructureView();
+
+                Tab tableStruct = new Tab("表结构");
+                tableStruct.setClosable(false);
+                tableStruct.setGraphic(Assets.use("struct1"));
+
+                BorderPane borderPane = new BorderPane();
+                borderPane.setCenter(structureView);
+                tableStruct.setContent(borderPane);
+
+                Tab indexStruct = new Tab("索引");
+                indexStruct.setClosable(false);
+                indexStruct.setGraphic(Assets.use("index0"));
+
+                tabPane.getTabs().addAll(
+                        tableStruct,
+                        indexStruct
+                );
 
                 setTop(toolBar);
-                setCenter(tableView);
+                setCenter(tabPane);
         }
 
         private void setupToolBar()
         {
-                Button save = VFX.newIconButton("保存", "save");
+                Button save = VFX.newIconButton("保存", "storage");
+                save.setOnAction(e -> applySave());
+
                 Button plus = VFX.newIconButton("新增行", "plus");
+                plus.setOnAction(e -> applyPlus());
+
                 Button minus = VFX.newIconButton("删除行", "minus");
+                minus.setOnAction(e -> applyMinus());
 
                 toolBar.getItems().addAll(
                         save,
@@ -50,11 +75,26 @@ public class DesignTablePane extends DetailPane
                 );
         }
 
-        private void setupTableView()
+        private void applySave()
         {
-                tableView.setEditable(true);
-                tableView.getSelectionModel().setCellSelectionEnabled(true);
-                tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        }
+
+        private void applyPlus()
+        {
+                structureView.getItems().add(new ColumnMetaData());
+                structureView.refresh();
+        }
+
+        private void applyMinus()
+        {
+        }
+
+        private void setupStructureView()
+        {
+                structureView.setEditable(true);
+                structureView.getSelectionModel().setCellSelectionEnabled(true);
+                structureView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
                 // 列
                 TableColumn<ColumnMetaData, String> name = VFX.newEditableTableColumn("名称");
@@ -99,7 +139,7 @@ public class DesignTablePane extends DetailPane
                 autoIncrement.setPrefWidth(100);
                 comment.setPrefWidth(200);
 
-                tableView.getColumns().addAll(
+                structureView.getColumns().addAll(
                         name,
                         type,
                         length,
@@ -111,6 +151,6 @@ public class DesignTablePane extends DetailPane
                         comment
                 );
 
-                tableView.getItems().addAll(FXCollections.observableArrayList(columnMetaDatas));
+                structureView.getItems().addAll(FXCollections.observableArrayList(columnMetaDatas));
         }
 }

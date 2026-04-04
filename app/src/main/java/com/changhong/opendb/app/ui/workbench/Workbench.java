@@ -25,7 +25,7 @@ import static com.changhong.opendb.app.utils.StringUtils.strfmt;
  * @author Luo Tiansheng
  * @since 2026/3/25
  */
-@SuppressWarnings("FieldCanBeLocal")
+@SuppressWarnings({"FieldCanBeLocal", "MismatchedQueryAndUpdateOfCollection"})
 public class Workbench extends VBox implements EventListener
 {
         private final VTabPane tabPane = new VTabPane();
@@ -236,6 +236,7 @@ public class Workbench extends VBox implements EventListener
         {
                 Tab tab = new Tab(e.id());
                 tab.setContent(new DesignTablePane(e.table, e.columns));
+                tab.setGraphic(Assets.use("struct1"));
                 tabPane.addAndSelect(tab);
                 tableMetaDataMgr.put(e.table, tab);
         }

@@ -74,6 +74,10 @@ public class Assets
                 IMAGES.put("cross", load("/assets/icons/cross.png"));
                 IMAGES.put("reload", load("/assets/icons/reload.png"));
                 IMAGES.put("save", load("/assets/icons/save.png"));
+                IMAGES.put("struct0", load("/assets/icons/struct0.png"));
+                IMAGES.put("struct1", load("/assets/icons/struct1.png"));
+                IMAGES.put("index0", load("/assets/icons/index0.png"));
+                IMAGES.put("storage", load("/assets/icons/storage.png"));
 
         }
 

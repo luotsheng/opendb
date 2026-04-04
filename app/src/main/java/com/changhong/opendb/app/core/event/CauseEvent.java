@@ -12,9 +12,17 @@ public class CauseEvent extends Event
 
         public CauseEvent(Throwable e)
         {
-                Throwable cause = e.getCause();
-                this.message = cause != null
-                        ? cause.getMessage()
-                        : e.getMessage();
+                this.message = findCauseMessage(e);
         }
+
+        private static String findCauseMessage(Throwable e) {
+                Throwable root = e;
+
+                while (root.getCause() != null) {
+                        root = root.getCause();
+                }
+
+                return root.getMessage();
+        }
+
 }
