@@ -88,7 +88,7 @@ public abstract class SQLExecutor
 
         public abstract MutableDataGrid execute(SQL sql, ExecuteCallback callback);
 
-        public abstract MutableDataGrid select(TableMetaData table, int start, int size)
+        public abstract MutableDataGrid selectByPage(TableMetaData table, int start, int size)
                 throws SQLException;
 
         public abstract void cancel(Long id);

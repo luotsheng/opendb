@@ -95,7 +95,7 @@ public class MySQLExecutor extends SQLExecutor
         public List<ColumnMetaData> getColumns(TableMetaData table)
         {
                 try {
-                        return select(table, 0, 0).getColumns();
+                        return selectByPage(table, 0, 0).getColumns();
                 } catch (Exception e) {
                         Catcher.ithrow(e);
                         return List.of();
@@ -228,7 +228,7 @@ public class MySQLExecutor extends SQLExecutor
                 return null;
         }
 
-        public MutableDataGrid select(TableMetaData tbMeta, int start, int size)
+        public MutableDataGrid selectByPage(TableMetaData tbMeta, int start, int size)
                 throws SQLException
         {
                 MutableDataGrid grid;

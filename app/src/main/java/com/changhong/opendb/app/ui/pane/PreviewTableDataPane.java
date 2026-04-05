@@ -73,7 +73,7 @@ public class PreviewTableDataPane extends BorderPane
 
                 new Thread(() -> {
                         try {
-                                MutableDataGrid rs = sqlExecutor.select(
+                                MutableDataGrid rs = sqlExecutor.selectByPage(
                                         tableInfo,
                                         start,
                                         size);
