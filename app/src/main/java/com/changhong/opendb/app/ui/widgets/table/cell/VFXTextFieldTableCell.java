@@ -1,4 +1,4 @@
-package com.changhong.opendb.app.ui.widgets;
+package com.changhong.opendb.app.ui.widgets.table.cell;
 
 import com.changhong.opendb.app.ui.workbench.ModifyCell;
 import javafx.application.Platform;
@@ -10,7 +10,7 @@ import javafx.util.converter.DefaultStringConverter;
  * @author Luo Tiansheng
  * @since 2026/4/3
  */
-public class VFXStringEditingTableCell<S> extends TextFieldTableCell<S, String>
+public class VFXTextFieldTableCell<S> extends TextFieldTableCell<S, String>
 {
         /**
          * 文本编辑器
@@ -31,12 +31,12 @@ public class VFXStringEditingTableCell<S> extends TextFieldTableCell<S, String>
 
         private final ModifyListener modifyListener;
 
-        public VFXStringEditingTableCell()
+        public VFXTextFieldTableCell()
         {
                 this(null);
         }
 
-        public VFXStringEditingTableCell(ModifyListener modifyListener)
+        public VFXTextFieldTableCell(ModifyListener modifyListener)
         {
                 super(new DefaultStringConverter());
                 this.modifyListener = modifyListener;

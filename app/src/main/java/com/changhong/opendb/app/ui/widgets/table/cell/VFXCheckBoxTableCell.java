@@ -1,4 +1,4 @@
-package com.changhong.opendb.app.ui.widgets;
+package com.changhong.opendb.app.ui.widgets.table.cell;
 
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -10,6 +10,14 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 public class VFXCheckBoxTableCell<S> extends CheckBoxTableCell<S, Boolean>
 {
         private final CheckBox checkBox = new CheckBox();
+
+        public VFXCheckBoxTableCell()
+        {
+                checkBox.setOnAction(event -> {
+                        startEdit();
+                        commitEdit(checkBox.isSelected());
+                });
+        }
 
         @Override
         public void updateItem(Boolean item, boolean empty)
@@ -23,5 +31,11 @@ public class VFXCheckBoxTableCell<S> extends CheckBoxTableCell<S, Boolean>
 
                 checkBox.setSelected(item != null ? item : false);
                 setGraphic(checkBox);
+        }
+
+        @Override
+        public void commitEdit(Boolean newValue)
+        {
+                super.commitEdit(newValue);
         }
 }

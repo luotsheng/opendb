@@ -8,6 +8,11 @@ import com.changhong.opendb.app.driver.TableMetaData;
 import com.changhong.opendb.app.driver.executor.SQLExecutor;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.widgets.*;
+import com.changhong.opendb.app.ui.widgets.table.VFXTableColumn;
+import com.changhong.opendb.app.ui.widgets.table.VFXTableColumnFactory;
+import com.changhong.opendb.app.ui.widgets.table.VFXTableView;
+import com.changhong.opendb.app.ui.widgets.table.cell.VFXCheckBoxTableCell;
+import com.changhong.opendb.app.ui.widgets.table.cell.VFXTextFieldTableCell;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
@@ -159,16 +164,20 @@ public class TableDesignerTablePane extends DetailPane
                 structureView.getSelectionModel().setCellSelectionEnabled(true);
                 structureView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+                VFXTableColumnFactory<ColumnMetaData> factory = new VFXTableColumnFactory<>(event -> {
+                        System.out.println("表格有修改");
+                });
+
                 // 列
-                TableColumn<ColumnMetaData, String> name = new VFXTableColumn<>("名称", true);
-                TableColumn<ColumnMetaData, String> type = new VFXTableColumn<>("类型", true);
-                TableColumn<ColumnMetaData, Integer> length = new VFXTableColumn<>("长度", true);
-                TableColumn<ColumnMetaData, Integer> scale = new VFXTableColumn<>("小数位", true);
-                TableColumn<ColumnMetaData, String> defaultValue = new VFXTableColumn<>("默认值", true);
-                TableColumn<ColumnMetaData, Boolean> nullable = new VFXTableColumn<>("是否允许NULL", true);
-                TableColumn<ColumnMetaData, Boolean> primary = new VFXTableColumn<>("主键", true);
-                TableColumn<ColumnMetaData, Boolean> autoIncrement = new VFXTableColumn<>("是否自增", true);
-                TableColumn<ColumnMetaData, String> comment = new VFXTableColumn<>("注释", true);
+                TableColumn<ColumnMetaData, String> name = factory.createEditableColumn("名称");
+                TableColumn<ColumnMetaData, String> type = factory.createEditableColumn("类型");
+                TableColumn<ColumnMetaData, Integer> length = factory.createEditableColumn("长度");
+                TableColumn<ColumnMetaData, Integer> scale = factory.createEditableColumn("小数位");
+                TableColumn<ColumnMetaData, String> defaultValue = factory.createEditableColumn("默认值");
+                TableColumn<ColumnMetaData, Boolean> nullable = factory.createEditableColumn("是否允许NULL");
+                TableColumn<ColumnMetaData, Boolean> primary = factory.createEditableColumn("主键");
+                TableColumn<ColumnMetaData, Boolean> autoIncrement = factory.createEditableColumn("是否自增");
+                TableColumn<ColumnMetaData, String> comment = factory.createEditableColumn("注释");
 
                 name.setCellValueFactory(new PropertyValueFactory<>("name"));
                 type.setCellValueFactory(new PropertyValueFactory<>("type"));
@@ -180,12 +189,12 @@ public class TableDesignerTablePane extends DetailPane
                 autoIncrement.setCellValueFactory(new PropertyValueFactory<>("autoIncrement"));
                 comment.setCellValueFactory(new PropertyValueFactory<>("comment"));
 
-                name.setCellFactory(c -> new VFXStringEditingTableCell<>());
-                type.setCellFactory(c -> new VFXStringEditingTableCell<>());
-                defaultValue.setCellFactory(c -> new VFXStringEditingTableCell<>());
+                name.setCellFactory(c -> new VFXTextFieldTableCell<>());
+                type.setCellFactory(c -> new VFXTextFieldTableCell<>());
+                defaultValue.setCellFactory(c -> new VFXTextFieldTableCell<>());
                 length.setCellFactory(c -> new TextFieldTableCell<>(new IntegerStringConverter()));
                 scale.setCellFactory(c -> new TextFieldTableCell<>(new IntegerStringConverter()));
-                comment.setCellFactory(c -> new VFXStringEditingTableCell<>());
+                comment.setCellFactory(c -> new VFXTextFieldTableCell<>());
                 nullable.setCellFactory(c -> new VFXCheckBoxTableCell<>());
                 primary.setCellFactory(c -> new VFXCheckBoxTableCell<>());
                 autoIncrement.setCellFactory(c -> new VFXCheckBoxTableCell<>());
@@ -228,9 +237,9 @@ public class TableDesignerTablePane extends DetailPane
                 columns.setCellValueFactory(new PropertyValueFactory<>("columnsText"));
                 type.setCellValueFactory(new PropertyValueFactory<>("type"));
 
-                name.setCellFactory(c -> new VFXStringEditingTableCell<>());
-                columns.setCellFactory(c -> new VFXStringEditingTableCell<>());
-                type.setCellFactory(c -> new VFXStringEditingTableCell<>());
+                name.setCellFactory(c -> new VFXTextFieldTableCell<>());
+                columns.setCellFactory(c -> new VFXTextFieldTableCell<>());
+                type.setCellFactory(c -> new VFXTextFieldTableCell<>());
 
                 name.setPrefWidth(150);
                 columns.setPrefWidth(200);

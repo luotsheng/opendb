@@ -1,4 +1,4 @@
-package com.changhong.opendb.app.ui.widgets;
+package com.changhong.opendb.app.ui.widgets.table;
 
 import javafx.scene.control.TableColumn;
 

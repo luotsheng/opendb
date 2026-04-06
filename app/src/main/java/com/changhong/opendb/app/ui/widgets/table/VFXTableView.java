@@ -1,7 +1,8 @@
-package com.changhong.opendb.app.ui.widgets;
+package com.changhong.opendb.app.ui.widgets.table;
 
 
 import javafx.animation.FadeTransition;
+import javafx.collections.ListChangeListener;
 import javafx.scene.control.TableView;
 import javafx.util.Duration;
 
@@ -15,6 +16,11 @@ public class VFXTableView<S> extends TableView<S>
         {
                 getStyleClass().add("vfx-table-view");
                 setFixedCellSize(26);
+        }
+
+        public void addItemListener(ListChangeListener<? super S> listener)
+        {
+                getItems().addListener(listener);
         }
 
         public void blink()
