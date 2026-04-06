@@ -14,8 +14,10 @@ public class VFXCheckBoxTableCell<S> extends CheckBoxTableCell<S, Boolean>
         public VFXCheckBoxTableCell()
         {
                 checkBox.setOnAction(event -> {
+                        boolean newVal = checkBox.isSelected();
                         startEdit();
-                        commitEdit(checkBox.isSelected());
+                        setItem(newVal);
+                        commitEdit(newVal);
                 });
         }
 

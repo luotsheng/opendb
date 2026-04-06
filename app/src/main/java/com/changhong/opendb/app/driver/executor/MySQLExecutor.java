@@ -11,6 +11,8 @@ import com.changhong.opendb.app.driver.sql.SQLParsedStatement;
 import com.changhong.opendb.app.utils.Catcher;
 import com.changhong.opendb.app.utils.ResultSets;
 import com.github.vertical_blank.sqlformatter.SqlFormatter;
+import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.alter.Alter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -251,6 +253,17 @@ public class MySQLExecutor extends SQLExecutor
                 grid.setAddable(true);
 
                 return grid;
+        }
+
+        @Override
+        public void updateColumnMetaData(Collection<ColumnMetaData> columnMetaDatas)
+        {
+                for (ColumnMetaData col : columnMetaDatas) {
+
+                        Alter alter = new Alter();
+                        alter.setTable(new Table(col.getTable()));
+
+                }
         }
 
         @Override

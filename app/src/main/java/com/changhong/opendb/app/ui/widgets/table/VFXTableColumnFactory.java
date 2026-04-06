@@ -1,6 +1,6 @@
 package com.changhong.opendb.app.ui.widgets.table;
 
-import javafx.scene.control.TableColumn;
+import lombok.Setter;
 
 /**
  * @author Luo Tiansheng
@@ -8,23 +8,31 @@ import javafx.scene.control.TableColumn;
  */
 public class VFXTableColumnFactory<S>
 {
-        public interface EditCommitEventCallback<S>
+        public interface EditCommitEventListener
         {
-                void onCommit(TableColumn.CellEditEvent<S, ?> event);
+                void onCommit(int row, int col, Object newVal);
         }
 
-        private final EditCommitEventCallback<S> callback;
+        @Setter
+        private EditCommitEventListener onEditCommitEventListener;
 
-        public VFXTableColumnFactory(EditCommitEventCallback<S> callback)
+        public VFXTableColumnFactory()
         {
-                this.callback = callback;
         }
 
         public <T> VFXTableColumn<S, T> createEditableColumn(String name)
         {
                 VFXTableColumn<S, T> c = new VFXTableColumn<>(name, true);
 
-                c.setOnEditCommit(callback::onCommit);
+                c.setOnEditCommit(event -> {
+                        if (onEditCommitEventListener != null) {
+                                onEditCommitEventListener.onCommit(
+                                        event.getTablePosition().getRow(),
+                                        event.getTablePosition().getColumn(),
+                                        event.getNewValue()
+                                );
+                        }
+                });
 
                 return c;
         }

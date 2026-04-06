@@ -1,18 +1,22 @@
 package com.changhong.opendb.app.ui.pane;
 
 import atlantafx.base.util.IntegerStringConverter;
+import com.changhong.collection.Lists;
 import com.changhong.opendb.app.driver.ColumnMetaData;
 import com.changhong.opendb.app.driver.MySQL;
 import com.changhong.opendb.app.driver.TableIndexMetaData;
 import com.changhong.opendb.app.driver.TableMetaData;
 import com.changhong.opendb.app.driver.executor.SQLExecutor;
 import com.changhong.opendb.app.resource.Assets;
-import com.changhong.opendb.app.ui.widgets.*;
+import com.changhong.opendb.app.ui.widgets.VFX;
+import com.changhong.opendb.app.ui.widgets.VFXSeparator;
 import com.changhong.opendb.app.ui.widgets.table.VFXTableColumn;
 import com.changhong.opendb.app.ui.widgets.table.VFXTableColumnFactory;
 import com.changhong.opendb.app.ui.widgets.table.VFXTableView;
 import com.changhong.opendb.app.ui.widgets.table.cell.VFXCheckBoxTableCell;
 import com.changhong.opendb.app.ui.widgets.table.cell.VFXTextFieldTableCell;
+import com.changhong.reflect.UClass;
+import com.changhong.reflect.UField;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
@@ -21,7 +25,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Luo Tiansheng
@@ -44,7 +48,40 @@ public class TableDesignerTablePane extends DetailPane
         private List<ColumnMetaData> columnMetaDatas;
         private List<TableIndexMetaData> indexes;
 
+        private final Set<ColumnMetaData> columnMetaDataUpdateBuffer = new HashSet<>();
+        private final Map<Integer, TableIndexMetaData> tableIndexMetaDataUpdateBuffer = new HashMap<>();
+
         private Button reload;
+
+        /**
+         * ColumnMetaData 与表格列索引映射表
+         */
+        private static final Map<Integer, UField> columnMetaDataMapping = new HashMap<>();
+
+        /**
+         * TableIndexMetaData 与表格列索引映射表
+         */
+        private static final Map<Integer, UField> indexMetaDataMapping = new HashMap<>();
+
+        static {
+                UClass colClass = new UClass(ColumnMetaData.class);
+
+                columnMetaDataMapping.put(0, colClass.getDeclaredField("name"));
+                columnMetaDataMapping.put(1, colClass.getDeclaredField("type"));
+                columnMetaDataMapping.put(2, colClass.getDeclaredField("length"));
+                columnMetaDataMapping.put(3, colClass.getDeclaredField("scale"));
+                columnMetaDataMapping.put(4, colClass.getDeclaredField("nullable"));
+                columnMetaDataMapping.put(5, colClass.getDeclaredField("primary"));
+                columnMetaDataMapping.put(6, colClass.getDeclaredField("autoIncrement"));
+                columnMetaDataMapping.put(7, colClass.getDeclaredField("defaultValue"));
+                columnMetaDataMapping.put(8, colClass.getDeclaredField("comment"));
+
+                UClass idxClass = new UClass(TableIndexMetaData.class);
+                indexMetaDataMapping.put(0, idxClass.getDeclaredField("name"));
+                indexMetaDataMapping.put(1, idxClass.getDeclaredField("columnsText"));
+                indexMetaDataMapping.put(2, idxClass.getDeclaredField("type"));
+
+        }
 
         public TableDesignerTablePane(Tab ownerTab,
                                       SQLExecutor executor,
@@ -111,7 +148,8 @@ public class TableDesignerTablePane extends DetailPane
 
         private void applySave()
         {
-
+                executor.updateColumnMetaData(columnMetaDataUpdateBuffer);
+                columnMetaDataUpdateBuffer.clear();
         }
 
         private void applyPlus()
@@ -143,15 +181,19 @@ public class TableDesignerTablePane extends DetailPane
 
         private void applyReload()
         {
+                columnMetaDataUpdateBuffer.clear();
+
                 beginReload();
                 new Thread(() -> {
                         try {
                                 this.columnMetaDatas = executor.getColumns(tableMetaData);
                                 this.indexes = executor.getIndexes(tableMetaData);
-                                structureView.getItems().setAll(FXCollections.observableArrayList(columnMetaDatas));
-                                structureView.blink();
-                                indexView.getItems().setAll(FXCollections.observableArrayList(indexes));
-                                indexView.blink();
+                                Platform.runLater(() -> {
+                                        structureView.getItems().setAll(FXCollections.observableArrayList(columnMetaDatas));
+                                        structureView.blink();
+                                        indexView.getItems().setAll(FXCollections.observableArrayList(indexes));
+                                        indexView.blink();
+                                });
                         } finally {
                                 endReload();
                         }
@@ -164,8 +206,13 @@ public class TableDesignerTablePane extends DetailPane
                 structureView.getSelectionModel().setCellSelectionEnabled(true);
                 structureView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-                VFXTableColumnFactory<ColumnMetaData> factory = new VFXTableColumnFactory<>(event -> {
-                        System.out.println("表格有修改");
+                VFXTableColumnFactory<ColumnMetaData> factory = new VFXTableColumnFactory<>();
+
+                factory.setOnEditCommitEventListener((row, col, newVal) -> {
+                        UField uField = columnMetaDataMapping.get(col);
+                        ColumnMetaData columnMetaData = structureView.getItems().get(row);
+                        uField.write(columnMetaData, newVal);
+                        columnMetaDataUpdateBuffer.add(columnMetaData);
                 });
 
                 // 列

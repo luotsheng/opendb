@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,6 +91,8 @@ public abstract class SQLExecutor
 
         public abstract MutableDataGrid selectByPage(TableMetaData table, int start, int size)
                 throws SQLException;
+
+        public abstract void updateColumnMetaData(Collection<ColumnMetaData> columnMetaDatas);
 
         public abstract void cancel(Long id);
 }
