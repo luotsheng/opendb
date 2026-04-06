@@ -5,10 +5,7 @@ import com.changhong.opendb.app.driver.ColumnMetaData;
 import com.changhong.opendb.app.driver.Row;
 import com.changhong.opendb.app.driver.MutableDataGrid;
 import com.changhong.opendb.app.resource.Assets;
-import com.changhong.opendb.app.ui.widgets.ConfirmDialog;
-import com.changhong.opendb.app.ui.widgets.VfxStringEditingTableCell;
-import com.changhong.opendb.app.ui.widgets.VFX;
-import com.changhong.opendb.app.ui.widgets.VfxSeparator;
+import com.changhong.opendb.app.ui.widgets.*;
 import com.changhong.opendb.app.ui.workbench.ModifyCell;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -43,7 +40,7 @@ public class MutableDataGridViewPane extends BorderPane
 {
         private final TabPane tabPane = new TabPane();
         private final Tab dataGridTab = new Tab();
-        private final TableView<Row> tableView = VFX.newTableView();
+        private final TableView<Row> tableView = new VfxTableView<>();
         private final ToolBar toolBar = new ToolBar();
         private final VBox vContainer;
 

@@ -7,9 +7,7 @@ import com.changhong.opendb.app.driver.TableIndexMetaData;
 import com.changhong.opendb.app.driver.TableMetaData;
 import com.changhong.opendb.app.driver.executor.SQLExecutor;
 import com.changhong.opendb.app.resource.Assets;
-import com.changhong.opendb.app.ui.widgets.VfxStringEditingTableCell;
-import com.changhong.opendb.app.ui.widgets.VfxCheckBoxTableCell;
-import com.changhong.opendb.app.ui.widgets.VFX;
+import com.changhong.opendb.app.ui.widgets.*;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -29,8 +27,8 @@ public class TableDesignerTablePane extends DetailPane
         private final TableMetaData tableMetaData;
         private final List<ColumnMetaData> columnMetaDatas;
         private final List<TableIndexMetaData> indexes;
-        private final TableView<ColumnMetaData> structureView = VFX.newTableView();
-        private final TableView<TableIndexMetaData> indexView = VFX.newTableView();
+        private final TableView<ColumnMetaData> structureView = new VfxTableView<>();
+        private final TableView<TableIndexMetaData> indexView = new VfxTableView<>();
         private final ToolBar toolBar = new ToolBar();
         private final TabPane tabPane = new TabPane();
 
@@ -109,15 +107,15 @@ public class TableDesignerTablePane extends DetailPane
                 structureView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
                 // 列
-                TableColumn<ColumnMetaData, String> name = VFX.newEditableTableColumn("名称");
-                TableColumn<ColumnMetaData, String> type = VFX.newEditableTableColumn("类型");
-                TableColumn<ColumnMetaData, Integer> length = VFX.newEditableTableColumn("长度");
-                TableColumn<ColumnMetaData, Integer> scale = VFX.newEditableTableColumn("小数位");
-                TableColumn<ColumnMetaData, String> defaultValue = VFX.newEditableTableColumn("默认值");
-                TableColumn<ColumnMetaData, Boolean> nullable = VFX.newEditableTableColumn("是否允许 NULL");
-                TableColumn<ColumnMetaData, Boolean> primary = VFX.newEditableTableColumn("主键");
-                TableColumn<ColumnMetaData, Boolean> autoIncrement = VFX.newEditableTableColumn("是否自增");
-                TableColumn<ColumnMetaData, String> comment = VFX.newEditableTableColumn("注释");
+                TableColumn<ColumnMetaData, String> name = new VfxTableColumn<>("名称", true);
+                TableColumn<ColumnMetaData, String> type = new VfxTableColumn<>("类型", true);
+                TableColumn<ColumnMetaData, Integer> length = new VfxTableColumn<>("长度", true);
+                TableColumn<ColumnMetaData, Integer> scale = new VfxTableColumn<>("小数位", true);
+                TableColumn<ColumnMetaData, String> defaultValue = new VfxTableColumn<>("默认值", true);
+                TableColumn<ColumnMetaData, Boolean> nullable = new VfxTableColumn<>("是否允许NULL", true);
+                TableColumn<ColumnMetaData, Boolean> primary = new VfxTableColumn<>("主键", true);
+                TableColumn<ColumnMetaData, Boolean> autoIncrement = new VfxTableColumn<>("是否自增", true);
+                TableColumn<ColumnMetaData, String> comment = new VfxTableColumn<>("注释", true);
 
                 name.setCellValueFactory(new PropertyValueFactory<>("name"));
                 type.setCellValueFactory(new PropertyValueFactory<>("type"));
@@ -144,7 +142,7 @@ public class TableDesignerTablePane extends DetailPane
                 name.setPrefWidth(150);
                 type.setPrefWidth(150);
                 length.setPrefWidth(120);
-                scale.setPrefWidth(80);
+                scale.setPrefWidth(100);
                 defaultValue.setPrefWidth(200);
                 nullable.setPrefWidth(120);
                 primary.setPrefWidth(50);
@@ -172,9 +170,9 @@ public class TableDesignerTablePane extends DetailPane
                 indexView.getSelectionModel().setCellSelectionEnabled(true);
                 indexView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-                TableColumn<TableIndexMetaData, String> name = VFX.newEditableTableColumn("名称");
-                TableColumn<TableIndexMetaData, String> columns = VFX.newEditableTableColumn("索引列");
-                TableColumn<TableIndexMetaData, String> type = VFX.newEditableTableColumn("类型");
+                TableColumn<TableIndexMetaData, String> name = new VfxTableColumn<>("名称", true);
+                TableColumn<TableIndexMetaData, String> columns = new VfxTableColumn<>("索引列", true);
+                TableColumn<TableIndexMetaData, String> type = new VfxTableColumn<>("类型", true);
 
                 name.setCellValueFactory(new PropertyValueFactory<>("name"));
                 columns.setCellValueFactory(new PropertyValueFactory<>("columnsText"));
@@ -188,15 +186,16 @@ public class TableDesignerTablePane extends DetailPane
                 columns.setPrefWidth(200);
                 type.setPrefWidth(100);
 
+                indexView.getColumns().addAll(name, columns, type);
+
                 if (executor.getProductMetaData().getMajorVersion() >= MySQL.VERSION_8x) {
-                        TableColumn<TableIndexMetaData, Boolean> visible = VFX.newEditableTableColumn("是否可见");
+                        TableColumn<TableIndexMetaData, Boolean> visible = new VfxTableColumn<>("是否可见", true);
                         visible.setCellValueFactory(new PropertyValueFactory<>("visible"));
                         visible.setCellFactory(c -> new VfxCheckBoxTableCell<>());
                         visible.setPrefWidth(120);
-                        indexView.getColumns().add(visible);
+                        indexView.getColumns().addLast(visible);
                 }
 
-                indexView.getColumns().addAll(name, columns, type);
                 indexView.getItems().addAll(FXCollections.observableArrayList(indexes));
         }
 }

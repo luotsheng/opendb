@@ -47,7 +47,7 @@ public class DatabaseDetailPane extends DetailPane
         {
                 this.database = database;
 
-                tableView = VFX.newTableView();
+                tableView = new VfxTableView<>();
                 toolBar = new ToolBar();
 
                 // setup
@@ -101,13 +101,13 @@ public class DatabaseDetailPane extends DetailPane
         private void initializeColumn()
         {
                 // 列
-                name = VFX.newTableColumn("名称");
-                createTime = VFX.newTableColumn("创建时间");
-                updateTime = VFX.newTableColumn("更新时间");
-                engine = VFX.newTableColumn("存储引擎");
-                size = VFX.newTableColumn("表大小");
-                rows = VFX.newTableColumn("数据条数");
-                comment = VFX.newTableColumn("注释");
+                name = new VfxTableColumn<>("名称");
+                createTime = new VfxTableColumn<>("创建时间");
+                updateTime = new VfxTableColumn<>("更新时间");
+                engine = new VfxTableColumn<>("存储引擎");
+                size = new VfxTableColumn<>("表大小");
+                rows = new VfxTableColumn<>("数据条数");
+                comment = new VfxTableColumn<>("注释");
 
                 // 属性配置
                 name.setCellValueFactory(new PropertyValueFactory<>("name"));

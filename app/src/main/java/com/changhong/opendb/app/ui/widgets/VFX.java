@@ -9,26 +9,6 @@ import javafx.scene.control.*;
  */
 public class VFX
 {
-        public static <S> TableView<S> newTableView()
-        {
-                TableView<S> table = new TableView<>();
-                table.getStyleClass().add("vfx-table-view");
-                table.setFixedCellSize(26);
-                return table;
-        }
-
-        public static <S, T> TableColumn<S, T> newTableColumn(String name)
-        {
-                return new TableColumn<>(name);
-        }
-
-        public static <S, T> TableColumn<S, T> newEditableTableColumn(String name)
-        {
-                TableColumn<S, T> c = newTableColumn(name);
-                c.setEditable(true);
-                return c;
-        }
-
         public static Button newIconButton(String tip, String icon)
         {
                 Button button = new Button();
