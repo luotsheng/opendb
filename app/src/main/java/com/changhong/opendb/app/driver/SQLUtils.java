@@ -9,7 +9,6 @@ import net.sf.jsqlparser.statement.create.table.CreateTable;
 import java.util.List;
 import java.util.Map;
 
-import static com.changhong.string.StringStaticize.streq;
 import static com.changhong.string.StringStaticize.strieq;
 
 /**

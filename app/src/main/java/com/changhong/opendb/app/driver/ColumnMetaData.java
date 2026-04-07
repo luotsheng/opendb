@@ -1,8 +1,7 @@
 package com.changhong.opendb.app.driver;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 列元数据
@@ -10,7 +9,8 @@ import lombok.Data;
  * @author Luo Tiansheng
  * @since 2026/4/02
  */
-@Data
+@Getter
+@Setter
 public class ColumnMetaData
 {
         /**
@@ -72,6 +72,11 @@ public class ColumnMetaData
          * 字段注释
          */
         private String comment;
+
+        /**
+         * 原始字段名
+         */
+        private String originName;
 
         /**
          * 所属表名

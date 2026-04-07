@@ -12,8 +12,13 @@ import com.changhong.opendb.app.exception.VFXRuntimeException;
 import com.changhong.opendb.app.utils.Catcher;
 import com.changhong.opendb.app.utils.ResultSets;
 import com.github.vertical_blank.sqlformatter.SqlFormatter;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.alter.Alter;
+import net.sf.jsqlparser.statement.alter.AlterExpression;
+import net.sf.jsqlparser.statement.alter.AlterOperation;
+import net.sf.jsqlparser.statement.create.table.ColDataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +27,7 @@ import java.util.*;
 
 import static com.changhong.string.StringStaticize.streq;
 import static com.changhong.string.StringStaticize.strwfmt;
-import static com.changhong.utils.TypeConverter.atobool;
-import static com.changhong.utils.TypeConverter.atoi;
+import static com.changhong.utils.TypeConverter.*;
 
 /**
  * @author Luo Tiansheng
@@ -291,12 +295,59 @@ public class MySQLExecutor extends SQLExecutor
         }
 
         @Override
-        public void updateColumnMetaData(Collection<ColumnMetaData> columnMetaDatas)
-        {
+        @SuppressWarnings("ExtractMethodRecommender")
+        public void updateColumnMetaData(TableMetaData tableMetaData, Collection<ColumnMetaData> columnMetaDatas) {
+                StringBuilder builder = new StringBuilder();
+
                 for (ColumnMetaData col : columnMetaDatas) {
+                        AlterExpression alterExpr = new AlterExpression();
+                        // alterExpr.setColumnName(col.getName());
+
+                        if (col.getOriginName() != null) {
+                                alterExpr.setOperation(AlterOperation.CHANGE);
+                                alterExpr.setColumnOldName(col.getOriginName());
+                        } else {
+                                alterExpr.setOperation(AlterOperation.ADD);
+                        }
+
+                        ColDataType colDataType = new ColDataType(col.getType());
+                        
+                        if (col.getLength() > 0)
+                                colDataType.setArgumentsStringList(List.of(atos(col.getLength())));
+                        
+                        if (col.getScale() > 0)
+                                colDataType.setArgumentsStringList(List.of(atos(col.getLength()), atos(col.getScale())));
+
+                        var alterColDataType = new AlterExpression.ColumnDataType(false);
+
+                        alterColDataType.setColumnName(col.getName());
+                        alterColDataType.setColDataType(colDataType);
+
+                        alterColDataType.addColumnSpecs(
+                                col.isNullable() ? "NULL" : "NOT NULL",
+                                "DEFAULT",
+                                col.getDefaultValue() == null ? null : col.getDefaultValue()
+                        );
+
+                        if (col.getComment() != null)
+                                alterColDataType.addColumnSpecs("COMMENT", "'" + col.getComment() + "'");
+
+                        alterExpr.addColDataType(alterColDataType);
+
                         Alter alter = new Alter();
                         alter.setTable(new Table(col.getTable()));
+                        alter.setAlterExpressions(List.of(alterExpr));
+
+                        builder.append(alter).append(";");
                 }
+
+                execute(new SQL(tableMetaData.getDatabase(), atos(builder)));
+        }
+
+        public static void main(String[] args) throws JSQLParserException
+        {
+                net.sf.jsqlparser.statement.Statement parse = CCJSqlParserUtil.parse("alter table a_user add name varchar(255) not null default ''");
+                System.out.println();
         }
 
         @Override
@@ -343,6 +394,8 @@ public class MySQLExecutor extends SQLExecutor
                         c.setNullable(
                                 rsMeta.isNullable(i) == ResultSetMetaData.columnNullable
                         );
+
+                        c.setOriginName(c.getName());
 
                         c.setTable(rsMeta.getTableName(i));
 

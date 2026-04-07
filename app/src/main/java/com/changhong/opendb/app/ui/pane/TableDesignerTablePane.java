@@ -115,8 +115,9 @@ public class TableDesignerTablePane extends DetailPane
 
         private void applySave()
         {
-                executor.updateColumnMetaData(columnMetaDataUpdateBuffer);
+                executor.updateColumnMetaData(tableMetaData, columnMetaDataUpdateBuffer);
                 columnMetaDataUpdateBuffer.clear();
+                applyReload();
         }
 
         private void applyPlus()
@@ -175,29 +176,18 @@ public class TableDesignerTablePane extends DetailPane
 
                 VFXTableColumnFactory<ColumnMetaData> factory = new VFXTableColumnFactory<>();
 
-                factory.setOnEditCommitEventListener((row, col, newVal) -> {
-                });
+                factory.setOnEditCommitEventListener(columnMetaDataUpdateBuffer::add);
 
                 // 列
-                TableColumn<ColumnMetaData, String> name = factory.createEditableColumn("名称");
-                TableColumn<ColumnMetaData, String> type = factory.createEditableColumn("类型");
-                TableColumn<ColumnMetaData, Integer> length = factory.createEditableColumn("长度");
-                TableColumn<ColumnMetaData, Integer> scale = factory.createEditableColumn("小数位");
-                TableColumn<ColumnMetaData, String> defaultValue = factory.createEditableColumn("默认值");
-                TableColumn<ColumnMetaData, Boolean> nullable = factory.createEditableColumn("是否允许NULL");
-                TableColumn<ColumnMetaData, Boolean> primary = factory.createEditableColumn("主键");
-                TableColumn<ColumnMetaData, Boolean> autoIncrement = factory.createEditableColumn("是否自增");
-                TableColumn<ColumnMetaData, String> comment = factory.createEditableColumn("注释");
-
-                name.setCellValueFactory(new PropertyValueFactory<>("name"));
-                type.setCellValueFactory(new PropertyValueFactory<>("type"));
-                length.setCellValueFactory(new PropertyValueFactory<>("length"));
-                scale.setCellValueFactory(new PropertyValueFactory<>("scale"));
-                defaultValue.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
-                nullable.setCellValueFactory(new PropertyValueFactory<>("nullable"));
-                primary.setCellValueFactory(new PropertyValueFactory<>("primary"));
-                autoIncrement.setCellValueFactory(new PropertyValueFactory<>("autoIncrement"));
-                comment.setCellValueFactory(new PropertyValueFactory<>("comment"));
+                TableColumn<ColumnMetaData, String> name = factory.createEditableColumn("名称", "name");
+                TableColumn<ColumnMetaData, String> type = factory.createEditableColumn("类型", "type");
+                TableColumn<ColumnMetaData, Integer> length = factory.createEditableColumn("长度", "length");
+                TableColumn<ColumnMetaData, Integer> scale = factory.createEditableColumn("小数位", "scale");
+                TableColumn<ColumnMetaData, String> defaultValue = factory.createEditableColumn("默认值", "defaultValue");
+                TableColumn<ColumnMetaData, Boolean> nullable = factory.createEditableColumn("是否允许NULL", "nullable");
+                TableColumn<ColumnMetaData, Boolean> primary = factory.createEditableColumn("主键", "primary");
+                TableColumn<ColumnMetaData, Boolean> autoIncrement = factory.createEditableColumn("是否自增", "autoIncrement");
+                TableColumn<ColumnMetaData, String> comment = factory.createEditableColumn("注释", "comment");
 
                 name.setCellFactory(c -> new VFXTextFieldTableCell<>());
                 type.setCellFactory(c -> new VFXTextFieldTableCell<>());
