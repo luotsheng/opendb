@@ -344,12 +344,6 @@ public class MySQLExecutor extends SQLExecutor
                 execute(new SQL(tableMetaData.getDatabase(), atos(builder)));
         }
 
-        public static void main(String[] args) throws JSQLParserException
-        {
-                net.sf.jsqlparser.statement.Statement parse = CCJSqlParserUtil.parse("alter table a_user add name varchar(255) not null default ''");
-                System.out.println();
-        }
-
         @Override
         public void cancel(Long id)
         {
