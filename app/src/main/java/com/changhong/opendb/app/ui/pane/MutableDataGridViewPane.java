@@ -58,6 +58,7 @@ public class MutableDataGridViewPane extends BorderPane
         public interface ReloadProgressListener
         {
                 void start();
+
                 void end();
         }
 
@@ -222,15 +223,15 @@ public class MutableDataGridViewPane extends BorderPane
                 });
 
                 tableView.setOnMouseDragged(event -> {
-                       var cur = getTablePosition(event);
+                        var cur = getTablePosition(event);
 
-                       if (start != null && cur != null) {
-                               tableView.getSelectionModel().clearSelection();
-                               tableView.getSelectionModel().selectRange(
-                                       start.getRow(), (TableColumn) start.getTableColumn(),
-                                       cur.getRow(), cur.getTableColumn()
-                               );
-                       }
+                        if (start != null && cur != null) {
+                                tableView.getSelectionModel().clearSelection();
+                                tableView.getSelectionModel().selectRange(
+                                        start.getRow(), (TableColumn) start.getTableColumn(),
+                                        cur.getRow(), cur.getTableColumn()
+                                );
+                        }
                 });
 
                 tableView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -302,7 +303,7 @@ public class MutableDataGridViewPane extends BorderPane
                 var pick = event.getPickResult();
                 Node node = pick.getIntersectedNode();
 
-                while (node != null && !(node instanceof TableCell<?,?>))
+                while (node != null && !(node instanceof TableCell<?, ?>))
                         node = node.getParent();
 
                 if (node instanceof TableCell cell && !cell.isEmpty()) {
@@ -369,10 +370,13 @@ public class MutableDataGridViewPane extends BorderPane
 
                         if (grid.isEditable()) {
                                 labelBuilder.append("\n# ")
-                                        .append(columnMetaData.getType())
-                                        .append('(')
-                                        .append(columnMetaData.getLength())
-                                        .append(')');
+                                        .append(columnMetaData.getType());
+
+                                if (columnMetaData.getLength() > 0) {
+                                        labelBuilder.append('(')
+                                                .append(columnMetaData.getLength())
+                                                .append(')');
+                                }
 
                                 if (columnMetaData.isPrimary())
                                         labelBuilder.append(" ").append("PK");

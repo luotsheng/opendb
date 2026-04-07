@@ -259,10 +259,8 @@ public class MySQLExecutor extends SQLExecutor
         public void updateColumnMetaData(Collection<ColumnMetaData> columnMetaDatas)
         {
                 for (ColumnMetaData col : columnMetaDatas) {
-
                         Alter alter = new Alter();
                         alter.setTable(new Table(col.getTable()));
-
                 }
         }
 
@@ -302,7 +300,8 @@ public class MySQLExecutor extends SQLExecutor
 
                         c.setJdbcType(rsMeta.getColumnType(i));
 
-                        c.setLength(rsMeta.getPrecision(i));
+                        if (!JdbcTypes.isTime(c.getJdbcType()))
+                                c.setLength(rsMeta.getPrecision(i));
 
                         c.setScale(rsMeta.getScale(i));
 
