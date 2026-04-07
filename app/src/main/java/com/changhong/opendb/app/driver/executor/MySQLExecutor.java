@@ -8,6 +8,7 @@ import com.changhong.opendb.app.driver.datasource.VirtualDataSource;
 import com.changhong.opendb.app.driver.sql.SQL;
 import com.changhong.opendb.app.driver.sql.SQLCommandType;
 import com.changhong.opendb.app.driver.sql.SQLParsedStatement;
+import com.changhong.opendb.app.exception.VFXRuntimeException;
 import com.changhong.opendb.app.utils.Catcher;
 import com.changhong.opendb.app.utils.ResultSets;
 import com.github.vertical_blank.sqlformatter.SqlFormatter;
@@ -98,7 +99,25 @@ public class MySQLExecutor extends SQLExecutor
         public List<ColumnMetaData> getColumns(TableMetaData table)
         {
                 try {
-                        return selectByPage(table, 0, 0).getColumns();
+                        List<ColumnMetaData> columns = selectByPage(table, 0, 0).getColumns();
+
+                        Map<String, ColumnMetaData> columnMetaDataMap = new HashMap<>();
+
+                        for (ColumnMetaData column : columns)
+                                columnMetaDataMap.put(column.getName(), column);
+
+                        String createTableDDL = showCreateTable(table.getDatabase(), table.getName());
+
+                        Map<String, ColumnDefaultSpec> defaultSpecs = SQLUtils.parseColumnDefaultSpec(createTableDDL);
+
+                        for (Map.Entry<String, ColumnDefaultSpec> entry : defaultSpecs.entrySet()) {
+                                var columnMetaData = columnMetaDataMap.get(entry.getKey());
+
+                                if (columnMetaData != null)
+                                        columnMetaData.setDefaultValue(entry.getValue().getDefaultValue());
+                        }
+
+                        return columns;
                 } catch (Exception e) {
                         Catcher.ithrow(e);
                         return List.of();
@@ -153,6 +172,22 @@ public class MySQLExecutor extends SQLExecutor
                 ret.forEach(TableIndexMetaData::generateColumnText);
 
                 return ret;
+        }
+
+        @Override
+        public String showCreateTable(String db, String table)
+        {
+                String sql = "SHOW CREATE TABLE " + table + ";";
+
+                try (var connection = ds.getConnection();
+                     var statement = connection.createStatement()) {
+                        ResultSet rs = statement.executeQuery(sql);
+                        if (rs.next())
+                                return rs.getString(2);
+                        return null;
+                } catch (SQLException e) {
+                        throw new VFXRuntimeException(e);
+                }
         }
 
         @Override
