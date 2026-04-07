@@ -82,12 +82,4 @@ public class ColumnMetaData
          * 所属 schema
          */
         private String schema;
-
-        private BooleanProperty isPrimary;
-
-        public BooleanProperty primaryProperty()
-        {
-                return isPrimary;
-        }
-
 }
