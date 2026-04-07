@@ -1,7 +1,9 @@
 package com.changhong.opendb.app.driver;
 
 import com.changhong.collection.Maps;
+import com.changhong.opendb.app.exception.VFXRuntimeException;
 import com.changhong.utils.Captor;
+import javafx.scene.layout.Pane;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
@@ -26,7 +28,7 @@ public class SQLUtils
         {
                 Map<String, ColumnDefaultSpec> ret = Maps.newHashMap();
 
-                Captor.call(() -> {
+                try {
                         var createTable = (CreateTable) CCJSqlParserUtil.parse(ddl);
 
                         List<ColumnDefinition> definitions = createTable.getColumnDefinitions();
@@ -35,6 +37,9 @@ public class SQLUtils
                                 boolean isDefault = false;
 
                                 List<String> specs = definition.getColumnSpecs();
+
+                                if (specs == null)
+                                        continue;
 
                                 for (String spec : specs) {
                                         if (isDefault) {
@@ -47,7 +52,9 @@ public class SQLUtils
                                                 isDefault = true;
                                 }
                         }
-                });
+                } catch (Exception e) {
+                        throw new VFXRuntimeException(e);
+                }
 
                 return ret;
         }
