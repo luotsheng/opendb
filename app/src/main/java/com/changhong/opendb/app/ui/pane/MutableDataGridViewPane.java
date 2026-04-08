@@ -12,6 +12,7 @@ import com.changhong.opendb.app.ui.workbench.ModifyCell;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
@@ -56,12 +57,17 @@ public class MutableDataGridViewPane extends BorderPane
         private MutableDataGrid grid;
         private TablePosition<?, ?> start;
 
-        public interface ReloadProgressListener
-        {
+        public interface ReloadProgressListener {
                 void start();
-
                 void end();
         }
+
+        public interface AllTabClosedListener {
+                void closed();
+        }
+
+        @Setter
+        private AllTabClosedListener onClosedListener;
 
         @Setter
         private ReloadProgressListener reloadProgressListener;
@@ -89,6 +95,19 @@ public class MutableDataGridViewPane extends BorderPane
 
                 setTop(toolBar);
                 setCenter(tabPane);
+
+                /*
+                 * 允许外部父容器监听当前表格预览组件中的标签页是否完全关闭。
+                 *
+                 * 父容器可以设置监听器，当所有标签都被关闭后，父容器可以选
+                 * 择同时关闭当前预览页面。
+                 */
+                tabPane.getTabs().addListener((ListChangeListener<? super Tab>) change -> {
+                        if (!isPreview && tabPane.getTabs().isEmpty()) {
+                                if (onClosedListener != null)
+                                        onClosedListener.closed();
+                        }
+                });
 
                 updateCheckCross();
                 setupToolButtonAction();
@@ -409,11 +428,6 @@ public class MutableDataGridViewPane extends BorderPane
                 tableView.setItems(
                         FXCollections.observableArrayList(grid.getRows())
                 );
-        }
-
-        public void setOnCloseRequest(EventHandler<Event> value)
-        {
-                dataGridTab.setOnCloseRequest(value);
         }
 
         private static int calcColWidth(String colText, List<Row> values, int index)

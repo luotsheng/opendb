@@ -189,9 +189,8 @@ public class SqlEditor extends SplitPane
 
         private void setupResultSetCloseEvent()
         {
-                mutableDataGridViewPane.setOnCloseRequest(event -> {
-                        getItems().remove(mutableDataGridViewPane);
-                });
+                mutableDataGridViewPane.setOnClosedListener(() ->
+                        getItems().remove(mutableDataGridViewPane));
         }
 
         private ComboBox<ODBNConnection> newConnectionComboBox()
