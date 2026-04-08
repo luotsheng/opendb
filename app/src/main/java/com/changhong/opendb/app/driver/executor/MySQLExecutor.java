@@ -221,7 +221,7 @@ public class MySQLExecutor extends SQLExecutor
 
                         if (col.getOriginName() != null) {
                                 alterExpr.setOperation(AlterOperation.CHANGE);
-                                alterExpr.setColumnOldName(col.getOriginName());
+                                alterExpr.setColumnOldName("`" + col.getOriginName() + "`");
                         } else {
                                 alterExpr.setOperation(AlterOperation.ADD);
                         }
@@ -238,7 +238,7 @@ public class MySQLExecutor extends SQLExecutor
 
                         var alterColDataType = new AlterExpression.ColumnDataType(false);
 
-                        alterColDataType.setColumnName(col.getName());
+                        alterColDataType.setColumnName("`" + col.getName() + "`");
                         alterColDataType.setColDataType(colDataType);
 
                         alterColDataType.addColumnSpecs(
@@ -254,7 +254,7 @@ public class MySQLExecutor extends SQLExecutor
                         alterExpr.addColDataType(alterColDataType);
 
                         Alter alter = new Alter();
-                        alter.setTable(new Table(tableMetaData.getName()));
+                        alter.setTable(new Table("`" + tableMetaData.getName() + "`"));
                         alter.setAlterExpressions(List.of(alterExpr));
 
                         builder.append(alter).append(";");
