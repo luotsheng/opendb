@@ -159,8 +159,8 @@ public class TableDesignerTablePane extends DetailPane
                                 Platform.runLater(() -> {
                                         structureView.getItems().setAll(FXCollections.observableArrayList(columnMetaDatas));
                                         indexView.getItems().setAll(FXCollections.observableArrayList(indexes));
-                                        structureView.refreshAndBlink();
-                                        indexView.refreshAndBlink();
+                                        structureView.refresh();
+                                        indexView.refresh();
                                 });
                         } finally {
                                 endReload();

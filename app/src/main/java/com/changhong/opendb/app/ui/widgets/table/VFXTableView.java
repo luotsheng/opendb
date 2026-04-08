@@ -23,7 +23,8 @@ public class VFXTableView<S> extends TableView<S>
                 getItems().addListener(listener);
         }
 
-        public void blink()
+        @Override
+        public void refresh()
         {
                 FadeTransition ft = new FadeTransition(Duration.millis(300), this);
                 ft.setFromValue(0.1);
@@ -34,11 +35,7 @@ public class VFXTableView<S> extends TableView<S>
                 ft.setOnFinished(event -> this.setOpacity(1.0));
 
                 ft.play();
-        }
 
-        public void refreshAndBlink()
-        {
-                blink();
-                refresh();
+                super.refresh();
         }
 }
