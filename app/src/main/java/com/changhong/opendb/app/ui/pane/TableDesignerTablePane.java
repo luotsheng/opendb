@@ -115,7 +115,7 @@ public class TableDesignerTablePane extends DetailPane
 
         private void applySave()
         {
-                executor.updateColumnMetaData(tableMetaData, columnMetaDataUpdateBuffer);
+                executor.alterChange(tableMetaData, columnMetaDataUpdateBuffer);
                 columnMetaDataUpdateBuffer.clear();
                 applyReload();
         }
@@ -158,9 +158,9 @@ public class TableDesignerTablePane extends DetailPane
                                 this.indexes = executor.getIndexes(tableMetaData);
                                 Platform.runLater(() -> {
                                         structureView.getItems().setAll(FXCollections.observableArrayList(columnMetaDatas));
-                                        structureView.blink();
                                         indexView.getItems().setAll(FXCollections.observableArrayList(indexes));
-                                        indexView.blink();
+                                        structureView.refreshAndBlink();
+                                        indexView.refreshAndBlink();
                                 });
                         } finally {
                                 endReload();

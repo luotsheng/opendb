@@ -35,4 +35,10 @@ public class VFXTableView<S> extends TableView<S>
 
                 ft.play();
         }
+
+        public void refreshAndBlink()
+        {
+                blink();
+                refresh();
+        }
 }

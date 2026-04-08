@@ -204,6 +204,62 @@ public class MySQLExecutor extends SQLExecutor
         }
 
         @Override
+        @SuppressWarnings("ExtractMethodRecommender")
+        public void alterChange(TableMetaData tableMetaData, Collection<ColumnMetaData> columnMetaDatas)
+        {
+                if (Lists.isEmpty(columnMetaDatas))
+                        return;
+
+                StringBuilder builder = new StringBuilder();
+
+                for (ColumnMetaData col : columnMetaDatas) {
+                        AlterExpression alterExpr = new AlterExpression();
+
+                        if (col.getOriginName() != null) {
+                                alterExpr.setOperation(AlterOperation.CHANGE);
+                                alterExpr.setColumnOldName(col.getOriginName());
+                        } else {
+                                alterExpr.setOperation(AlterOperation.ADD);
+                        }
+
+                        ColDataType colDataType = new ColDataType(col.getType());
+
+                        if (JdbcTypes.isSupportLength(col.getJdbcType())) {
+                                if (col.getLength() > 0)
+                                        colDataType.setArgumentsStringList(List.of(atos(col.getLength())));
+
+                                if (col.getScale() > 0)
+                                        colDataType.setArgumentsStringList(List.of(atos(col.getLength()), atos(col.getScale())));
+                        }
+
+                        var alterColDataType = new AlterExpression.ColumnDataType(false);
+
+                        alterColDataType.setColumnName(col.getName());
+                        alterColDataType.setColDataType(colDataType);
+
+                        alterColDataType.addColumnSpecs(
+                                col.isNullable() ? "NULL" : "NOT NULL"
+                        );
+
+                        if (col.getDefaultValue() != null)
+                                alterColDataType.addColumnSpecs("DEFAULT", col.getDefaultValue());
+
+                        if (col.getComment() != null)
+                                alterColDataType.addColumnSpecs("COMMENT", "'" + col.getComment() + "'");
+
+                        alterExpr.addColDataType(alterColDataType);
+
+                        Alter alter = new Alter();
+                        alter.setTable(new Table(tableMetaData.getName()));
+                        alter.setAlterExpressions(List.of(alterExpr));
+
+                        builder.append(alter).append(";");
+                }
+
+                execute(new SQL(tableMetaData.getDatabase(), atos(builder)));
+        }
+
+        @Override
         @SuppressWarnings("resource")
         public MutableDataGrid execute(SQL sql, ExecuteCallback callback)
         {
@@ -292,56 +348,6 @@ public class MySQLExecutor extends SQLExecutor
                 grid.setAddable(true);
 
                 return grid;
-        }
-
-        @Override
-        @SuppressWarnings("ExtractMethodRecommender")
-        public void updateColumnMetaData(TableMetaData tableMetaData, Collection<ColumnMetaData> columnMetaDatas) {
-                StringBuilder builder = new StringBuilder();
-
-                for (ColumnMetaData col : columnMetaDatas) {
-                        AlterExpression alterExpr = new AlterExpression();
-
-                        if (col.getOriginName() != null) {
-                                alterExpr.setOperation(AlterOperation.CHANGE);
-                                alterExpr.setColumnOldName(col.getOriginName());
-                        } else {
-                                alterExpr.setOperation(AlterOperation.ADD);
-                        }
-
-                        ColDataType colDataType = new ColDataType(col.getType());
-                        
-                        if (col.getLength() > 0)
-                                colDataType.setArgumentsStringList(List.of(atos(col.getLength())));
-                        
-                        if (col.getScale() > 0)
-                                colDataType.setArgumentsStringList(List.of(atos(col.getLength()), atos(col.getScale())));
-
-                        var alterColDataType = new AlterExpression.ColumnDataType(false);
-
-                        alterColDataType.setColumnName(col.getName());
-                        alterColDataType.setColDataType(colDataType);
-
-                        alterColDataType.addColumnSpecs(
-                                col.isNullable() ? "NULL" : "NOT NULL"
-                        );
-
-                        if (col.getDefaultValue() != null)
-                                alterColDataType.addColumnSpecs("DEFAULT", col.getDefaultValue());
-
-                        if (col.getComment() != null)
-                                alterColDataType.addColumnSpecs("COMMENT", "'" + col.getComment() + "'");
-
-                        alterExpr.addColDataType(alterColDataType);
-
-                        Alter alter = new Alter();
-                        alter.setTable(new Table(tableMetaData.getName()));
-                        alter.setAlterExpressions(List.of(alterExpr));
-
-                        builder.append(alter).append(";");
-                }
-
-                execute(new SQL(tableMetaData.getDatabase(), atos(builder)));
         }
 
         @Override

@@ -85,6 +85,8 @@ public abstract class SQLExecutor
 
         public abstract void drop(String db, String table) throws SQLException;
 
+        public abstract void alterChange(TableMetaData tableMetaData, Collection<ColumnMetaData> columnMetaDatas);
+
         public MutableDataGrid execute(SQL sql) {
               return execute(sql, new DefaultExecutorCallback());
         }
@@ -93,8 +95,6 @@ public abstract class SQLExecutor
 
         public abstract MutableDataGrid selectByPage(TableMetaData table, int start, int size)
                 throws SQLException;
-
-        public abstract void updateColumnMetaData(TableMetaData tableMetaData, Collection<ColumnMetaData> columnMetaDatas);
 
         public abstract void cancel(Long id);
 }
