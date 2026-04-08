@@ -386,10 +386,14 @@ public class MySQLExecutor extends SQLExecutor
 
                         c.setJdbcType(rsMeta.getColumnType(i));
 
-                        if (!JdbcTypes.isTime(c.getJdbcType()))
-                                c.setLength(rsMeta.getPrecision(i));
+                        if (JdbcTypes.isSupportLength(c.getJdbcType())) {
 
-                        c.setScale(rsMeta.getScale(i));
+                                if (!JdbcTypes.isTime(c.getJdbcType()))
+                                        c.setLength(rsMeta.getPrecision(i));
+
+                                c.setScale(rsMeta.getScale(i));
+
+                        }
 
                         c.setNullable(
                                 rsMeta.isNullable(i) == ResultSetMetaData.columnNullable

@@ -41,10 +41,19 @@ public class SQLUtils
                                 if (specs == null)
                                         continue;
 
-                                for (String spec : specs) {
+                                for (int i = 0; i < specs.size(); i++) {
+                                        String spec = specs.get(i);
+
                                         if (isDefault) {
+                                                int next = i + 1;
+
+                                                /* 针对处理带参数的默认函数值，例如：CURRENT_TIMESTAMP(3) */
+                                                if (specs.size() > next && specs.get(next).startsWith("("))
+                                                        spec = spec + specs.get(next);
+
                                                 var columnDefaultSpec = newColumnDefaultSpec(definition, spec);
                                                 ret.put(columnDefaultSpec.getName(), columnDefaultSpec);
+
                                                 break;
                                         }
 

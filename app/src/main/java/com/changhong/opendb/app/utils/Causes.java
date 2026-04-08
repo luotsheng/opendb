@@ -8,8 +8,12 @@ public class Causes
 {
         public static String message(Throwable e)
         {
-                if (e.getCause() != null)
-                        return e.getCause().getMessage();
+                int cnt = 0;
+
+                while (e.getCause() != null) {
+                        e = e.getCause();
+                        cnt++;
+                }
 
                 return e.getMessage();
         }
