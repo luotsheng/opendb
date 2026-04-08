@@ -33,7 +33,7 @@ public class Workbench extends VBox implements EventListener
         private final List<SqlEditor> editors = new ArrayList<>();
         
         private final Map<String, Tab> mutableDataGridMgr = new HashMap<>();
-        private final Map<TableMetaData, Tab> tableMetaDataMgr = new HashMap<>();
+        private final Map<String, Tab> tableMetaDataMgr = new HashMap<>();
 
         private final ContextMenu tabPaneContextMenu = new ContextMenu();
         private final MenuItem closeCurrent = new MenuItem("关闭当前");;
@@ -234,10 +234,15 @@ public class Workbench extends VBox implements EventListener
 
         private void handleOpenDesignTablePaneEvent(OpenDesignTablePaneEvent e)
         {
-                Tab tab = new Tab(e.id());
-                tab.setContent(new TableDesignerTablePane(tab, e.executor, e.table));
-                tab.setGraphic(Assets.use("struct1"));
+                Tab tab = tableMetaDataMgr.get(e.id());
+
+                if (tab == null) {
+                        tab = new Tab(e.id());
+                        tab.setContent(new TableDesignerTablePane(tab, e.executor, e.table));
+                        tab.setGraphic(Assets.use("struct1"));
+                        tableMetaDataMgr.put(e.id(), tab);
+                }
+
                 tabPane.addAndSelect(tab);
-                tableMetaDataMgr.put(e.table, tab);
         }
 }
