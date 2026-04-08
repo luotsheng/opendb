@@ -9,7 +9,7 @@ import com.changhong.opendb.app.driver.sql.SQL;
 import com.changhong.opendb.app.driver.sql.SQLCommandType;
 import com.changhong.opendb.app.driver.sql.SQLParsedStatement;
 import com.changhong.opendb.app.exception.VFXRuntimeException;
-import com.changhong.opendb.app.utils.Catcher;
+import com.changhong.opendb.app.ui.widgets.Dialogs;
 import com.changhong.opendb.app.utils.ResultSets;
 import com.github.vertical_blank.sqlformatter.SqlFormatter;
 import net.sf.jsqlparser.schema.Table;
@@ -121,7 +121,7 @@ public class MySQLExecutor extends SQLExecutor
 
                         return columns;
                 } catch (Exception e) {
-                        Catcher.ithrow(e);
+                        Dialogs.openError(e);
                         return List.of();
                 }
         }
@@ -343,7 +343,7 @@ public class MySQLExecutor extends SQLExecutor
         @Override
         public void cancel(Long id)
         {
-                Catcher.tryCall(() -> {
+                Dialogs.tryCall(() -> {
                         if (queue.containsKey(id))
                                 queue.get(id).cancel();
                 });

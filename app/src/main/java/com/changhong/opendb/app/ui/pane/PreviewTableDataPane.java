@@ -4,7 +4,7 @@ import com.changhong.opendb.app.driver.executor.SQLExecutor;
 import com.changhong.opendb.app.driver.MutableDataGrid;
 import com.changhong.opendb.app.driver.TableMetaData;
 import com.changhong.opendb.app.resource.Assets;
-import com.changhong.opendb.app.utils.Catcher;
+import com.changhong.opendb.app.ui.widgets.Dialogs;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
@@ -79,7 +79,7 @@ public class PreviewTableDataPane extends BorderPane
                                         size);
                                 Platform.runLater(() -> mutableDataGridViewPane.render(rs));
                         } catch (Exception e) {
-                                Catcher.ithrow(e);
+                                Dialogs.openError(e);
                         } finally {
                                 Platform.runLater(this::removeLoadingIndicator);
                         }

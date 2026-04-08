@@ -1,6 +1,5 @@
 package com.changhong.opendb.app.ui.pane;
 
-import atlantafx.base.util.IntegerStringConverter;
 import com.changhong.opendb.app.driver.ColumnMetaData;
 import com.changhong.opendb.app.driver.MySQL;
 import com.changhong.opendb.app.driver.TableIndexMetaData;
@@ -14,12 +13,12 @@ import com.changhong.opendb.app.ui.widgets.table.VFXTableColumnFactory;
 import com.changhong.opendb.app.ui.widgets.table.VFXTableView;
 import com.changhong.opendb.app.ui.widgets.table.cell.VFXCheckBoxTableCell;
 import com.changhong.opendb.app.ui.widgets.table.cell.VFXTextFieldTableCell;
+import com.changhong.opendb.app.ui.widgets.Dialogs;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 
 import java.util.*;
@@ -115,9 +114,13 @@ public class TableDesignerTablePane extends DetailPane
 
         private void applySave()
         {
-                executor.alterChange(tableMetaData, columnMetaDataUpdateBuffer);
-                columnMetaDataUpdateBuffer.clear();
-                applyReload();
+                try {
+                        executor.alterChange(tableMetaData, columnMetaDataUpdateBuffer);
+                        applyReload();
+                        columnMetaDataUpdateBuffer.clear();
+                } catch (Exception e) {
+                        Dialogs.openError(e);
+                }
         }
 
         private void applyPlus()

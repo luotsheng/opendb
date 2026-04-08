@@ -1,5 +1,7 @@
 package com.changhong.opendb.app.core.event;
 
+import com.changhong.opendb.app.utils.Causes;
+
 /**
  * 异常捕获事件
  *
@@ -12,17 +14,7 @@ public class ThrowableEvent extends Event
 
         public ThrowableEvent(Throwable e)
         {
-                this.message = findCauseMessage(e);
-        }
-
-        private static String findCauseMessage(Throwable e) {
-                Throwable root = e;
-
-                while (root.getCause() != null) {
-                        root = root.getCause();
-                }
-
-                return root.getMessage();
+                this.message = Causes.message(e);
         }
 
 }

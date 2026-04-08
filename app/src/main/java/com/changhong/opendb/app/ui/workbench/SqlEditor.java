@@ -11,7 +11,7 @@ import com.changhong.opendb.app.ui.navigator.node.ODBNDatabase;
 import com.changhong.opendb.app.ui.pane.MutableDataGridViewPane;
 import com.changhong.opendb.app.ui.pane.SqlMessagePane;
 import com.changhong.opendb.app.ui.widgets.*;
-import com.changhong.opendb.app.utils.Catcher;
+import com.changhong.opendb.app.ui.widgets.Dialogs;
 import com.changhong.opendb.app.utils.Causes;
 import com.github.vertical_blank.sqlformatter.SqlFormatter;
 import javafx.application.Platform;
@@ -466,7 +466,7 @@ public class SqlEditor extends SplitPane
                                 int count = rw.read(buf);
                                 builder.append(buf, 0, count);
                         } catch (Throwable e) {
-                                Catcher.ithrow(e);
+                                Dialogs.openError(e);
                         }
 
                         codeArea.clear();

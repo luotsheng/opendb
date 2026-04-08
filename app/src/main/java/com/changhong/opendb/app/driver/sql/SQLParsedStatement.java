@@ -1,7 +1,7 @@
 package com.changhong.opendb.app.driver.sql;
 
 import com.changhong.opendb.app.core.exception.CatcherException;
-import com.changhong.opendb.app.utils.Catcher;
+import com.changhong.opendb.app.ui.widgets.Dialogs;
 import lombok.Getter;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.*;
@@ -55,7 +55,7 @@ public class SQLParsedStatement
 
                         initialize(beg(statements), true);
                 } catch (Exception e) {
-                        Catcher.ithrow(e);
+                        Dialogs.openError(e);
                 }
         }
 
@@ -72,7 +72,7 @@ public class SQLParsedStatement
                 this.star = false;
 
                 if (type == SQLCommandType.UNSUPPORTED)
-                        Catcher.ithrow("Unsupported " + script);
+                        Dialogs.openError("Unsupported " + script);
 
                 if (type == SQLCommandType.DQL && !(statement instanceof ShowIndexStatement)) {
                         TablesNamesFinder<Void> finder = new TablesNamesFinder<>();

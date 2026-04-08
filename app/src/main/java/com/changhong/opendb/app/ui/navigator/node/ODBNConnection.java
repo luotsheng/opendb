@@ -9,7 +9,7 @@ import com.changhong.opendb.app.model.ODBNStatus;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.dialog.connection.ConnectionDialog;
 import com.changhong.opendb.app.ui.widgets.ConfirmDialog;
-import com.changhong.opendb.app.utils.Catcher;
+import com.changhong.opendb.app.ui.widgets.Dialogs;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -92,7 +92,7 @@ public class ODBNConnection extends ODBNode
 
                 databases.clear();
                 getChildren().clear();
-                Catcher.tryCall(dataSource::close);
+                Dialogs.tryCall(dataSource::close);
 
                 openFlag = false;
         }

@@ -1,5 +1,7 @@
 package com.changhong.opendb.app.utils;
 
+import com.changhong.opendb.app.ui.widgets.Dialogs;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,7 +31,7 @@ public class FileUtils
                                 .isEmpty();
 
                 } catch (IOException e) {
-                        Catcher.ithrow(e);
+                        Dialogs.openError(e);
                 }
 
                 return false;
@@ -49,14 +51,14 @@ public class FileUtils
                 Path path = Paths.get(pathname);
 
                 if (Files.isRegularFile(path)) {
-                        Catcher.tryCall(() -> Files.deleteIfExists(path));
+                        Dialogs.tryCall(() -> Files.deleteIfExists(path));
                         return;
                 }
 
-                Catcher.tryCall(() -> {
+                Dialogs.tryCall(() -> {
                         Files.walk(path)
                                 .sorted(Comparator.reverseOrder())
-                                .forEach(pathVal -> Catcher.tryCall(() -> Files.delete(pathVal)));
+                                .forEach(pathVal -> Dialogs.tryCall(() -> Files.delete(pathVal)));
                 });
         }
 }

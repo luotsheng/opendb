@@ -1,5 +1,6 @@
 package com.changhong.opendb.app.utils;
 
+import com.changhong.opendb.app.ui.widgets.Dialogs;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -40,7 +41,7 @@ public class JSONUtils
                 try {
                         return objectMapper.readValue(json, aClass);
                 } catch (JsonProcessingException e) {
-                        Catcher.ithrow(e);
+                        Dialogs.openError(e);
                         return null;
                 }
         }
@@ -53,7 +54,7 @@ public class JSONUtils
 
                         return objectMapper.readValue(jsonArray, collectionType);
                 } catch (JsonProcessingException e) {
-                        Catcher.ithrow(e);
+                        Dialogs.openError(e);
                         return null;
                 }
         }

@@ -2,7 +2,7 @@ package com.changhong.opendb.app.repository;
 
 import com.changhong.opendb.app.Users;
 import com.changhong.opendb.app.model.ConnectionInfo;
-import com.changhong.opendb.app.utils.Catcher;
+import com.changhong.opendb.app.ui.widgets.Dialogs;
 import com.changhong.opendb.app.utils.FileUtils;
 import com.changhong.opendb.app.utils.JSONUtils;
 
@@ -30,12 +30,12 @@ public class ConnectionRepository
                 File odbc = new File(dir, ".odbc");
 
                 if (odbc.exists())
-                        Catcher.ithrow(new FileAlreadyExistsException(name + "已存在！"));
+                        Dialogs.openError(new FileAlreadyExistsException(name + "已存在！"));
 
                 dir.mkdirs();
 
                 if (!odbc.exists())
-                        Catcher.tryCall(odbc::createNewFile);
+                        Dialogs.tryCall(odbc::createNewFile);
 
                 try (FileOutputStream fos = new FileOutputStream(odbc)) {
 
@@ -44,7 +44,7 @@ public class ConnectionRepository
                 } catch (IOException e) {
                         /* 删除文件夹 */
                         FileUtils.forceDelete(dir);
-                        Catcher.ithrow(e);
+                        Dialogs.openError(e);
                 }
         }
 
@@ -86,7 +86,7 @@ public class ConnectionRepository
                                 String content = new String(bytes, StandardCharsets.UTF_8);
                                 ret.add(JSONUtils.toJavaObject(content, ConnectionInfo.class));
                         } catch (Exception e) {
-                                Catcher.ithrow(e);
+                                Dialogs.openError(e);
                         }
                 }
 
