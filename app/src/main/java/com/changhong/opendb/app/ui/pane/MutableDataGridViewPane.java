@@ -161,6 +161,7 @@ public class MutableDataGridViewPane extends BorderPane
                 grid.addEmptyRow();
                 tableView.getItems().setAll(grid.getRows());
                 tableView.refresh();
+                tableView.playFlash();
         }
 
         private void applyMinus()
@@ -229,7 +230,7 @@ public class MutableDataGridViewPane extends BorderPane
                                 grid.reload();
                                 Platform.runLater(() -> render(grid));
                         } finally {
-                                tableView.blink();
+                                tableView.playFlash();
 
                                 if (enableProgressIndicator)
                                         removeProgressIndicator();
