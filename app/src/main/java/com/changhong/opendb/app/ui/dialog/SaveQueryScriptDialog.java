@@ -10,7 +10,7 @@ import com.changhong.opendb.app.ui.workbench.SqlEditor;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
+import com.changhong.opendb.app.ui.widgets.VFXComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -31,8 +31,8 @@ public class SaveQueryScriptDialog extends DetailPane
         private final Stage stage;
         private final SqlEditor sqlEditor;
         private final TextField textField;
-        private final ComboBox<ODBNConnection> connectionComboBox;
-        private final ComboBox<ODBNDatabase> databaseComboBox;
+        private final VFXComboBox<ODBNConnection> connectionComboBox;
+        private final VFXComboBox<ODBNDatabase> databaseComboBox;
 
         public SaveQueryScriptDialog(Stage stage, SqlEditor sqlEditor)
         {

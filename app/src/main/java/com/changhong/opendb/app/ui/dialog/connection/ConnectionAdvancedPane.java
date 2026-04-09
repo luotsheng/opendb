@@ -3,7 +3,7 @@ package com.changhong.opendb.app.ui.dialog.connection;
 import com.changhong.opendb.app.model.ConnectionInfo;
 import com.changhong.opendb.app.ui.pane.PropertyGridPane;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
+import com.changhong.opendb.app.ui.widgets.VFXComboBox;
 import javafx.scene.control.TextField;
 
 /**
@@ -15,7 +15,7 @@ class ConnectionAdvancedPane extends PropertyGridPane
         private final ConnectionInfo info;
 
         private final TextField jdbcUrl = new TextField("jdbc:mysql://");
-        private final ComboBox<String> timezone = new ComboBox<>();
+        private final VFXComboBox<String> timezone = new VFXComboBox<>();
         private final CheckBox useSSL = new CheckBox("使用 SSL");
 
         private static final String[] TIMEZONES = new String[]{

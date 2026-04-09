@@ -6,7 +6,7 @@ import com.changhong.opendb.app.driver.TableIndexMetaData;
 import com.changhong.opendb.app.driver.TableMetaData;
 import com.changhong.opendb.app.driver.executor.SQLExecutor;
 import com.changhong.opendb.app.resource.Assets;
-import com.changhong.opendb.app.ui.widgets.VFX;
+import com.changhong.opendb.app.ui.widgets.VFXIconButton;
 import com.changhong.opendb.app.ui.widgets.VFXSeparator;
 import com.changhong.opendb.app.ui.widgets.table.VFXTableColumn;
 import com.changhong.opendb.app.ui.widgets.table.VFXTableColumnFactory;
@@ -90,16 +90,16 @@ public class TableDesignerTablePane extends DetailPane
 
         private void setupToolBar()
         {
-                Button save = VFX.newIconButton("保存", "storage");
+                Button save = new VFXIconButton("保存", "storage");
                 save.setOnAction(e -> applySave());
 
-                Button plus = VFX.newIconButton("新增行", "plus");
+                Button plus = new VFXIconButton("新增行", "plus");
                 plus.setOnAction(e -> applyPlus());
 
-                Button minus = VFX.newIconButton("删除行", "minus");
+                Button minus = new VFXIconButton("删除行", "minus");
                 minus.setOnAction(e -> applyMinus());
 
-                reload = VFX.newIconButton("刷新", "reload");
+                reload = new VFXIconButton("刷新", "reload");
                 reload.setOnAction(e -> applyReload());
 
                 toolBar.getItems().addAll(

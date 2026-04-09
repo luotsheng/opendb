@@ -65,9 +65,9 @@ public class DatabaseDetailPane extends DetailPane
         {
                 toolBar.setOrientation(Orientation.HORIZONTAL);
 
-                Button modifyTable = VFX.newIconButton("编辑表", "modify");
-                Button newTable = VFX.newIconButton("创建表", "plus");
-                Button delTable = VFX.newIconButton("删除表", "minus");
+                Button modifyTable = new VFXIconButton("编辑表", "modify");
+                Button newTable = new VFXIconButton("创建表", "plus");
+                Button delTable = new VFXIconButton("删除表", "minus");
                 delTable.setOnAction(event -> deleteTable());
 
                 Region spacer = new Region();

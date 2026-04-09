@@ -45,11 +45,11 @@ public class MutableDataGridViewPane extends BorderPane
         private final VBox vContainer;
         private final boolean isPreview;
 
-        private final Button plus = VFX.newIconButton("新增数据", "plus");
-        private final Button minus = VFX.newIconButton("删除选中行", "minus");
-        private final Button check = VFX.newIconButton("应用更改", "check");
-        private final Button cross = VFX.newIconButton("取消更改", "cross");
-        private final Button reload = VFX.newIconButton("刷新", "reload");
+        private final Button plus = new VFXIconButton("新增数据", "plus");
+        private final Button minus = new VFXIconButton("删除选中行", "minus");
+        private final Button check = new VFXIconButton("应用更改", "check");
+        private final Button cross = new VFXIconButton("取消更改", "cross");
+        private final Button reload = new VFXIconButton("刷新", "reload");
 
         private final Node progressIndicator = Assets.newProgressIndicator();
 

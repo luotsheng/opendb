@@ -65,8 +65,8 @@ public class SqlEditor extends SplitPane
         private SQLExecutor sqlExecutor = null;
         private long currentTaskId = System.currentTimeMillis();
         private boolean saveFlag = true;
-        private ComboBox<ODBNConnection> connectionComboBox;
-        private ComboBox<ODBNDatabase> databaseComboBox;
+        private VFXComboBox<ODBNConnection> connectionComboBox;
+        private VFXComboBox<ODBNDatabase> databaseComboBox;
 
         private static int numberCount = 0;
 
@@ -134,16 +134,16 @@ public class SqlEditor extends SplitPane
                 ODBNStatus instance = ODBNStatus.getInstance();
                 ODBNConnection selectedConnection = getSelectionConnection(instance, queryInfo);
 
-                run = VFX.newIconButton("运行已选择", "run0");
+                run = new VFXIconButton("运行已选择", "run0");
                 run.setText("运行");
                 run.setOnAction(event -> runTask());
 
-                stop = VFX.newIconButton("停止当时运行", "stop");
+                stop = new VFXIconButton("停止当时运行", "stop");
                 stop.setText("停止");
                 stop.setDisable(true);
                 stop.setOnAction(event -> stopTask());
 
-                beautify = VFX.newIconButton("美化 SQL", "beautify");
+                beautify = new VFXIconButton("美化 SQL", "beautify");
                 beautify.setText("美化 SQL");
                 beautify.setOnAction(event -> beautifySQL());
 
@@ -194,9 +194,9 @@ public class SqlEditor extends SplitPane
                         getItems().remove(mutableDataGridViewPane));
         }
 
-        private ComboBox<ODBNConnection> newConnectionComboBox()
+        private VFXComboBox<ODBNConnection> newConnectionComboBox()
         {
-                ComboBox<ODBNConnection> connection = new ComboBox<>();
+                VFXComboBox<ODBNConnection> connection = new VFXComboBox<>();
                 configureConnectionComboBox(connection);
                 connection.setPrefWidth(200);
 
@@ -211,9 +211,9 @@ public class SqlEditor extends SplitPane
                 return connection;
         }
 
-        private ComboBox<ODBNDatabase> newDatabaseComboBox()
+        private VFXComboBox<ODBNDatabase> newDatabaseComboBox()
         {
-                ComboBox<ODBNDatabase> database = new ComboBox<>();
+                VFXComboBox<ODBNDatabase> database = new VFXComboBox<>();
                 configureDatabaseComboBox(database);
                 database.setPrefWidth(200);
 
@@ -225,7 +225,7 @@ public class SqlEditor extends SplitPane
                 return database;
         }
 
-        private void configureConnectionComboBox(ComboBox<ODBNConnection> comboBox)
+        private void configureConnectionComboBox(VFXComboBox<ODBNConnection> comboBox)
         {
                 comboBox.setButtonCell(new ListCell<>()
                 {
@@ -273,7 +273,7 @@ public class SqlEditor extends SplitPane
                 });
         }
 
-        private void configureDatabaseComboBox(ComboBox<ODBNDatabase> comboBox)
+        private void configureDatabaseComboBox(VFXComboBox<ODBNDatabase> comboBox)
         {
                 comboBox.setButtonCell(new ListCell<>()
                 {
@@ -440,16 +440,16 @@ public class SqlEditor extends SplitPane
                 return codeArea.getText();
         }
 
-        public ComboBox<ODBNConnection> copyConnectionComboBox()
+        public VFXComboBox<ODBNConnection> copyConnectionComboBox()
         {
-                ComboBox<ODBNConnection> dst = VFX.copyComboBox(connectionComboBox);
+                VFXComboBox<ODBNConnection> dst = connectionComboBox.copyComboBox();
                 configureConnectionComboBox(dst);
                 return dst;
         }
 
-        public ComboBox<ODBNDatabase> copyDatabaseComboBox()
+        public VFXComboBox<ODBNDatabase> copyDatabaseComboBox()
         {
-                ComboBox<ODBNDatabase> dst = VFX.copyComboBox(databaseComboBox);
+                VFXComboBox<ODBNDatabase> dst = databaseComboBox.copyComboBox();
                 configureDatabaseComboBox(dst);
                 return dst;
         }

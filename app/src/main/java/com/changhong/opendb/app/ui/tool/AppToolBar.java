@@ -4,7 +4,7 @@ import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.event.NewQueryScriptEvent;
 import com.changhong.opendb.app.model.ODBNStatus;
 import com.changhong.opendb.app.ui.navigator.node.ODBNConnection;
-import com.changhong.opendb.app.ui.widgets.VFX;
+import com.changhong.opendb.app.ui.widgets.VFXIconButton;
 import com.changhong.opendb.app.ui.widgets.VFXSeparator;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
@@ -17,10 +17,10 @@ public class AppToolBar extends ToolBar
 {
         public AppToolBar()
         {
-                Button newConnectionButton = VFX.newIconButton("连接", "chain");
+                Button newConnectionButton = new VFXIconButton("连接", "chain");
                 newConnectionButton.setText("新建连接");
 
-                Button newQueryButton = VFX.newIconButton("查询", "sql");
+                Button newQueryButton = new VFXIconButton("查询", "sql");
                 newQueryButton.setText("新建查询");
                 newQueryButton.setOnAction(event -> newQuery());
 
