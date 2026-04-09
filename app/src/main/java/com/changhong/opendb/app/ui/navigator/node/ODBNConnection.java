@@ -71,7 +71,7 @@ public class ODBNConnection extends ODBNode
                                 setExpanded(true);
                                 openFlag = true;
                         } catch (Throwable e) {
-                                Platform.runLater(() -> EventBus.publish(e));
+                                Dialogs.openError(e);
                         } finally {
                                 Platform.runLater(this::removeLoadingIndicator);
                         }

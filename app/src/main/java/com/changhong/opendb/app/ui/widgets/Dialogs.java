@@ -1,8 +1,6 @@
 package com.changhong.opendb.app.ui.widgets;
 
-import com.changhong.exception.SystemRuntimeException;
-import com.changhong.opendb.app.core.event.EventBus;
-import com.changhong.opendb.app.core.exception.CatcherException;
+import com.changhong.opendb.app.utils.Causes;
 import javafx.application.Platform;
 
 /**
@@ -26,26 +24,15 @@ public class Dialogs
 
         public static void openError(String message)
         {
-                openError(new SystemRuntimeException(message));
+                Platform.runLater(() -> ErrorDialog.showDialog(message));
         }
 
         /**
          * 弹出异常提示框
          */
-        public static void openError(Throwable throwable)
+        public static void openError(Throwable e)
         {
-                CatcherException e = null;
-
-                if (throwable instanceof CatcherException catcherException) {
-                        e = catcherException;
-                } else {
-                        e = new CatcherException(throwable);
-                }
-
-                CatcherException copy = e;
-                Platform.runLater(() -> EventBus.publish(copy));
-
-                throw e;
+                openError(Causes.message(e));
         }
 
 }

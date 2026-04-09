@@ -50,12 +50,4 @@ public class EventBus
                 });
         }
 
-        /**
-         * 发布异常事件
-         */
-        public static void publish(Throwable e)
-        {
-                publish(new ThrowableEvent(e));
-        }
-
 }

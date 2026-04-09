@@ -1,6 +1,6 @@
 package com.changhong.opendb.app.driver.sql;
 
-import com.changhong.opendb.app.core.exception.CatcherException;
+import com.changhong.exception.SystemRuntimeException;
 import com.changhong.opendb.app.ui.widgets.Dialogs;
 import lombok.Getter;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -51,7 +51,7 @@ public class SQLParsedStatement
                         Statements statements = CCJSqlParserUtil.parseStatements(text);
 
                         if (statements.size() > 1)
-                                throw new CatcherException("jsqlparser: parse statements size > 1");
+                                throw new SystemRuntimeException("jsqlparser: parse statements size > 1");
 
                         initialize(beg(statements), true);
                 } catch (Exception e) {

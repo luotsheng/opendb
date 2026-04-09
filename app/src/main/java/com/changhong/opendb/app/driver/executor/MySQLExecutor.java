@@ -2,8 +2,6 @@ package com.changhong.opendb.app.driver.executor;
 
 import com.changhong.collection.Lists;
 import com.changhong.exception.SystemRuntimeException;
-import com.changhong.opendb.app.core.event.EventBus;
-import com.changhong.opendb.app.core.exception.CatcherException;
 import com.changhong.opendb.app.driver.*;
 import com.changhong.opendb.app.driver.datasource.VirtualDataSource;
 import com.changhong.opendb.app.driver.sql.SQL;
@@ -66,7 +64,7 @@ public class MySQLExecutor extends SQLExecutor
 
                         return ret;
                 } catch (SQLException e) {
-                        EventBus.publish(e);
+                        Dialogs.openError(e);
                 }
 
                 return List.of();
@@ -97,7 +95,7 @@ public class MySQLExecutor extends SQLExecutor
                         metas.forEach(e -> e.setDatabase(db));
                         return metas;
                 } catch (SQLException e) {
-                        EventBus.publish(e);
+                        Dialogs.openError(e);
                 }
 
                 return List.of();

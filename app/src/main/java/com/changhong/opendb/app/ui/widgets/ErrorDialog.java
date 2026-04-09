@@ -1,9 +1,5 @@
 package com.changhong.opendb.app.ui.widgets;
 
-import com.changhong.opendb.app.core.event.Event;
-import com.changhong.opendb.app.core.event.EventBus;
-import com.changhong.opendb.app.core.event.EventListener;
-import com.changhong.opendb.app.core.event.ThrowableEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -22,23 +18,6 @@ import java.awt.*;
  */
 public class ErrorDialog
 {
-        @SuppressWarnings("unused")
-        private static ErrorListener listener = null;
-
-        static class ErrorListener implements EventListener
-        {
-                ErrorListener()
-                {
-                        EventBus.subscribe(ThrowableEvent.class, this);
-                }
-
-                @Override
-                public void onEvent(Event event)
-                {
-                        showDialog(((ThrowableEvent) event).message);
-                }
-        }
-
         public static void showDialog(String message) {
                 Toolkit.getDefaultToolkit().beep();
 
@@ -68,11 +47,4 @@ public class ErrorDialog
                 stage.setScene(scene);
                 stage.showAndWait();
         }
-
-        public static void initializeListener()
-        {
-                if (listener == null)
-                         listener = new ErrorListener();
-        }
-
 }

@@ -7,6 +7,7 @@ import com.changhong.opendb.app.model.QueryInfo;
 import com.changhong.opendb.app.repository.QueryScriptRepository;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.pane.DatabaseDetailPane;
+import com.changhong.opendb.app.ui.widgets.Dialogs;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -135,7 +136,7 @@ public class ODBNDatabase extends ODBNode implements EventListener
                                         openFlag = true;
                                 });
                         } catch (Throwable e) {
-                                Platform.runLater(() -> EventBus.publish(e));
+                                Dialogs.openError(e);
                         } finally {
                                 Platform.runLater(this::removeLoadingIndicator);
                         }

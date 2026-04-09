@@ -2,7 +2,6 @@ package com.changhong.opendb.app;
 
 import atlantafx.base.theme.CupertinoLight;
 import com.changhong.opendb.app.ui.layout.MainLayout;
-import com.changhong.opendb.app.ui.widgets.ErrorDialog;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -57,11 +56,6 @@ public class Application extends javafx.application.Application
 
         }
 
-        static void initialize()
-        {
-                ErrorDialog.initializeListener();
-        }
-
         static void initializeVFX(Scene scene)
         {
                 addVFXStylesheet(scene, "/css/vfx-table-view.css");
@@ -72,7 +66,6 @@ public class Application extends javafx.application.Application
         @Override
         public void start(Stage stage)
         {
-                initialize();
                 javafx.application.Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
                 Scene scene = new Scene(new MainLayout(), 1200, 800);
                 initializeVFX(scene);
