@@ -1,6 +1,7 @@
 package com.changhong.opendb.app.ui.widgets.dialog;
 
 import com.changhong.opendb.app.VFXApplication;
+import com.changhong.opendb.app.resource.Assets;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -10,6 +11,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -59,7 +62,8 @@ class WindowConfirm
                 AtomicBoolean flag = new AtomicBoolean(true);
 
                 CheckBox checkBox = new CheckBox();
-                checkBox.setText("⚠ 我了解此操作无法恢复！");
+                checkBox.setText("我晓得操作没法恢复！");
+                checkBox.setGraphic(Assets.use("warning@2x"));
 
                 Button ok = new Button("确认");
                 ok.setDisable(true);
@@ -80,7 +84,10 @@ class WindowConfirm
                         ok.setDisable(!newVal);
                 });
 
-                openDialog(stage, strwfmt(fmt, args), checkBox, ok, cancel);
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                openDialog(stage, strwfmt(fmt, args), checkBox, spacer, ok, cancel);
 
                 return flag.get();
         }

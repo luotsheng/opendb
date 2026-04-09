@@ -78,7 +78,7 @@ public class Assets
                 IMAGES.put("struct1", load("/assets/icons/struct1.png"));
                 IMAGES.put("index0", load("/assets/icons/index0.png"));
                 IMAGES.put("storage", load("/assets/icons/storage.png"));
-
+                IMAGES.put("warning", load("/assets/icons/warning.png"));
         }
 
         private static Image load(String path)
