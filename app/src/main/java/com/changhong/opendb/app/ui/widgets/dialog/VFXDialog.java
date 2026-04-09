@@ -23,17 +23,17 @@ public class VFXDialog
 
         public static boolean openConfirm(String fmt, Object... args)
         {
-                return ConfirmDialog.showDialog(fmt, args);
+                return WindowConfirm.showDialog(fmt, args);
         }
 
         public static boolean openCheckConfirm(String fmt, Object... args)
         {
-                return ConfirmDialog.showCheckDialog(fmt, args);
+                return WindowConfirm.showCheckDialog(fmt, args);
         }
 
         public static void openError(String fmt, Object... args)
         {
-                ErrorDialog.showDialog(fmt, args);
+                WindowError.showDialog(fmt, args);
         }
 
         /**

@@ -414,6 +414,94 @@ public class StringStaticize
     }
 
     /**
+     * 统计字符串中的行数。
+     *
+     * <p>此方法通过遍历字符串并统计换行符（'\n'）的数量来计算文本的行数。
+     * 该实现仅扫描字符数组，不使用正则表达式或字符串分割，
+     * 适用于需要高性能统计文本行数的场景。
+     *
+     * <p>换行规则：
+     * 每出现一个 '\n' 视为一行结束，因此返回值等于 '\n' 的数量。
+     * 该方法同时兼容 Unix（\n）与 Windows（\r\n）换行格式，
+     * 因为 Windows 换行同样包含 '\n'。
+     *
+     * @param wstr 要处理的字符串对象
+     * @return 字符串中包含的行数（即 '\n' 的数量）
+     */
+    public static int strnlines(Object wstr)
+    {
+        String text = atos(wstr);
+
+        int lines = 0;
+
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '\n')
+                lines++;
+        }
+
+        return lines;
+    }
+
+    /**
+     * 计算字符串中每一行文本的最大宽度。
+     *
+     * <p>此方法遍历字符串并统计每行字符数量，返回最长一行的宽度。
+     * 行分隔符使用 '\n' 判断，兼容 Unix（\n）与 Windows（\r\n）换行格式。
+     * 实现仅进行一次线性扫描，不使用正则表达式或字符串拆分，
+     * 适用于需要高性能统计文本布局宽度的场景。
+     *
+     * @param wstr 要处理的字符串对象
+     * @return 所有行中最长一行的字符数量
+     */
+    public static int strmaxwidth(Object wstr)
+    {
+        String text = atos(wstr);
+
+        int width = 0;
+        int max = 0;
+
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+
+            if (c == '\n') {
+                if (width > max)
+                    max = width;
+
+                width = 0;
+            } else {
+                width++;
+            }
+        }
+
+        if (width > max)
+            max = width;
+
+        return max;
+    }
+
+    /**
+     * 判断字符串是否仅包含 ASCII 字符。
+     *
+     * <p>此方法遍历字符串字符编码，检测是否存在大于 127 的字符。
+     * 如果存在则返回 false，表示字符串包含非 ASCII（Unicode）字符。
+     *
+     * @param wstr 要检测的字符串对象
+     * @return 如果字符串全部为 ASCII 字符返回 true，否则返回 false
+     */
+    public static boolean strascii(Object wstr)
+    {
+        String text = atos(wstr);
+
+        for (int i = 0; i < text.length(); i++)
+        {
+            if (text.charAt(i) > 127)
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
      * 检查字符串是否为数字。
      *
      * <p>此方法用于判断输入字符串是否可以解析为有效的数字，适用于

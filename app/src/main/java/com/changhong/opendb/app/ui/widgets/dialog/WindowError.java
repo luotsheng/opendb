@@ -19,17 +19,19 @@ import static com.changhong.string.StringStaticize.strwfmt;
  * @since 2026/3/26
  */
 @SuppressWarnings("DuplicatedCode")
-class ErrorDialog
+class WindowError
 {
         public static void showDialog(String fmt, Object... args) {
                 Toolkit.getDefaultToolkit().beep();
 
                 Stage stage = new Stage();
                 stage.initModality(Modality.APPLICATION_MODAL);
-                stage.setResizable(false);
+                stage.setResizable(true);
                 stage.setTitle("数据库管理工具");
 
-                Label label = new Label(strwfmt(fmt, args));
+                String text = strwfmt(fmt, args);
+
+                Label label = new Label(text);
                 label.setWrapText(true);
 
                 Button ok = new Button("确认");
@@ -45,9 +47,12 @@ class ErrorDialog
                 root.setCenter(label);
                 root.setBottom(hbox);
 
-                Scene scene = new Scene(root, 350, 150);
+                Dimension size = new Dimension(text);
+
+                Scene scene = new Scene(root, size.width, size.height);
 
                 stage.setScene(scene);
+                stage.sizeToScene();
                 stage.showAndWait();
         }
 }

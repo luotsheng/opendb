@@ -22,7 +22,7 @@ import static com.changhong.string.StringStaticize.strwfmt;
  * @since 2026/3/26
  */
 @SuppressWarnings("DuplicatedCode")
-class ConfirmDialog
+class WindowConfirm
 {
         private static void openDialog(Stage stage, String message, Node... children)
         {
@@ -44,7 +44,8 @@ class ConfirmDialog
                 root.setCenter(label);
                 root.setBottom(hbox);
 
-                Scene scene = new Scene(root, 350, 150);
+                Dimension dimension = new Dimension(message);
+                Scene scene = new Scene(root, dimension.width, dimension.height);
 
                 stage.setScene(scene);
                 stage.showAndWait();
