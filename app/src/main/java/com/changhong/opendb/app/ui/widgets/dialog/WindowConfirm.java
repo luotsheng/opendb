@@ -2,6 +2,7 @@ package com.changhong.opendb.app.ui.widgets.dialog;
 
 import com.changhong.opendb.app.VFXApplication;
 import com.changhong.opendb.app.resource.Assets;
+import com.changhong.opendb.app.ui.workbench.VFXCopyableLabel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -36,8 +37,7 @@ class WindowConfirm
                 stage.setResizable(false);
                 stage.setTitle(VFXApplication.TITLE);
 
-                Label label = new Label(message);
-                label.setWrapText(true);
+                VFXCopyableLabel label = new VFXCopyableLabel(message);
 
                 HBox hbox = new HBox(children);
                 hbox.setPadding(new Insets(10));

@@ -1,17 +1,22 @@
 package com.changhong.opendb.app.ui.widgets.dialog;
 
 import com.changhong.opendb.app.VFXApplication;
+import com.changhong.opendb.app.ui.workbench.VFXCopyableLabel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.awt.*;
+import java.awt.Toolkit;
 
 import static com.changhong.string.StringStaticize.strwfmt;
 
@@ -32,8 +37,7 @@ class WindowError
 
                 String text = strwfmt(fmt, args);
 
-                Label label = new Label(text);
-                label.setWrapText(true);
+                VFXCopyableLabel label = new VFXCopyableLabel(text);
 
                 Button ok = new Button("确认");
                 ok.setDefaultButton(true);
