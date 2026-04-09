@@ -3,7 +3,7 @@ package com.changhong.opendb.app.ui.workbench;
 import com.changhong.opendb.app.VFXApplication;
 import com.changhong.opendb.app.core.event.*;
 import com.changhong.opendb.app.resource.Assets;
-import com.changhong.opendb.app.ui.pane.TableDesignerTablePane;
+import com.changhong.opendb.app.ui.pane.TableDesignerPane;
 import com.changhong.opendb.app.ui.pane.PreviewTableDataPane;
 import com.changhong.opendb.app.ui.widgets.VFXTabPane;
 import javafx.scene.Node;
@@ -237,7 +237,7 @@ public class Workbench extends VBox implements EventListener
 
                 if (tab == null) {
                         tab = new Tab(e.id());
-                        tab.setContent(new TableDesignerTablePane(tab, e.executor, e.table));
+                        tab.setContent(new TableDesignerPane(tab, e.executor, e.table));
                         tab.setGraphic(Assets.use("struct1"));
                         tableMetaDataMgr.put(e.id(), tab);
                 }

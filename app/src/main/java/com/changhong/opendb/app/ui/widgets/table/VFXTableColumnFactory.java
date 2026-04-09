@@ -59,7 +59,7 @@ public class VFXTableColumnFactory<S>
                                         Assert.notNull(propertyCellValueRef.field);
                                 }
 
-                                propertyCellValueRef.field.write(rowValue, event.getNewValue());
+                                propertyCellValueRef.field.set(rowValue, event.getNewValue());
 
                                 onEditCommitEventListener.onCommit(rowValue);
                         }

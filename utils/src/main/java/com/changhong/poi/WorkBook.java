@@ -488,19 +488,19 @@ public class WorkBook implements Iterable<Row> {
 
         /* 基础数据类型 */
         if (uField.isPrimitiveCheck())
-            uField.write(obj, TypeConverter.toPrimitiveValue(value, uField.getOriginType()));
+            uField.set(obj, TypeConverter.toPrimitiveValue(value, uField.getOriginType()));
 
         /* 日期类型 */
         else if (uField.typecheck(Date.class))
-            uField.write(obj, DateFormatter.parse(value, annotation.pattern()));
+            uField.set(obj, DateFormatter.parse(value, annotation.pattern()));
 
         /* 浮点类型 */
         else if (uField.typecheck(BigDecimal.class))
-            uField.write(obj, new BigDecimal(value));
+            uField.set(obj, new BigDecimal(value));
 
         /* 字符串 */
         else if (uField.typecheck(String.class))
-            uField.write(obj, value);
+            uField.set(obj, value);
     }
 
     /**
