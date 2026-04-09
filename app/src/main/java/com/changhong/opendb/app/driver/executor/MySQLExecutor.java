@@ -64,7 +64,7 @@ public class MySQLExecutor extends SQLExecutor
 
                         return ret;
                 } catch (SQLException e) {
-                        VFXDialogHelper.warn(e);
+                        VFXDialogHelper.alert(e);
                 }
 
                 return List.of();
@@ -95,7 +95,7 @@ public class MySQLExecutor extends SQLExecutor
                         metas.forEach(e -> e.setDatabase(db));
                         return metas;
                 } catch (SQLException e) {
-                        VFXDialogHelper.warn(e);
+                        VFXDialogHelper.alert(e);
                 }
 
                 return List.of();
@@ -118,7 +118,7 @@ public class MySQLExecutor extends SQLExecutor
 
                         return columns;
                 } catch (Exception e) {
-                        VFXDialogHelper.warn(e);
+                        VFXDialogHelper.alert(e);
                         return List.of();
                 }
         }

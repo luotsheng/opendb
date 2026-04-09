@@ -79,7 +79,7 @@ public class PreviewTableDataPane extends BorderPane
                                         size);
                                 Platform.runLater(() -> mutableDataGridViewPane.render(rs));
                         } catch (Exception e) {
-                                VFXDialogHelper.warn(e);
+                                VFXDialogHelper.alert(e);
                         } finally {
                                 Platform.runLater(this::removeLoadingIndicator);
                         }

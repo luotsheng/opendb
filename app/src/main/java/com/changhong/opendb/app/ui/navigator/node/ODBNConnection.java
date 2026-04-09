@@ -69,7 +69,7 @@ public class ODBNConnection extends ODBNode
                                 setExpanded(true);
                                 openFlag = true;
                         } catch (Throwable e) {
-                                VFXDialogHelper.warn(e);
+                                VFXDialogHelper.alert(e);
                         } finally {
                                 Platform.runLater(this::removeLoadingIndicator);
                         }

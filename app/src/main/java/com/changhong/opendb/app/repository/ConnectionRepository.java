@@ -29,7 +29,7 @@ public class ConnectionRepository
                 File odbc = new File(dir, ".odbc");
 
                 if (odbc.exists())
-                        VFXDialogHelper.warn(name + "已存在！");
+                        VFXDialogHelper.alert(name + "已存在！");
 
                 dir.mkdirs();
 
@@ -43,7 +43,7 @@ public class ConnectionRepository
                 } catch (IOException e) {
                         /* 删除文件夹 */
                         FileUtils.forceDelete(dir);
-                        VFXDialogHelper.warn(e);
+                        VFXDialogHelper.alert(e);
                 }
         }
 
@@ -85,7 +85,7 @@ public class ConnectionRepository
                                 String content = new String(bytes, StandardCharsets.UTF_8);
                                 ret.add(JSONUtils.toJavaObject(content, ConnectionInfo.class));
                         } catch (Exception e) {
-                                VFXDialogHelper.warn(e);
+                                VFXDialogHelper.alert(e);
                         }
                 }
 

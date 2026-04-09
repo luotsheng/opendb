@@ -119,7 +119,7 @@ public class TableDesignerPane extends DetailPane
                         applyReload();
                         columnMetaDataUpdateBuffer.clear();
                 } catch (Exception e) {
-                        VFXDialogHelper.warn(e);
+                        VFXDialogHelper.alert(e);
                 }
         }
 
@@ -134,7 +134,6 @@ public class TableDesignerPane extends DetailPane
                 ColumnMetaData selectedItem = structureView.getSelectedItem();
 
                 if (selectedItem == null) {
-                        VFXDialogHelper.warn();
                         return;
                 }
 

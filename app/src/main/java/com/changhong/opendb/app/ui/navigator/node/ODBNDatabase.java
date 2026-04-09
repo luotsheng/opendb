@@ -136,7 +136,7 @@ public class ODBNDatabase extends ODBNode implements EventListener
                                         openFlag = true;
                                 });
                         } catch (Throwable e) {
-                                VFXDialogHelper.warn(e);
+                                VFXDialogHelper.alert(e);
                         } finally {
                                 Platform.runLater(this::removeLoadingIndicator);
                         }
