@@ -93,6 +93,7 @@ public class ODBNConnection extends ODBNode
                 databases.clear();
                 getChildren().clear();
                 Dialogs.tryCall(dataSource::close);
+                ODBNStatus.getInstance().removeConnection(this);
 
                 openFlag = false;
         }

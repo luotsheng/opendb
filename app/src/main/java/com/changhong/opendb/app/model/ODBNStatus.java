@@ -35,6 +35,11 @@ public class ODBNStatus
                 connections.add(connection);
         }
 
+        public void removeConnection(ODBNConnection connection)
+        {
+                connections.remove(connection);
+        }
+
         public void selectedConnection(ODBNConnection connection)
         {
                 selectedConnection = connection;
