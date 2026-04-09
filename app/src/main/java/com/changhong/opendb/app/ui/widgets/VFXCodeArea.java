@@ -1,5 +1,6 @@
 package com.changhong.opendb.app.ui.widgets;
 
+import com.changhong.opendb.app.VFXApplication;
 import com.changhong.opendb.app.ui.workbench.SqlKeyWordDefine;
 import com.changhong.opendb.app.utils.OS;
 import javafx.scene.control.ContextMenu;
@@ -101,6 +102,17 @@ public class VFXCodeArea extends CodeArea
                 contextMenu.setOnShowing(event -> showingMenuListeners.forEach(listener -> listener.apply(event)));
 
                 setContextMenu(contextMenu);
+        }
+
+        @Override
+        public void paste()
+        {
+                String text = VFXApplication.getClipboardText();
+
+                if (text == null)
+                        return;
+
+                replaceSelection(text.replaceAll("\t", "  "));
         }
 
         public void addContextMenuGroup(MenuItem... items)
