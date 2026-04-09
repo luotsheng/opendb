@@ -1,5 +1,6 @@
 package com.changhong.opendb.app.ui.widgets.dialog;
 
+import com.changhong.opendb.app.VFXApplication;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -27,7 +28,7 @@ class WindowError
                 Stage stage = new Stage();
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.setResizable(true);
-                stage.setTitle("数据库管理工具");
+                stage.setTitle(VFXApplication.TITLE);
 
                 String text = strwfmt(fmt, args);
 

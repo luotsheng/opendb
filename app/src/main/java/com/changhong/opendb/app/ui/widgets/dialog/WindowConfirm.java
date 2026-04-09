@@ -1,5 +1,6 @@
 package com.changhong.opendb.app.ui.widgets.dialog;
 
+import com.changhong.opendb.app.VFXApplication;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -30,7 +31,7 @@ class WindowConfirm
 
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.setResizable(false);
-                stage.setTitle("数据库管理工具");
+                stage.setTitle(VFXApplication.TITLE);
 
                 Label label = new Label(message);
                 label.setWrapText(true);

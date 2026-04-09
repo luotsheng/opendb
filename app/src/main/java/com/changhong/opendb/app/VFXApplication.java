@@ -21,6 +21,8 @@ import java.util.List;
  */
 public class VFXApplication extends Application
 {
+        public static final String TITLE = "OpenDB-v1.0.3-Beta";
+
         private static final Class<VFXApplication> aClass = VFXApplication.class;
         private static final List<LauncherTask> tasks = new ArrayList<>();
 
@@ -70,7 +72,7 @@ public class VFXApplication extends Application
                 javafx.application.Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
                 Scene scene = new Scene(new MainLayout(), 1200, 800);
                 initializeVFX(scene);
-                stage.setTitle("OpenDB-v1.0.3-Beta");
+                stage.setTitle(TITLE);
                 stage.setScene(scene);
                 stage.setMaximized(true);
 
