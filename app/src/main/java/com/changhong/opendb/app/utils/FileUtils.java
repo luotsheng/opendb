@@ -31,7 +31,7 @@ public class FileUtils
                                 .isEmpty();
 
                 } catch (IOException e) {
-                        VFXDialogHelper.warn(e);
+                        VFXDialogHelper.alert(e);
                 }
 
                 return false;

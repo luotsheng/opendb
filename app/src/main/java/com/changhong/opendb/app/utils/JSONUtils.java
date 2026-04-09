@@ -41,7 +41,7 @@ public class JSONUtils
                 try {
                         return objectMapper.readValue(json, aClass);
                 } catch (JsonProcessingException e) {
-                        VFXDialogHelper.warn(e);
+                        VFXDialogHelper.alert(e);
                         return null;
                 }
         }
@@ -54,7 +54,7 @@ public class JSONUtils
 
                         return objectMapper.readValue(jsonArray, collectionType);
                 } catch (JsonProcessingException e) {
-                        VFXDialogHelper.warn(e);
+                        VFXDialogHelper.alert(e);
                         return null;
                 }
         }

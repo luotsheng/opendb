@@ -467,7 +467,7 @@ public class SqlEditor extends SplitPane
                                 int count = rw.read(buf);
                                 builder.append(buf, 0, count);
                         } catch (Throwable e) {
-                                VFXDialogHelper.warn(e);
+                                VFXDialogHelper.alert(e);
                         }
 
                         codeArea.clear();

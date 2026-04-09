@@ -64,7 +64,7 @@ public class ResultSets
 
                         return JSONUtils.toJavaList(jsonArray, aClass);
                 } catch (Exception e) {
-                        VFXDialogHelper.warn(e);
+                        VFXDialogHelper.alert(e);
                         return List.of();
                 }
         }

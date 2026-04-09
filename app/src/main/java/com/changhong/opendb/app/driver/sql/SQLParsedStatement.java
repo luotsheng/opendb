@@ -56,7 +56,7 @@ public class SQLParsedStatement
 
                         initialize(beg(statements), true);
                 } catch (Exception e) {
-                        VFXDialogHelper.warn(e);
+                        VFXDialogHelper.alert(e);
                 }
         }
 
@@ -73,7 +73,7 @@ public class SQLParsedStatement
                 this.star = false;
 
                 if (type == SQLCommandType.UNSUPPORTED)
-                        Platform.runLater(() -> VFXDialogHelper.warn("Unsupported " + script));
+                        Platform.runLater(() -> VFXDialogHelper.alert("Unsupported " + script));
 
                 if (type == SQLCommandType.DQL && !(statement instanceof ShowIndexStatement)) {
                         TablesNamesFinder<Void> finder = new TablesNamesFinder<>();

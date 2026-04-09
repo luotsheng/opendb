@@ -38,7 +38,7 @@ public class VFXDialogHelper
                 try {
                         callback.apply();
                 } catch (Throwable e) {
-                        error(e);
+                        alert(e);
                 }
         }
 
@@ -61,7 +61,7 @@ public class VFXDialogHelper
         /**
          * 警告提示框
          */
-        public static void warn(String fmt, Object... args)
+        public static void alert(String fmt, Object... args)
         {
                 showDialog(fmt, args);
         }
@@ -69,9 +69,9 @@ public class VFXDialogHelper
         /**
          * 异常提示框
          */
-        public static void error(Throwable e)
+        public static void alert(Throwable e)
         {
-                warn(Causes.message(e));
+                alert(Causes.message(e));
         }
 
         private static void openDialog(Stage stage, String message, Node... children)
