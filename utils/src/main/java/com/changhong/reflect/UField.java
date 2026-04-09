@@ -134,9 +134,9 @@ public class UField {
     }
 
     /** 属性数据读取接口 */
-    interface FieldReader<T> { T read(); }
+    interface FieldReader<T> { T get(); }
     /** 属性数据写入接口 */
-    interface FieldWriter { void write(Object value); }
+    interface FieldWriter { void set(Object value); }
 
     /**
      * 可访问的`Field`对象实例，该实例默认`Field`对象的
@@ -156,13 +156,13 @@ public class UField {
         /**
          * 获取当前属性中的值
          */
-        public Object read() {
+        public Object get() {
             return Captor.call(() -> field.get(instance));
         }
         /**
          * 设置当前属性中的值
          */
-        public void write(Object value) {
+        public void set(Object value) {
             Captor.call(() -> field.set(instance, value));
         }
     }
@@ -210,7 +210,7 @@ public class UField {
      *        对象实例
      */
     public Object read(Object instance) {
-        return createFieldDescriptor(instance).read();
+        return createFieldDescriptor(instance).get();
     }
 
     /**
@@ -225,8 +225,8 @@ public class UField {
      * @param instance
      *        对象实例
      */
-    public void write(Object instance, Object value) {
-        createFieldDescriptor(instance).write(value);
+    public void set(Object instance, Object value) {
+        createFieldDescriptor(instance).set(value);
     }
 
     /**
@@ -246,7 +246,7 @@ public class UField {
         Object value = new UField(name, src.getClass()).read(src);
         /* write to dest. */
         UField destUField = new UField(name, dest.getClass());
-        destUField.write(dest, value);
+        destUField.set(dest, value);
     }
 
     /**

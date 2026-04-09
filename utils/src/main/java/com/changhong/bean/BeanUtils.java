@@ -118,7 +118,7 @@ public class BeanUtils {
             String name = dstField.getName();
             if (ignores.length > 0 && strcheckin(name, ignores))
                 continue;
-            Captor.icall(() -> dstField.write(dst, srcClass.readFieldValue(name, src)));
+            Captor.icall(() -> dstField.set(dst, srcClass.readFieldValue(name, src)));
         }
     }
 

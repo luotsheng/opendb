@@ -28,7 +28,7 @@ import java.util.*;
  * @since 2026/4/3
  */
 @SuppressWarnings({"FieldCanBeLocal", "unchecked"})
-public class TableDesignerTablePane extends DetailPane
+public class TableDesignerPane extends DetailPane
 {
         private final Tab ownerTab;
         private final SQLExecutor executor;
@@ -49,9 +49,9 @@ public class TableDesignerTablePane extends DetailPane
 
         private Button reload;
 
-        public TableDesignerTablePane(Tab ownerTab,
-                                      SQLExecutor executor,
-                                      TableMetaData tableMetaData)
+        public TableDesignerPane(Tab ownerTab,
+                                 SQLExecutor executor,
+                                 TableMetaData tableMetaData)
         {
                 this.ownerTab = ownerTab;
                 this.executor = executor;
@@ -183,7 +183,9 @@ public class TableDesignerTablePane extends DetailPane
 
                 VFXTableColumnFactory<ColumnMetaData> factory = new VFXTableColumnFactory<>();
 
-                factory.setOnEditCommitEventListener(columnMetaDataUpdateBuffer::add);
+                factory.setOnEditCommitEventListener(newVal -> {
+                        columnMetaDataUpdateBuffer.add(newVal);
+                });
 
                 // 列
                 TableColumn<ColumnMetaData, String> name = factory.createEditableColumn("名称", "name");
