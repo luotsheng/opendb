@@ -1,6 +1,7 @@
 package com.changhong.opendb.app.driver.executor;
 
 import com.changhong.collection.Lists;
+import com.changhong.collection.Sets;
 import com.changhong.io.IOUtils;
 import com.changhong.opendb.app.driver.*;
 import com.changhong.opendb.app.driver.datasource.VirtualDataSource;
@@ -136,6 +137,7 @@ public class MySQLExecutor extends SQLExecutor
 
                         String keyName = dataGrid.getRowValue("Key_name", i);
 
+                        /* 主键忽略 */
                         if (streq(keyName, "PRIMARY"))
                                 continue;
 
@@ -170,6 +172,19 @@ public class MySQLExecutor extends SQLExecutor
                 ret.forEach(TableIndexMetaData::generateColumnText);
 
                 return ret;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public Set<String> getIndexTypes()
+        {
+                return Sets.newLinkedHashSet(
+                        "NORMAL",
+                        "UNIQUE",
+                        "FULLTEXT",
+                        "SPATIAL",
+                        "HASH"
+                );
         }
 
         @Override

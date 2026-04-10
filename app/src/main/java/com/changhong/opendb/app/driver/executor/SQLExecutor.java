@@ -85,6 +85,8 @@ public abstract class SQLExecutor
 
         public abstract List<TableIndexMetaData> getIndexes(TableMetaData table);
 
+        public abstract Set<String> getIndexTypes();
+
         public abstract String showCreateTable(String db, String table);
 
         public abstract void dropTable(String db, String table);

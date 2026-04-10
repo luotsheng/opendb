@@ -22,15 +22,20 @@ public class VFXTableView<S> extends TableView<S>
                 setFixedCellSize(26);
         }
 
+        public void enableCellEdit()
+        {
+                setEditable(true);
+                getSelectionModel().setCellSelectionEnabled(true);
+                getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        }
+
         /**
          * 启用矩形选择
          */
         @SuppressWarnings({"rawtypes", "unchecked"})
         public void enableRectangularSelection()
         {
-                setEditable(true);
-                getSelectionModel().setCellSelectionEnabled(true);
-                getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+                enableCellEdit();
 
                 setOnMousePressed(event -> {
                         start = getTablePosition(event);

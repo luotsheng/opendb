@@ -175,4 +175,23 @@ public class Sets {
         return newHashSet(Arrays.asList(a));
     }
 
+    /**
+     * 通过传入的泛型可变参数去分配一个 {@link LinkedHashSet} 集合对象实例。泛型可变参数不能为空
+     * 否则会抛出 {@link NullPointerException} 异常。
+     *
+     * @param a
+     *        泛型可变参数数组
+     *
+     * @return 一个新的 {@link LinkedHashSet} 对象实例
+     *
+     * @throws NullPointerException
+     *         如果泛型参数为空值
+     *
+     * @see #newHashSet(Collection)
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> Set<E> newLinkedHashSet(E... a)
+    {
+        return new LinkedHashSet<>(Arrays.asList(a));
+    }
 }
