@@ -1,9 +1,6 @@
 package com.changhong.opendb.app.ui.pane;
 
-import com.changhong.opendb.app.driver.ColumnMetaData;
-import com.changhong.opendb.app.driver.MySQL;
-import com.changhong.opendb.app.driver.TableIndexMetaData;
-import com.changhong.opendb.app.driver.TableMetaData;
+import com.changhong.opendb.app.driver.*;
 import com.changhong.opendb.app.driver.executor.SQLExecutor;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.widgets.VFXIconButton;
@@ -31,7 +28,7 @@ import static com.changhong.io.IOUtils.printf;
  * @author Luo Tiansheng
  * @since 2026/4/3
  */
-@SuppressWarnings({"FieldCanBeLocal", "unchecked", "ExtractMethodRecommender"})
+@SuppressWarnings("unchecked")
 public class TableStructureDesignerPane extends DetailPane
 {
         private final Tab ownerTab;
@@ -55,16 +52,11 @@ public class TableStructureDesignerPane extends DetailPane
         private List<ColumnMetaData> columnMetaDatas;
         private List<TableIndexMetaData> indexes;
 
-        private TabViewType tabViewType = TabViewType.STRUCTURE;
+        private final Designer<ColumnMetaData> tableStructureDesigner;
+        private final Designer<TableIndexMetaData> indexColumnDesigner;
 
-        private final Set<ColumnMetaData> columnMetaDataUpdateBuffer = new HashSet<>();
-        private final Set<ColumnMetaData> primaryUpdateBuffer = new LinkedHashSet<>();
-        private final Map<Integer, TableIndexMetaData> tableIndexMetaDataUpdateBuffer = new HashMap<>();
-
-        enum TabViewType {
-                STRUCTURE,
-                INDEX
-        }
+        /* 当前选中标签对应的设计接口 */
+        private Designer<?> designer;
 
         public TableStructureDesignerPane(Tab ownerTab,
                                           SQLExecutor executor,
@@ -75,6 +67,9 @@ public class TableStructureDesignerPane extends DetailPane
                 this.tableMetaData = tableMetaData;
                 this.columnMetaDatas = executor.getColumns(tableMetaData);
                 this.indexes = executor.getIndexes(tableMetaData);
+
+                this.tableStructureDesigner = new MySQLTableStructureDesigner(tableMetaData, executor, "表结构");
+                this.indexColumnDesigner = new MySQLIndexStructureDesigner(tableMetaData, executor, "索引");
 
                 setupToolBar();
 
@@ -94,17 +89,28 @@ public class TableStructureDesignerPane extends DetailPane
                 indexTab.setContent(indexView);
                 indexTab.setGraphic(Assets.use("index0"));
 
-                tabPane.selectionModelProperty().addListener((obs, oldVal, newVal) -> {
-                        Tab tab = newVal.getSelectedItem();
+                setupTabPane();
+
+                setTop(toolBar);
+                setCenter(tabPane);
+        }
+
+        private void setupTabPane()
+        {
+                tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                        if (newVal == structureTab) {
+                                designer = tableStructureDesigner;
+                        } else if (newVal == indexTab) {
+                                designer = indexColumnDesigner;
+                        } else {
+                                throw new UnsupportedOperationException("Unsupported tab");
+                        }
                 });
 
                 tabPane.getTabs().addAll(
                         structureTab,
                         indexTab
                 );
-
-                setTop(toolBar);
-                setCenter(tabPane);
         }
 
         private void setupToolBar()
@@ -127,10 +133,7 @@ public class TableStructureDesignerPane extends DetailPane
         private void applySave()
         {
                 try {
-                        executor.alterChange(tableMetaData, columnMetaDataUpdateBuffer);
-                        executor.alterPrimaryKey(tableMetaData, primaryUpdateBuffer);
-                        primaryUpdateBuffer.clear();
-                        columnMetaDataUpdateBuffer.clear();
+                        designer.applySave();
                         applyReload();
                 } catch (Exception e) {
                         VFXDialogHelper.alert(e);
@@ -139,13 +142,30 @@ public class TableStructureDesignerPane extends DetailPane
 
         private void applyPlus()
         {
-                structureView.getItems().add(new ColumnMetaData());
-                structureView.refresh();
+                switch (designer) {
+                        case MySQLTableStructureDesigner inst -> {
+                                ColumnMetaData columnMetaData = new ColumnMetaData();
+                                inst.applyPlus(columnMetaData);
+                                structureView.getItems().add(columnMetaData);
+                                structureView.refresh();
+                        }
+
+                        case MySQLIndexStructureDesigner inst -> {
+
+                        }
+
+                        default -> throw new UnsupportedOperationException("Unsupported designer object instance");
+                }
+
         }
 
         private void applyMinus()
         {
-                ObservableList<ColumnMetaData> items = structureView.getSelectionModel().getSelectedItems();
+                ObservableList<?> items = switch (designer) {
+                        case MySQLTableStructureDesigner ignored -> structureView.getSelectionModel().getSelectedItems();
+                        case MySQLIndexStructureDesigner ignored -> indexView.getSelectionModel().getSelectedItems();
+                        default -> FXCollections.emptyObservableList();
+                };
 
                 if (items.isEmpty())
                         return;
@@ -158,7 +178,11 @@ public class TableStructureDesignerPane extends DetailPane
 
                 new Thread(() -> {
                         try {
-                                executor.deleteColumns(tableMetaData, items);
+                                switch (designer) {
+                                        case MySQLTableStructureDesigner inst -> inst.applyMinus((Collection<ColumnMetaData>) items);
+                                        case MySQLIndexStructureDesigner inst -> inst.applyMinus((Collection<TableIndexMetaData>) items);
+                                        default -> throw new UnsupportedOperationException("Unsupported designer object instance");
+                                }
                                 doReload();
                         } catch (Exception e) {
                                 VFXDialogHelper.alert(e);
@@ -190,8 +214,6 @@ public class TableStructureDesignerPane extends DetailPane
 
         private void applyReload()
         {
-                columnMetaDataUpdateBuffer.clear();
-
                 beginReload();
                 new Thread(() -> {
                         try {
@@ -205,7 +227,11 @@ public class TableStructureDesignerPane extends DetailPane
         private void doReload()
         {
                 this.columnMetaDatas = executor.getColumns(tableMetaData);
+                tableStructureDesigner.onReload(columnMetaDatas);
+
                 this.indexes = executor.getIndexes(tableMetaData);
+                indexColumnDesigner.onReload(indexes);
+
                 Platform.runLater(() -> {
                         structureView.getItems().setAll(FXCollections.observableArrayList(columnMetaDatas));
                         indexView.getItems().setAll(FXCollections.observableArrayList(indexes));
@@ -226,29 +252,7 @@ public class TableStructureDesignerPane extends DetailPane
 
                 VFXTableColumnFactory<ColumnMetaData> factory = new VFXTableColumnFactory<>();
 
-                factory.setOnEditCommitEventListener((oldVal, newVal) -> {
-                        /* 检测到主键变动 */
-                        if (oldVal.isPrimary() != newVal.isPrimary()) {
-
-                                /* 如果主键列表为空初始化，如果表没有主键那就一直初始化（无伤大雅） */
-                                if (primaryUpdateBuffer.isEmpty()) {
-                                        for (ColumnMetaData columnMetaData : columnMetaDatas)
-                                                if (columnMetaData.isPrimary())
-                                                        primaryUpdateBuffer.add(columnMetaData);
-                                }
-
-                                if (newVal.isPrimary()) {
-                                        primaryUpdateBuffer.add(newVal);
-                                } else {
-                                        primaryUpdateBuffer.remove(newVal);
-                                }
-
-                                return;
-                        }
-
-                        /* 变更记录 */
-                        columnMetaDataUpdateBuffer.add(newVal);
-                });
+                factory.setOnEditCommitEventListener(tableStructureDesigner::onCommitEdit);
 
                 // 列
                 TableColumn<ColumnMetaData, String> name = factory.createEditableColumn("名称", "name");
