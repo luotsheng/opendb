@@ -28,7 +28,7 @@ import java.util.*;
  * @since 2026/4/3
  */
 @SuppressWarnings({"FieldCanBeLocal", "unchecked", "ExtractMethodRecommender"})
-public class TableDesignerPane extends DetailPane
+public class TableStructureDesignerPane extends DetailPane
 {
         private final Tab ownerTab;
         private final SQLExecutor executor;
@@ -50,9 +50,9 @@ public class TableDesignerPane extends DetailPane
 
         private Button reload;
 
-        public TableDesignerPane(Tab ownerTab,
-                                 SQLExecutor executor,
-                                 TableMetaData tableMetaData)
+        public TableStructureDesignerPane(Tab ownerTab,
+                                          SQLExecutor executor,
+                                          TableMetaData tableMetaData)
         {
                 this.ownerTab = ownerTab;
                 this.executor = executor;
