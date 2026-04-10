@@ -12,6 +12,7 @@ import com.changhong.opendb.app.ui.widgets.table.VFXTableColumn;
 import com.changhong.opendb.app.ui.widgets.table.VFXTableColumnFactory;
 import com.changhong.opendb.app.ui.widgets.table.VFXTableView;
 import com.changhong.opendb.app.ui.widgets.table.cell.VFXCheckBoxTableCell;
+import com.changhong.opendb.app.ui.widgets.table.cell.VFXComboBoxTableCell;
 import com.changhong.opendb.app.ui.widgets.table.cell.VFXTextFieldTableCell;
 import com.changhong.opendb.app.ui.widgets.dialog.VFXDialogHelper;
 import javafx.application.Platform;
@@ -23,6 +24,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 
 import java.util.*;
+
+import static com.changhong.io.IOUtils.printf;
 
 /**
  * @author Luo Tiansheng
@@ -38,10 +41,13 @@ public class TableStructureDesignerPane extends DetailPane
         private final VFXTableView<TableIndexMetaData> indexView = new VFXTableView<>();
         private final ToolBar toolBar = new ToolBar();
         private final TabPane tabPane = new TabPane();
+        private final Tab structureTab = new Tab("表结构");
+        private final Tab indexTab = new Tab("索引");
 
         private final Button saveButton = new VFXIconButton("保存", "storage");
         private final Button plusButton = new VFXIconButton("新增行", "plus");
         private final Button minusButton = new VFXIconButton("删除行", "minus");
+        private final Button reloadButton = new VFXIconButton("刷新", "reload");
 
         private Node oldGraphic;
         private final ProgressIndicator progressIndicator = Assets.newProgressIndicator();
@@ -49,11 +55,16 @@ public class TableStructureDesignerPane extends DetailPane
         private List<ColumnMetaData> columnMetaDatas;
         private List<TableIndexMetaData> indexes;
 
+        private TabViewType tabViewType = TabViewType.STRUCTURE;
+
         private final Set<ColumnMetaData> columnMetaDataUpdateBuffer = new HashSet<>();
         private final Set<ColumnMetaData> primaryUpdateBuffer = new LinkedHashSet<>();
         private final Map<Integer, TableIndexMetaData> tableIndexMetaDataUpdateBuffer = new HashMap<>();
 
-        private Button reload;
+        enum TabViewType {
+                STRUCTURE,
+                INDEX
+        }
 
         public TableStructureDesignerPane(Tab ownerTab,
                                           SQLExecutor executor,
@@ -72,22 +83,24 @@ public class TableStructureDesignerPane extends DetailPane
 
                 applyReload();
 
-                Tab tableStruct = new Tab("表结构");
-                tableStruct.setClosable(false);
-                tableStruct.setGraphic(Assets.use("struct1"));
+                structureTab.setClosable(false);
+                structureTab.setGraphic(Assets.use("struct1"));
 
                 BorderPane borderPane = new BorderPane();
                 borderPane.setCenter(structureView);
-                tableStruct.setContent(borderPane);
+                structureTab.setContent(borderPane);
 
-                Tab indexStruct = new Tab("索引");
-                indexStruct.setClosable(false);
-                indexStruct.setContent(indexView);
-                indexStruct.setGraphic(Assets.use("index0"));
+                indexTab.setClosable(false);
+                indexTab.setContent(indexView);
+                indexTab.setGraphic(Assets.use("index0"));
+
+                tabPane.selectionModelProperty().addListener((obs, oldVal, newVal) -> {
+                        Tab tab = newVal.getSelectedItem();
+                });
 
                 tabPane.getTabs().addAll(
-                        tableStruct,
-                        indexStruct
+                        structureTab,
+                        indexTab
                 );
 
                 setTop(toolBar);
@@ -99,9 +112,7 @@ public class TableStructureDesignerPane extends DetailPane
                 saveButton.setOnAction(e -> applySave());
                 plusButton.setOnAction(e -> applyPlus());
                 minusButton.setOnAction(e -> applyMinus());
-
-                reload = new VFXIconButton("刷新", "reload");
-                reload.setOnAction(e -> applyReload());
+                reloadButton.setOnAction(e -> applyReload());
 
                 toolBar.getItems().addAll(
                         saveButton,
@@ -109,7 +120,7 @@ public class TableStructureDesignerPane extends DetailPane
                         plusButton,
                         minusButton,
                         new VFXSeparator(),
-                        reload
+                        reloadButton
                 );
         }
 
@@ -163,7 +174,7 @@ public class TableStructureDesignerPane extends DetailPane
         private void beginReload()
         {
                 Platform.runLater(() -> {
-                        reload.setDisable(true);
+                        reloadButton.setDisable(true);
                         oldGraphic = ownerTab.getGraphic();
                         ownerTab.setGraphic(progressIndicator);
                 });
@@ -172,7 +183,7 @@ public class TableStructureDesignerPane extends DetailPane
         private void endReload()
         {
                 Platform.runLater(() -> {
-                        reload.setDisable(false);
+                        reloadButton.setDisable(false);
                         ownerTab.setGraphic(oldGraphic);
                 });
         }
@@ -278,25 +289,24 @@ public class TableStructureDesignerPane extends DetailPane
 
         private void setupIndexView()
         {
-                indexView.setEditable(true);
-                indexView.getSelectionModel().setCellSelectionEnabled(true);
-                indexView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+                indexView.enableCellEdit();
 
-                TableColumn<TableIndexMetaData, String> name = new VFXTableColumn<>("名称", true);
-                TableColumn<TableIndexMetaData, String> columns = new VFXTableColumn<>("索引列", true);
-                TableColumn<TableIndexMetaData, String> type = new VFXTableColumn<>("类型", true);
+                VFXTableColumnFactory<TableIndexMetaData> factory = new VFXTableColumnFactory<>();
 
-                name.setCellValueFactory(new PropertyValueFactory<>("name"));
-                columns.setCellValueFactory(new PropertyValueFactory<>("columnsText"));
-                type.setCellValueFactory(new PropertyValueFactory<>("type"));
+                factory.setOnEditCommitEventListener((oldVal, newVal) -> {
+                });
+
+                TableColumn<TableIndexMetaData, String> name = factory.createEditableColumn("名称", "name");
+                TableColumn<TableIndexMetaData, String> columns = factory.createEditableColumn("索引列", "columnsText");
+                TableColumn<TableIndexMetaData, String> type = factory.createEditableColumn("类型", "type");
 
                 name.setCellFactory(c -> new VFXTextFieldTableCell<>());
                 columns.setCellFactory(c -> new VFXTextFieldTableCell<>());
-                type.setCellFactory(c -> new VFXTextFieldTableCell<>());
+                type.setCellFactory(c -> new VFXComboBoxTableCell<>(executor.getIndexTypes()));
 
                 name.setPrefWidth(150);
-                columns.setPrefWidth(200);
-                type.setPrefWidth(100);
+                columns.setPrefWidth(350);
+                type.setPrefWidth(150);
 
                 indexView.getColumns().addAll(name, columns, type);
 
