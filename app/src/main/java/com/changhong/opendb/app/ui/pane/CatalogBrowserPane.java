@@ -30,7 +30,7 @@ import java.util.List;
  * @since 2026/3/27
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class CatalogBrowserPane extends DetailPane
+public class CatalogBrowserPane extends BrowserPane
 {
         private final TableView<Table> tableView;
         private final ToolBar toolBar;

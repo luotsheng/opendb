@@ -1,6 +1,6 @@
 package com.changhong.opendb.app.core.event;
 
-import com.changhong.opendb.app.ui.pane.DetailPane;
+import com.changhong.opendb.app.ui.pane.BrowserPane;
 import lombok.Getter;
 
 /**
@@ -12,9 +12,9 @@ import lombok.Getter;
 public class CloseWorkbenchPaneEvent extends Event
 {
         @Getter
-        private DetailPane pane;
+        private BrowserPane pane;
 
-        public CloseWorkbenchPaneEvent(DetailPane pane)
+        public CloseWorkbenchPaneEvent(BrowserPane pane)
         {
                 this.pane = pane;
         }

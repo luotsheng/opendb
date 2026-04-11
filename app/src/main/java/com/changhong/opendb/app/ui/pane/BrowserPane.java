@@ -8,6 +8,6 @@ import javafx.scene.layout.BorderPane;
  * @author Luo Tiansheng
  * @since 2026/3/26
  */
-public class DetailPane extends BorderPane
+public class BrowserPane extends BorderPane
 {
 }

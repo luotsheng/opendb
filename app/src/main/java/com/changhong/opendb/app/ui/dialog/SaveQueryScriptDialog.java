@@ -6,7 +6,7 @@ import com.changhong.opendb.app.core.event.RefreshQueryNodeEvent;
 import com.changhong.opendb.app.repository.QueryScriptRepository;
 import com.changhong.opendb.app.ui.navigator.node.ODBNConnection;
 import com.changhong.opendb.app.ui.navigator.node.ODBNDatabase;
-import com.changhong.opendb.app.ui.pane.DetailPane;
+import com.changhong.opendb.app.ui.pane.BrowserPane;
 import com.changhong.opendb.app.ui.workbench.SqlEditor;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -27,7 +27,7 @@ import java.io.File;
  * @since 2026/3/27
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class SaveQueryScriptDialog extends DetailPane
+public class SaveQueryScriptDialog extends BrowserPane
 {
         private final Stage stage;
         private final SqlEditor sqlEditor;

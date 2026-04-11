@@ -26,7 +26,7 @@ import java.util.*;
  * @since 2026/4/3
  */
 @SuppressWarnings("unchecked")
-public class TableStructureDesignerPane extends DetailPane
+public class TableStructureDesignerPane extends BrowserPane
 {
         private final Tab ownerTab;
         private final Session session;
