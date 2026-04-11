@@ -1,6 +1,8 @@
 package com.changhong.driver.api;
 
 import com.changhong.driver.api.sql.SQL;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -8,6 +10,8 @@ import java.util.List;
  * @author Luo Tiansheng
  * @since 2026/4/11
  */
+@Getter
+@Setter
 public class DataGrid
 {
         /**

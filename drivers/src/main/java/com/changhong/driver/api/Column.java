@@ -1,6 +1,8 @@
 package com.changhong.driver.api;
 
 import com.changhong.security.Codec;
+import lombok.Getter;
+import lombok.Setter;
 
 import static com.changhong.string.StringStaticize.strip;
 
@@ -31,6 +33,8 @@ import static com.changhong.string.StringStaticize.strip;
  * @author Luo Tiansheng
  * @since 2026/4/11
  */
+@Getter
+@Setter
 public class Column extends Sealable
 {
         /**

@@ -17,6 +17,10 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.truncate.Truncate;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.upsert.Upsert;
+import net.sf.jsqlparser.util.TablesNamesFinder;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Luo Tiansheng
@@ -25,14 +29,37 @@ import net.sf.jsqlparser.statement.upsert.Upsert;
 @Getter
 public class SQLParsedStatement
 {
+        /**
+         * SQL 语句
+         */
         private final Statement statement;
 
+        /**
+         * 命令类型
+         */
         private final SQLCommandType command;
+
+        /**
+         * SQL 语句中的所有表名称
+         */
+        private final Set<String> tables = new HashSet<>();
 
         public SQLParsedStatement(Statement statement)
         {
                 this.statement = statement;
                 this.command = toType(statement);
+                TablesNamesFinder<Void> finder = new TablesNamesFinder<>();
+                this.tables.addAll(finder.getTables(statement));
+        }
+
+        public boolean isSingleTable()
+        {
+                return tables.size() == 1;
+        }
+
+        public String getSingleTableName()
+        {
+                return tables.iterator().next();
         }
 
         private static SQLCommandType toType(Statement statement)

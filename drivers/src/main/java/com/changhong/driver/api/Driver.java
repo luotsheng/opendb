@@ -61,12 +61,12 @@ public abstract class Driver
                 /**
                  * 使用给定的 {@link Statement} 执行数据库操作。
                  *
+                 * @param connection JDBC 连接对象
                  * @param statement JDBC 语句对象，由调用方创建并管理生命周期
-                 * @return 与 {@link Statement#execute(String)} 语义一致：
                  * {@code true} 表示执行结果为结果集，{@code false} 表示更新计数或 DDL 语句
                  * @throws SQLException 如果数据库访问错误发生
                  */
-                boolean execute(Statement statement) throws SQLException;
+                void execute(Connection connection, Statement statement) throws SQLException;
         }
 
         /**
@@ -80,11 +80,12 @@ public abstract class Driver
                 /**
                  * 使用给定的 {@link Statement} 执行更新操作。
                  *
+                 * @param connection JDBC 连接对象
                  * @param statement JDBC 语句对象
                  * @return 受影响的记录行数（与 {@link Statement#executeUpdate(String)} 语义一致）
                  * @throws SQLException 如果数据库访问错误发生
                  */
-                int executeUpdate(Statement statement) throws SQLException;
+                int executeUpdate(Connection connection, Statement statement) throws SQLException;
         }
 
         /**
@@ -97,10 +98,12 @@ public abstract class Driver
                 /**
                  * 使用给定的 {@link Statement} 执行查询操作。
                  *
+                 * @param connection JDBC 连接对象
                  * @param statement JDBC 语句对象
+                 * @return 查询结果集数据表对象
                  * @throws SQLException 如果数据库访问错误发生
                  */
-                void executeQuery(Statement statement) throws SQLException;
+                DataGrid executeQuery(Connection connection, Statement statement) throws SQLException;
         }
 
         /**
@@ -242,15 +245,14 @@ public abstract class Driver
          *
          * @param session 当前会话上下文，包含 catalog 和 schema 信息
          * @param executeCallback 回调接口，定义具体执行逻辑
-         * @return {@code true} 如果第一个结果是结果集，{@code false} 如果是更新计数或没有结果
          * @throws SystemRuntimeException 如果发生 {@link SQLException}（包装后抛出）
          * @see Statement#execute(String)
          */
-        public boolean execute(Session session, StatementExecuteCallback executeCallback)
+        public void execute(Session session, StatementExecuteCallback executeCallback)
         {
                 try (Connection connection = getConnection(session)) {
                         try (Statement statement = connection.createStatement()) {
-                                return executeCallback.execute(statement);
+                                executeCallback.execute(connection, statement);
                         }
                 } catch (SQLException e) {
                         throw new SystemRuntimeException(e);
@@ -270,7 +272,7 @@ public abstract class Driver
         {
                 try (Connection connection = getConnection(session)) {
                         try (Statement statement = connection.createStatement()) {
-                                return executeUpdateCallback.executeUpdate(statement);
+                                return executeUpdateCallback.executeUpdate(connection, statement);
                         }
                 } catch (SQLException e) {
                         throw new SystemRuntimeException(e);
@@ -285,14 +287,15 @@ public abstract class Driver
          *
          * @param session 当前会话上下文
          * @param executeQueryCallback 回调接口，返回查询结果集
+         * @return 查询结果集数据表对象
          * @throws SystemRuntimeException 如果发生 {@link SQLException}
          * @see Statement#executeQuery(String)
          */
-        public void executeQuery(Session session, StatementExecuteQueryCallback executeQueryCallback)
+        public DataGrid executeQuery(Session session, StatementExecuteQueryCallback executeQueryCallback)
         {
                 try (Connection connection = getConnection(session)) {
                         try (Statement statement = connection.createStatement()) {
-                                executeQueryCallback.executeQuery(statement);
+                                return executeQueryCallback.executeQuery(connection, statement);
                         }
                 } catch (SQLException e) {
                         throw new SystemRuntimeException(e);

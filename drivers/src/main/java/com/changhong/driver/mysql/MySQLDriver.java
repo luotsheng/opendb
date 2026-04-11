@@ -42,7 +42,7 @@ public class MySQLDriver extends Driver implements SQLExecutor
         {
                 List<Table> tables = Lists.newArrayList();
 
-                executeQuery(session, statement -> {
+                execute(session, (connection, statement) -> {
                         String sql = strwfmt("""
                             SELECT
                             	`TABLE_NAME` AS `name`,
@@ -56,7 +56,7 @@ public class MySQLDriver extends Driver implements SQLExecutor
                             	information_schema.TABLES
                             WHERE
                             	TABLE_SCHEMA = '%s';
-                        """, session.schema());
+                        """, session.catalog());
 
                         try (var rs = statement.executeQuery(sql)) {
                                 while (rs.next()) {
@@ -81,7 +81,7 @@ public class MySQLDriver extends Driver implements SQLExecutor
         @Override
         public DataGrid execute(long jobId, Session session, SQL sql)
         {
-                executeQuery(session, statement -> {
+                return executeQuery(session, (connection, statement) -> {
 
                         taskQueue.put(jobId, statement);
 
@@ -97,12 +97,11 @@ public class MySQLDriver extends Driver implements SQLExecutor
 
                         if (endStatement.getCommand() == SQLCommandType.EXECUTE_QUERY) {
                                 ResultSet rs = statement.executeQuery(endStatement.toString());
-                                ResultSets.toDataGrid(rs);
+                                return ResultSets.toDataGrid(connection, endStatement, rs);
                         }
 
+                        return null;
                 });
-
-                return null;
         }
 
         @Override

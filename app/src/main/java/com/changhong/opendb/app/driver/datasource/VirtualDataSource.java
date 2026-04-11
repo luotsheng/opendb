@@ -1,6 +1,7 @@
 package com.changhong.opendb.app.driver.datasource;
 
 import com.changhong.driver.api.Session;
+import com.changhong.driver.api.sql.SQL;
 import com.changhong.driver.mysql.MySQLDriver;
 import com.changhong.opendb.app.driver.executor.SQLExecutor;
 import com.changhong.opendb.app.model.ConnectionInfo;
@@ -38,8 +39,12 @@ public abstract class VirtualDataSource
                 conf.setConnectionTimeout(30000);
 
                 ds = new HikariDataSource(conf);
+
                 mySQLDriver = new MySQLDriver(ds);
-                mySQLDriver.getTables(new Session(null, "worktable"));
+                mySQLDriver.getTables(new Session("worktable", null));
+
+                mySQLDriver.execute(-1, new Session("worktable", null), new SQL("SELECT * FROM addresses"));
+
                 System.out.println();
         }
 
