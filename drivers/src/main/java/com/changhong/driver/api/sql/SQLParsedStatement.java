@@ -23,6 +23,8 @@ import net.sf.jsqlparser.util.TablesNamesFinder;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.changhong.string.StringStaticize.strcut;
+
 /**
  * @author Luo Tiansheng
  * @since 2026/4/02
@@ -42,6 +44,11 @@ public class SQLParsedStatement
         private SQLCommandType command;
 
         /**
+         * sql 脚本
+         */
+        private final String textValue;
+
+        /**
          * SQL 语句中的所有表名称
          */
         private final Set<String> tables = new HashSet<>();
@@ -50,10 +57,13 @@ public class SQLParsedStatement
         {
                 this.statement = statement;
                 this.command = toType(statement);
+                this.textValue = statement.toString();
+
                 TablesNamesFinder<Void> finder = new TablesNamesFinder<>();
 
                 try {
-                        this.tables.addAll(finder.getTables(statement));
+                        for (String table : finder.getTables(statement))
+                                this.tables.add(removeQuote(table));
                 } catch (Exception ignored) {
                         /* IGNORED */
                 }
@@ -67,6 +77,17 @@ public class SQLParsedStatement
         public String getSingleTableName()
         {
                 return tables.iterator().next();
+        }
+
+        private static String removeQuote(String tableName)
+        {
+                if (tableName.startsWith("`")) {
+                        tableName = strcut(tableName, 1, 0);
+                        tableName = strcut(tableName, 0, -1);
+                        return tableName;
+                }
+
+                return tableName;
         }
 
         private static SQLCommandType toType(Statement statement)
@@ -111,6 +132,6 @@ public class SQLParsedStatement
         @Override
         public String toString()
         {
-                return statement.toString();
+                return textValue;
         }
 }

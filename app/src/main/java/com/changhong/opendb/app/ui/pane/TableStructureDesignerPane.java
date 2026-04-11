@@ -68,8 +68,8 @@ public class TableStructureDesignerPane extends DetailPane
                 this.columnMetaDatas = driver.getColumns(session, table.getName());
                 this.indexes = driver.getIndexes(session, table);
 
-                this.tableStructureDesigner = new MySQLTableStructureDesigner(session, driver, table, "表结构");
-                this.indexColumnDesigner = new MySQLIndexStructureDesigner(session, driver, table, "索引");
+                this.tableStructureDesigner = new TableStructureDesigner(session, driver, table, "表结构");
+                this.indexColumnDesigner = new IndexStructureDesigner(session, driver, table, "索引");
 
                 setupToolBar();
 
@@ -143,14 +143,14 @@ public class TableStructureDesignerPane extends DetailPane
         private void applyPlus()
         {
                 switch (designer) {
-                        case MySQLTableStructureDesigner inst -> {
+                        case TableStructureDesigner inst -> {
                                 Column columnMetaData = new Column();
                                 inst.applyPlus(columnMetaData);
                                 structureView.getItems().add(columnMetaData);
                                 structureView.refresh();
                         }
 
-                        case MySQLIndexStructureDesigner inst -> {
+                        case IndexStructureDesigner inst -> {
                                 Index indexMetaData = new Index();
                                 inst.applyPlus(indexMetaData);
                                 indexView.getItems().add(indexMetaData);
@@ -165,8 +165,8 @@ public class TableStructureDesignerPane extends DetailPane
         private void applyMinus()
         {
                 ObservableList<?> items = switch (designer) {
-                        case MySQLTableStructureDesigner ignored -> structureView.getSelectionModel().getSelectedItems();
-                        case MySQLIndexStructureDesigner ignored -> indexView.getSelectionModel().getSelectedItems();
+                        case TableStructureDesigner ignored -> structureView.getSelectionModel().getSelectedItems();
+                        case IndexStructureDesigner ignored -> indexView.getSelectionModel().getSelectedItems();
                         default -> FXCollections.emptyObservableList();
                 };
 
@@ -182,8 +182,8 @@ public class TableStructureDesignerPane extends DetailPane
                 new Thread(() -> {
                         try {
                                 switch (designer) {
-                                        case MySQLTableStructureDesigner inst -> inst.applyMinus((Collection<Column>) items);
-                                        case MySQLIndexStructureDesigner inst -> inst.applyMinus((Collection<Index>) items);
+                                        case TableStructureDesigner inst -> inst.applyMinus((Collection<Column>) items);
+                                        case IndexStructureDesigner inst -> inst.applyMinus((Collection<Index>) items);
                                         default -> throw new UnsupportedOperationException("Unsupported designer object instance");
                                 }
                                 doReload();

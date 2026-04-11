@@ -26,7 +26,7 @@ public class PreviewTableDataPane extends BorderPane
         private final Driver driver;
         private final Session session;
         private final Table table;
-        private final DataGridViewPane mutableDataGridViewPane;
+        private final DataGridViewPane dataGridViewPane;
 
         public PreviewTableDataPane(Tab ownerTab,
                                     Session session,
@@ -37,9 +37,9 @@ public class PreviewTableDataPane extends BorderPane
                 this.session = session;
                 this.driver = driver;
                 this.table = table;
-                this.mutableDataGridViewPane = new DataGridViewPane(true);
+                this.dataGridViewPane = new DataGridViewPane(true);
 
-                mutableDataGridViewPane.setReloadProgressListener(new DataGridViewPane.ReloadProgressListener()
+                dataGridViewPane.setReloadProgressListener(new DataGridViewPane.ReloadProgressListener()
                 {
                         @Override
                         public void start()
@@ -54,7 +54,7 @@ public class PreviewTableDataPane extends BorderPane
                         }
                 });
 
-                setCenter(mutableDataGridViewPane);
+                setCenter(dataGridViewPane);
         }
 
         private void setLoadingIndicator()
@@ -75,7 +75,7 @@ public class PreviewTableDataPane extends BorderPane
                 new Thread(() -> {
                         try {
                                 DataGrid rs = driver.selectByPage(session, table.getName(), start, size);
-                                Platform.runLater(() -> mutableDataGridViewPane.render(rs));
+                                Platform.runLater(() -> dataGridViewPane.render(rs));
                         } catch (Exception e) {
                                 VFXDialogHelper.alert(e);
                         } finally {

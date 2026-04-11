@@ -4,6 +4,7 @@ import com.changhong.driver.api.Driver;
 import com.changhong.driver.api.Index;
 import com.changhong.driver.api.Session;
 import com.changhong.driver.api.Table;
+import com.changhong.utils.Captor;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -13,12 +14,12 @@ import java.util.Set;
  * @author Luo Tiansheng
  * @since 2026/4/10
  */
-public class MySQLIndexStructureDesigner extends Designer<Index>
+public class IndexStructureDesigner extends Designer<Index>
 {
         private final Set<Index> alterBuffer = new LinkedHashSet<>();
         private final Set<Index> visibleBuffer = new LinkedHashSet<>();
 
-        public MySQLIndexStructureDesigner(Session session, Driver driver, Table table, String name)
+        public IndexStructureDesigner(Session session, Driver driver, Table table, String name)
         {
                 super(session, driver, table, name);
         }
@@ -40,7 +41,7 @@ public class MySQLIndexStructureDesigner extends Designer<Index>
         public void applySave()
         {
                 if (!alterBuffer.isEmpty()) {
-                        driver.dropIndexKeys(session, table, alterBuffer);
+                        Captor.icall(() -> driver.dropIndexKeys(session, table, alterBuffer));
                         driver.alterIndexKeys(session, table, alterBuffer);
                 }
 

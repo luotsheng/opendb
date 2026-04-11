@@ -15,6 +15,8 @@ import net.sf.jsqlparser.statement.alter.Alter;
 import net.sf.jsqlparser.statement.alter.AlterExpression;
 import net.sf.jsqlparser.statement.alter.AlterOperation;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -36,6 +38,8 @@ import static com.changhong.utils.TypeConverter.atos;
 @SuppressWarnings("SqlSourceToSinkFlow")
 public class MySQLDriver extends Driver
 {
+        private static final Logger LOG = LoggerFactory.getLogger(MySQLDriver.class);
+
         private final MySQLDialect dialect = new MySQLDialect();
 
         private final Map<Long, Statement> taskQueue = new ConcurrentHashMap<>();
@@ -203,11 +207,11 @@ public class MySQLDriver extends Driver
         }
 
         @Override
-        public void dropColumns(Session session, Table table, Collection<Column> columns)
+        public void dropColumns(Session session, String table, Collection<Column> columns)
         {
                 StringBuilder script = new StringBuilder();
 
-                script.append(strwfmt("ALTER TABLE `%s` ", table.getName()));
+                script.append(strwfmt("ALTER TABLE `%s` ", table));
 
                 for (Column col : columns)
                         script.append(strwfmt("DROP COLUMN `%s`, ", col.getName()));
@@ -219,7 +223,7 @@ public class MySQLDriver extends Driver
         }
 
         @Override
-        public void dropIndexKeys(Session session, Table table, Collection<Index> selectionItems)
+        public void dropIndexKeys(Session session, String table, Collection<Index> selectionItems)
         {
                 StringBuilder scripts = new StringBuilder();
 
@@ -230,7 +234,7 @@ public class MySQLDriver extends Driver
                                 : index.getOriginalName();
 
                         scripts.append(
-                                strwfmt("ALTER TABLE `%s` DROP INDEX `%s`;\n", table.getName(), name)
+                                strwfmt("ALTER TABLE `%s` DROP INDEX `%s`;\n", table, name)
                         );
                 }
 
@@ -238,25 +242,26 @@ public class MySQLDriver extends Driver
         }
 
         @Override
-        public void alterPrimaryKey(Session session, Table table, Collection<Column> primaryKeys)
+        public void alterPrimaryKey(Session session, String table, Collection<Column> primaryKeys)
         {
                 if (primaryKeys.isEmpty())
                         return;
 
-                String sql = strwfmt("ALTER TABLE %s DROP PRIMARY KEY;", dialect.quote(table.getName()));
-                execute(session, new SQL(sql));
+                try {
+                        String sql = strwfmt("ALTER TABLE %s DROP PRIMARY KEY;", dialect.quote(table));
+                        execute(session, new SQL(sql));
+                } catch (Exception e) {
+                        LOG.error("drop primary key error", e);
+                }
 
                 StringBuilder script = new StringBuilder();
 
-                script.append("ALTER TABLE `")
-                        .append(table.getName())
-                        .append("` ADD PRIMARY KEY (");
+                script.append("ALTER TABLE ")
+                        .append(dialect.quote(table))
+                        .append(" ADD PRIMARY KEY (");
 
                 for (Column primaryKey : primaryKeys) {
-                        script.append("`")
-                                .append(primaryKey.getName())
-                                .append("`")
-                                .append(",");
+                        script.append(dialect.quote(primaryKey.getName())).append(",");
                 }
 
                 script.delete(script.length() - 1, script.length());
@@ -266,7 +271,7 @@ public class MySQLDriver extends Driver
         }
 
         @Override
-        public void alterIndexKeys(Session session, Table table, Collection<Index> indexes)
+        public void alterIndexKeys(Session session, String table, Collection<Index> indexes)
         {
                 StringBuilder scripts = new StringBuilder();
 
@@ -281,7 +286,7 @@ public class MySQLDriver extends Driver
                                         strwfmt(
                                                 "CREATE INDEX `%s` ON `%s`(%s);\n",
                                                 name,
-                                                table.getName(),
+                                                table,
                                                 columns
                                         )
                                 );
@@ -340,7 +345,7 @@ public class MySQLDriver extends Driver
         }
 
         @Override
-        public void alterChange(Session session, Table table, Collection<Column> columns)
+        public void alterChange(Session session, String table, Collection<Column> columns)
         {
                 if (Lists.isEmpty(columns))
                         return;
@@ -361,7 +366,7 @@ public class MySQLDriver extends Driver
 
                         var alterColDataType = new AlterExpression.ColumnDataType(false);
 
-                        alterColDataType.setColumnName("`" + col.getName() + "`");
+                        alterColDataType.setColumnName(dialect.quote(col.getName()));
                         alterColDataType.setColDataType(colDataType);
 
                         alterColDataType.addColumnSpecs(
@@ -380,7 +385,7 @@ public class MySQLDriver extends Driver
                         alterExpr.addColDataType(alterColDataType);
 
                         Alter alter = new Alter();
-                        alter.setTable(new net.sf.jsqlparser.schema.Table(dialect.quote(table.getName())));
+                        alter.setTable(new net.sf.jsqlparser.schema.Table(dialect.quote(table)));
                         alter.setAlterExpressions(List.of(alterExpr));
 
                         builder.append(alter).append(";");
@@ -390,16 +395,16 @@ public class MySQLDriver extends Driver
         }
 
         @Override
-        public void alterVisible(Session session, Table table, Collection<Index> indexes)
+        public void alterVisible(Session session, String table, Collection<Index> indexes)
         {
                 StringBuilder scripts = new StringBuilder();
 
                 for (Index index : indexes) {
                         String isVisible = index.isVisible() ? "VISIBLE" : "INVISIBLE";
                         scripts.append(
-                                strwfmt("ALTER TABLE `%s` ALTER INDEX `%s` %s;",
-                                        table.getName(),
-                                        index.getName(),
+                                strwfmt("ALTER TABLE %s ALTER INDEX %s %s;",
+                                        dialect.quote(table),
+                                        dialect.quote(index.getName()),
                                         isVisible)
                         );
                 }
@@ -422,9 +427,10 @@ public class MySQLDriver extends Driver
 
                         taskQueue.put(jobId, statement);
 
-                        SQLParsedStatement endStatement = sql.popupEnd();
+                        SQLParsedStatement eps = sql.popupEnd();
 
                         for (SQLParsedStatement ps : sql) {
+                                LOG.info("Execute command type {} sql: {}", ps.getCommand(), ps);
                                 switch (ps.getCommand()) {
                                         case EXECUTE -> statement.execute(ps.toString());
                                         case EXECUTE_UPDATE -> statement.executeUpdate(ps.toString());
@@ -432,12 +438,18 @@ public class MySQLDriver extends Driver
                                 }
                         }
 
-                        sql.pushback(endStatement);
+                        sql.pushback(eps);
 
-                        if (endStatement.getCommand() == SQLCommandType.EXECUTE_QUERY) {
-                                ResultSet rs = statement.executeQuery(endStatement.toString());
-                                ResultSets.toDataGrid(connection, endStatement, rs, dataGrid);
-                                return dataGrid;
+                        LOG.info("Execute command type {} sql: {}", eps.getCommand(), eps);
+
+                        switch (eps.getCommand()) {
+                                case EXECUTE -> statement.execute(eps.toString());
+                                case EXECUTE_UPDATE -> statement.executeUpdate(eps.toString());
+                                case EXECUTE_QUERY -> {
+                                        ResultSet rs = statement.executeQuery(eps.toString());
+                                        ResultSets.toDataGrid(connection, eps, rs, dataGrid);
+                                        return dataGrid;
+                                }
                         }
 
                         return null;

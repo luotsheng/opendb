@@ -56,7 +56,7 @@ public class SqlEditor extends SplitPane
         private final VFXCodeArea codeArea;
         private final VirtualizedScrollPane<CodeArea> virtualizedScrollPane;
         private final BorderPane topBorderPane;
-        private final DataGridViewPane mutableDataGridViewPane;
+        private final DataGridViewPane dataGridViewPane;
         private final Tab sqlMessageTab;
         private final SqlMessagePane sqlMessagePane;
 
@@ -95,7 +95,7 @@ public class SqlEditor extends SplitPane
                 toolBar = new ToolBar();
                 codeArea = new VFXCodeArea();
                 virtualizedScrollPane = new VirtualizedScrollPane<>(codeArea);
-                mutableDataGridViewPane = new DataGridViewPane(false);
+                dataGridViewPane = new DataGridViewPane(false);
                 sqlMessagePane = new SqlMessagePane();
                 virtualizedScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 
@@ -194,8 +194,8 @@ public class SqlEditor extends SplitPane
 
         private void setupResultSetCloseEvent()
         {
-                mutableDataGridViewPane.setOnClosedListener(() ->
-                        getItems().remove(mutableDataGridViewPane));
+                dataGridViewPane.setOnClosedListener(() ->
+                        getItems().remove(dataGridViewPane));
         }
 
         private VFXComboBox<ODBNConnection> newConnectionComboBox()
@@ -345,15 +345,15 @@ public class SqlEditor extends SplitPane
 
         private void showResultSetTableViewPane(int flag)
         {
-                mutableDataGridViewPane.addTab(sqlMessageTab);
+                dataGridViewPane.addTab(sqlMessageTab);
 
                 switch (flag) {
-                        case QUERY_RESULT_SET_FIRST -> mutableDataGridViewPane.selectResultSetFirst();
-                        case QUERY_MESSAGE_LOG_FIRST -> mutableDataGridViewPane.select(sqlMessageTab);
+                        case QUERY_RESULT_SET_FIRST -> dataGridViewPane.selectResultSetFirst();
+                        case QUERY_MESSAGE_LOG_FIRST -> dataGridViewPane.select(sqlMessageTab);
                 }
 
-                if (!getItems().contains(mutableDataGridViewPane))
-                        getItems().add(mutableDataGridViewPane);
+                if (!getItems().contains(dataGridViewPane))
+                        getItems().add(dataGridViewPane);
         }
 
         /**
@@ -392,7 +392,7 @@ public class SqlEditor extends SplitPane
 
                                 if (grid != null) {
                                         Platform.runLater(() -> {
-                                                mutableDataGridViewPane.render(grid);
+                                                dataGridViewPane.render(grid);
                                                 showResultSetTableViewPane(QUERY_RESULT_SET_FIRST);
                                         });
                                 } else {

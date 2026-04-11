@@ -19,6 +19,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,6 +35,8 @@ import static com.changhong.string.StringStaticize.strwfmt;
 @SuppressWarnings("DuplicatedCode")
 public class VFXDialogHelper
 {
+        private static final Logger LOG = LoggerFactory.getLogger(VFXDialogHelper.class);
+
         public interface DialogCallback {
                 void run() throws Throwable;
         }
@@ -89,6 +93,7 @@ public class VFXDialogHelper
          */
         public static void alert(Throwable e)
         {
+                LOG.error("", e);
                 alert(Causes.message(e));
         }
 

@@ -406,6 +406,10 @@ public abstract class Driver implements SQLExecutor
          */
         public abstract void dropTable(Session session, String table);
 
+        public void dropTable(Session session, Table table) {
+                dropTable(session, table.getName());
+        }
+
         /**
          * 删除指定表中的多个列。
          * <p>
@@ -430,7 +434,11 @@ public abstract class Driver implements SQLExecutor
          * @throws IllegalArgumentException 如果 {@code columns} 为空集合，或任一列未绑定到该表
          * @throws SystemRuntimeException   如果执行 DDL 失败
          */
-        public abstract void dropColumns(Session session, Table table, Collection<Column> columns);
+        public abstract void dropColumns(Session session, String table, Collection<Column> columns);
+
+        public void dropColumns(Session session, Table table, Collection<Column> columns) {
+                dropColumns(session, table.getName(), columns);
+        }
 
         /**
          * 删除指定表上的多个索引。
@@ -458,7 +466,11 @@ public abstract class Driver implements SQLExecutor
          * @throws SystemRuntimeException 如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
          * @see Index
          */
-        public abstract void dropIndexKeys(Session session, Table table, Collection<Index> selectionItems);
+        public abstract void dropIndexKeys(Session session, String table, Collection<Index> selectionItems);
+
+        public void dropIndexKeys(Session session, Table table, Collection<Index> selectionItems) {
+                dropIndexKeys(session, table.getName(), selectionItems);
+        }
 
         /**
          * 修改表的主键约束。
@@ -486,7 +498,11 @@ public abstract class Driver implements SQLExecutor
          * @throws IllegalArgumentException 如果任一列不属于该表，或列数量为 0 但数据库不允许无主键表
          * @throws SystemRuntimeException   如果执行 DDL 失败
          */
-        public abstract void alterPrimaryKey(Session session, Table table, Collection<Column> primaryKeys);
+        public abstract void alterPrimaryKey(Session session, String table, Collection<Column> primaryKeys);
+
+        public void alterPrimaryKey(Session session, Table table, Collection<Column> primaryKeys) {
+                alterPrimaryKey(session, table.getName(), primaryKeys);
+        }
 
         /**
          * 修改指定表上的多个索引定义（如索引列、索引类型等）。
@@ -544,7 +560,11 @@ public abstract class Driver implements SQLExecutor
          * @throws SystemRuntimeException            如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
          * @see Index
          */
-        public abstract void alterIndexKeys(Session session, Table table, Collection<Index> indexes);
+        public abstract void alterIndexKeys(Session session, String table, Collection<Index> indexes);
+
+        public void alterIndexKeys(Session session, Table table, Collection<Index> indexes) {
+                alterIndexKeys(session, table.getName(), indexes);
+        }
 
         /**
          * 修改表中多个列的定义（变更列属性）。
@@ -570,16 +590,65 @@ public abstract class Driver implements SQLExecutor
          * </ul>
          *
          * @param session 当前会话上下文，包含 catalog 和 schema 信息
-         * @param table   目标表元数据（不能为 {@code null}）
+         * @param table   目标表名称（不能为 {@code null} 或空白字符串）
          * @param columns 需要变更的列集合，每个 {@link Column} 应包含完整的新定义（不能为 {@code null} 或空集合）
          * @throws NullPointerException             如果 {@code table} 或 {@code columns} 为 {@code null}
          * @throws IllegalArgumentException         如果 {@code columns} 为空集合，或任一列未包含必要的标识信息（如列名）
          * @throws UnsupportedOperationException    如果数据库方言不支持列修改操作
          * @throws SystemRuntimeException           如果执行 DDL 失败
          */
-        public abstract void alterChange(Session session, Table table, Collection<Column> columns);
+        public abstract void alterChange(Session session, String table, Collection<Column> columns);
 
-        public abstract void alterVisible(Session session, Table table, Collection<Index> indexes);
+        public void alterChange(Session session, Table table, Collection<Column> columns) {
+                alterChange(session, table.getName(), columns);
+        }
+
+        /**
+         * 修改指定表上多个索引的可见性状态。
+         * <p>
+         * 该方法用于启用或禁用一个或多个索引，而不删除索引定义。被禁用的索引将不会被查询优化器使用，
+         * 但索引定义仍保留在数据库系统表中，可随时重新启用。
+         * <p>
+         * <b>适用场景：</b>
+         * <ul>
+         *   <li>临时禁用索引以评估其对查询性能的影响</li>
+         *   <li>在大规模数据导入前禁用索引以提高写入性能，导入后重新启用</li>
+         *   <li>故障排查时隔离特定索引以定位性能问题</li>
+         * </ul>
+         * <p>
+         * <b>数据库支持差异：</b>
+         * <ul>
+         *   <li>Oracle: 支持 {@code ALTER INDEX index_name VISIBLE/INVISIBLE}</li>
+         *   <li>MySQL 8.0+: 支持 {@code ALTER INDEX index_name VISIBLE/INVISIBLE}</li>
+         *   <li>PostgreSQL: 不直接支持索引可见性，需通过 {@code pg_index.indisvisible} 或重新创建索引</li>
+         *   <li>SQL Server: 支持 {@code ALTER INDEX index_name ON table_name DISABLE/REBUILD}</li>
+         * </ul>
+         * <p>
+         * <b>实现要求：</b>
+         * <ul>
+         *   <li>每个 {@link Index} 对象应包含索引名称及目标可见性状态（通过 {@link Index#isVisible()} 或类似方法）</li>
+         *   <li>应尽量生成单条 DDL 语句完成所有索引的可见性修改（若数据库支持）</li>
+         *   <li>若数据库不支持索引可见性修改，应抛出 {@link UnsupportedOperationException}</li>
+         *   <li>若指定索引不存在，应根据策略选择忽略或抛出 {@link IllegalArgumentException}</li>
+         *   <li>注意：禁用索引可能导致依赖该索引的约束失效，实现时应考虑级联影响</li>
+         *   <li>建议在操作前后记录日志，便于问题追踪</li>
+         * </ul>
+         *
+         * @param session 会话上下文，用于获取连接及设置 catalog/schema（不能为 {@code null}）
+         * @param table   目标表名称（不能为 {@code null} 或空白字符串）
+         * @param indexes 需要修改可见性的索引集合，每个元素包含索引名称及目标可见性状态（不能为 {@code null} 或空集合）
+         * @throws NullPointerException              如果 {@code session}、{@code table} 或 {@code indexes} 为 {@code null}
+         * @throws IllegalArgumentException          如果 {@code table} 为空白字符串，或 {@code indexes} 为空集合，
+         *                                           或任一索引缺少名称，或指定索引不存在于表上
+         * @throws UnsupportedOperationException     如果数据库方言不支持索引可见性修改
+         * @throws SystemRuntimeException            如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
+         * @see Index#isVisible()
+         */
+        public abstract void alterVisible(Session session, String table, Collection<Index> indexes);
+
+        public void alterVisible(Session session, Table table, Collection<Index> indexes) {
+                alterVisible(session, table.getName(), indexes);
+        }
 
         /**
          * 执行返回布尔值的数据库操作（如 DDL、部分存储过程调用）。

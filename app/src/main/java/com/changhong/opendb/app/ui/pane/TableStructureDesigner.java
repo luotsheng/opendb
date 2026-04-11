@@ -14,12 +14,14 @@ import java.util.Set;
  * @author Luo Tiansheng
  * @since 2026/4/10
  */
-public class MySQLTableStructureDesigner extends Designer<Column>
+public class TableStructureDesigner extends Designer<Column>
 {
         private final Set<Column> updateBuffer = new HashSet<>();
         private final Set<Column> primaryBuffer = new LinkedHashSet<>();
 
-        public MySQLTableStructureDesigner(Session session, Driver driver, Table table, String name)
+        private boolean primaryChange = false;
+
+        public TableStructureDesigner(Session session, Driver driver, Table table, String name)
         {
                 super(session, driver, table, name);
         }
@@ -30,9 +32,11 @@ public class MySQLTableStructureDesigner extends Designer<Column>
                 primaryBuffer.clear();
                 updateBuffer.clear();
 
-                for (Column columnMetaData : values)
+                for (Column columnMetaData : values) {
                         if (columnMetaData.isPrimary())
                                 primaryBuffer.add(columnMetaData);
+                        primaryChange = false;
+                }
         }
 
         @Override
@@ -45,6 +49,8 @@ public class MySQLTableStructureDesigner extends Designer<Column>
                         } else {
                                 primaryBuffer.remove(newVal);
                         }
+
+                        primaryChange = true;
 
                         return;
                 }
@@ -61,8 +67,11 @@ public class MySQLTableStructureDesigner extends Designer<Column>
         @Override
         public void applySave()
         {
-                driver.alterChange(session, table, updateBuffer);
-                driver.alterPrimaryKey(session, table, primaryBuffer);
+                if (!updateBuffer.isEmpty())
+                        driver.alterChange(session, table, updateBuffer);
+
+                if (!primaryBuffer.isEmpty() && primaryChange)
+                        driver.alterPrimaryKey(session, table, primaryBuffer);
         }
 
         @Override
