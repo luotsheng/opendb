@@ -40,6 +40,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.changhong.admin</groupId>
+            <artifactId>drivers</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${openjfx.version}</version>

@@ -1,5 +1,7 @@
 package com.changhong.opendb.app.driver.datasource;
 
+import com.changhong.driver.api.Session;
+import com.changhong.driver.mysql.MySQLDriver;
 import com.changhong.opendb.app.driver.executor.SQLExecutor;
 import com.changhong.opendb.app.model.ConnectionInfo;
 import com.zaxxer.hikari.HikariConfig;
@@ -21,6 +23,8 @@ public abstract class VirtualDataSource
 {
         private final HikariDataSource ds;
 
+        private MySQLDriver mySQLDriver;
+
         public VirtualDataSource(ConnectionInfo info)
         {
                 HikariConfig conf = new HikariConfig();
@@ -34,6 +38,9 @@ public abstract class VirtualDataSource
                 conf.setConnectionTimeout(30000);
 
                 ds = new HikariDataSource(conf);
+                mySQLDriver = new MySQLDriver(ds);
+                mySQLDriver.getTables(new Session(null, "worktable"));
+                System.out.println();
         }
 
         public abstract Statement use(Connection connection, String database)
