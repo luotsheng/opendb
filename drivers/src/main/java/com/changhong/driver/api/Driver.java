@@ -1,7 +1,7 @@
 package com.changhong.driver.api;
 
 import com.changhong.collection.Lists;
-import com.changhong.driver.exception.SQLRuntimeException;
+import com.changhong.driver.exception.DriverException;
 import com.changhong.exception.SystemRuntimeException;
 
 import javax.sql.DataSource;
@@ -162,15 +162,17 @@ public abstract class Driver
                 return connection;
         }
 
+        public abstract String showCreateTable(Session session, String table);
+
         /**
          * 获取当前数据库实例中所有可用的 catalog（目录）名称列表。
          * <p>
          * 该方法通过 {@link DatabaseMetaData#getCatalogs()} 获取结果集，
          * 并提取列名为 {@code "TABLE_CAT"} 的值。所有 {@link SQLException}
-         * 会被捕获并包装为 {@link SQLRuntimeException} 后重新抛出。
+         * 会被捕获并包装为 {@link DriverException} 后重新抛出。
          *
          * @return 不可变的 catalog 名称列表（可能为空，但不为 {@code null}）
-         * @throws SQLRuntimeException 如果数据库元数据访问失败
+         * @throws DriverException 如果数据库元数据访问失败
          * @see DatabaseMetaData#getCatalogs()
          */
         public List<String> getCatalogs() {
@@ -185,7 +187,7 @@ public abstract class Driver
 
                         return catalogs;
                 } catch (SQLException e) {
-                        throw new SQLRuntimeException(e);
+                        throw new DriverException(e);
                 }
         }
 
@@ -194,10 +196,10 @@ public abstract class Driver
          * <p>
          * 该方法通过 {@link DatabaseMetaData#getSchemas()} 获取结果集，
          * 并提取列名为 {@code "TABLE_SCHEM"} 的值。所有 {@link SQLException}
-         * 会被捕获并包装为 {@link SQLRuntimeException} 后重新抛出。
+         * 会被捕获并包装为 {@link DriverException} 后重新抛出。
          *
          * @return 不可变的 schema 名称列表（可能为空，但不为 {@code null}）
-         * @throws SQLRuntimeException 如果数据库元数据访问失败
+         * @throws DriverException 如果数据库元数据访问失败
          * @see DatabaseMetaData#getSchemas()
          */
         public List<String> getSchemas() {
@@ -212,7 +214,7 @@ public abstract class Driver
 
                         return schemas;
                 } catch (SQLException e) {
-                        throw new SQLRuntimeException(e);
+                        throw new DriverException(e);
                 }
         }
 
@@ -232,10 +234,12 @@ public abstract class Driver
          * @param session 会话上下文，包含 catalog 和 schema 过滤条件（不能为 {@code null}）
          * @return 表名列表（可能为空，但不为 {@code null}）
          * @throws NullPointerException 如果 {@code session} 为 {@code null}
-         * @throws SQLRuntimeException 如果数据库元数据访问失败
+         * @throws DriverException 如果数据库元数据访问失败
          * @see DatabaseMetaData#getTables(String, String, String, String[])
          */
         public abstract List<Table> getTables(Session session);
+
+        public abstract List<Column> getColumns(Session session, String table);
 
         /**
          * 执行返回布尔值的数据库操作（如 DDL、部分存储过程调用）。

@@ -41,8 +41,7 @@ public abstract class VirtualDataSource
                 ds = new HikariDataSource(conf);
 
                 mySQLDriver = new MySQLDriver(ds);
-                mySQLDriver.getTables(new Session("worktable", null));
-
+                mySQLDriver.showCreateTable(new Session("worktable", null), "addresses");
                 mySQLDriver.execute(-1, new Session("worktable", null), new SQL("SELECT * FROM addresses"));
 
                 System.out.println();

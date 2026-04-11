@@ -5,7 +5,7 @@ import com.changhong.driver.api.*;
 import com.changhong.driver.api.Driver;
 import com.changhong.driver.api.sql.SQLCommandType;
 import com.changhong.driver.api.sql.SQLParsedStatement;
-import com.changhong.driver.exception.SQLRuntimeException;
+import com.changhong.driver.exception.DriverException;
 import com.changhong.driver.api.sql.SQL;
 import com.changhong.driver.api.sql.SQLExecutor;
 import com.changhong.driver.utils.ResultSets;
@@ -13,10 +13,12 @@ import com.changhong.utils.Captor;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.changhong.collection.Lists.beg;
 import static com.changhong.string.StringStaticize.strwfmt;
 
 /**
@@ -35,6 +37,16 @@ public class MySQLDriver extends Driver implements SQLExecutor
         public MySQLDriver(DataSource dataSource)
         {
                 super(dataSource);
+        }
+
+        @Override
+        public String showCreateTable(Session session, String table)
+        {
+                DataGrid dataGrid = execute(-1, session, new SQL(
+                        strwfmt("SHOW CREATE TABLE %s;", dialect.quote(table))
+                ));
+
+                return beg(dataGrid.getRows()).get(1);
         }
 
         @Override
@@ -71,11 +83,42 @@ public class MySQLDriver extends Driver implements SQLExecutor
                                         ));
                                 }
                         } catch (SQLException e) {
-                                throw new SQLRuntimeException(e);
+                                throw new DriverException(e);
                         }
                 });
 
                 return tables;
+        }
+
+        @Override
+        public List<Column> getColumns(Session session, String table)
+        {
+                try {
+                        String sql = strwfmt("SELECT * FROM %s", dialect.quote(table));
+                        List<Column> columns = selectByPage(session, sql, 0, 0).getColumns();
+
+                        Map<String, Column> columnMetaDataMap = new HashMap<>();
+
+                        for (Column column : columns)
+                                columnMetaDataMap.put(column.getName(), column);
+
+                        String createTableDDL = showCreateTable(session, table);
+
+                        SQLUtils.parseColumnDefSpec(createTableDDL, columnMetaDataMap);
+
+                        /* 防篡改码生成 */
+                        columns.forEach(Column::finalIntegrityCode);
+
+                        return columns;
+                } catch (Exception e) {
+                        throw new DriverException(e);
+                }
+        }
+
+        @Override
+        public DataGrid selectByPage(Session session, String sql, int off, int size)
+        {
+                return execute(-1, session, new SQL(dialect.limit(sql, off, size)));
         }
 
         @Override

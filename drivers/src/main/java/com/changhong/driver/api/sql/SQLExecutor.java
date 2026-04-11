@@ -27,6 +27,8 @@ import com.changhong.driver.api.Session;
  */
 public interface SQLExecutor
 {
+        DataGrid selectByPage(Session session, String sql, int off, int size);
+
         /**
          * 执行 SQL 任务
          *
