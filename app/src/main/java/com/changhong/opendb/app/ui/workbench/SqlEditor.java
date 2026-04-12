@@ -39,6 +39,8 @@ import java.io.FileReader;
 import static com.changhong.string.StringStaticize.strwfmt;
 
 /**
+ * SQL 脚本编辑器
+ *
  * @author Luo Tiansheng
  * @since 2026/3/29
  */
@@ -204,12 +206,10 @@ public class SqlEditor extends SplitPane
                 configureConnectionComboBox(connection);
                 connection.setPrefWidth(200);
 
+                /* 选中连接时打开连接 */
                 connection.valueProperty().addListener((obs, oldVal, newVal) -> {
                         if (!newVal.isOpen())
                                 newVal.openConnection();
-
-                        databaseComboBox.getItems().clear();
-                        databaseComboBox.getItems().addAll(newVal.getDatabases());
                 });
 
                 return connection;
