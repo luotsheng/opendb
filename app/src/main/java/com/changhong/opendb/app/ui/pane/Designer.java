@@ -52,15 +52,15 @@ public abstract class Designer<T>
         /**
          * 当用户点击保存按钮
          */
-        public abstract void applySave();
+        public abstract void onSave();
 
         /**
          * 当用户点击加号按钮
          */
-        public abstract void applyPlus(T newObject);
+        public abstract void onPlus(T newObject);
 
         /**
          * 当用户点击减号按钮
          */
-        public abstract void applyMinus(Collection<T> selectionItems);
+        public abstract void onMinus(Collection<T> selectionItems);
 }

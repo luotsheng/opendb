@@ -38,7 +38,7 @@ public class IndexStructureDesigner extends Designer<Index>
         }
 
         @Override
-        public void applySave()
+        public void onSave()
         {
                 if (!alterBuffer.isEmpty()) {
                         Captor.icall(() -> driver.dropIndexKeys(session, table, alterBuffer));
@@ -50,14 +50,14 @@ public class IndexStructureDesigner extends Designer<Index>
         }
 
         @Override
-        public void applyPlus(Index newObject)
+        public void onPlus(Index newObject)
         {
                 newObject.setType("NORMAL");
                 addAlterBuffer(newObject);
         }
 
         @Override
-        public void applyMinus(Collection<Index> selectionItems)
+        public void onMinus(Collection<Index> selectionItems)
         {
                 driver.dropIndexKeys(session, table, selectionItems);
         }

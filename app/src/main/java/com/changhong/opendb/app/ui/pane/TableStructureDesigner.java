@@ -64,11 +64,11 @@ public class TableStructureDesigner extends Designer<Column>
         }
 
         @Override
-        public void applySave()
+        public void onSave()
         {
                 List<Column> autoIncrements = Lists.newArrayList();
 
-                /* [1]: 如果存在自增列，先移除 */
+                /* [Step 1]: 如果存在自增列，先移除 */
                 for (Column column : alterBuffer) {
                         if (column.isAutoIncrement()) {
                                 column.setAutoIncrement(false);
@@ -76,15 +76,15 @@ public class TableStructureDesigner extends Designer<Column>
                         }
                 }
 
-                /* [2]: 执行字段新增或修改操作，但不包含自增选项 */
+                /* [Step 2]: 执行字段新增或修改操作 */
                 if (!alterBuffer.isEmpty())
                         driver.alterChange(session, table, alterBuffer);
 
-                /* [3]: 设置表主键字段 */
+                /* [Step 3]: 设置表主键字段 */
                 if (primaryChange)
                         driver.alterPrimaryKey(session, table, primaryBuffer);
 
-                /* [4]: 恢复自增列 */
+                /* [Step 4]: 恢复自增列 */
                 if (!autoIncrements.isEmpty()) {
                         autoIncrements.forEach(e -> e.setAutoIncrement(true));
                         driver.alterChange(session, table, autoIncrements);
@@ -92,13 +92,13 @@ public class TableStructureDesigner extends Designer<Column>
         }
 
         @Override
-        public void applyPlus(Column newObject)
+        public void onPlus(Column newObject)
         {
                 /* DO NOTHING... */
         }
 
         @Override
-        public void applyMinus(Collection<Column> selectionItems)
+        public void onMinus(Collection<Column> selectionItems)
         {
                 driver.dropColumns(session, table, selectionItems);
         }

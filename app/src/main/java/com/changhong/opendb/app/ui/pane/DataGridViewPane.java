@@ -144,9 +144,9 @@ public class DataGridViewPane extends BorderPane
 
         private void setupToolButtonAction()
         {
-                plus.setOnAction(event -> applyPlus());
+                plus.setOnAction(event -> onPlus());
 
-                minus.setOnAction(event -> applyMinus());
+                minus.setOnAction(event -> onMinus());
 
                 check.setOnAction(event -> applyCheck());
                 cross.setOnAction(event -> applyCross());
@@ -154,7 +154,7 @@ public class DataGridViewPane extends BorderPane
                 reload.setOnAction(event -> reloadAndBlinkTable(true));
         }
 
-        private void applyPlus()
+        private void onPlus()
         {
                 grid.addEmptyRow();
                 tableView.getItems().setAll(grid.getRows());
@@ -162,7 +162,7 @@ public class DataGridViewPane extends BorderPane
                 tableView.playFlash();
         }
 
-        private void applyMinus()
+        private void onMinus()
         {
                 var indices = tableView.getSelectionModel().getSelectedIndices();
 

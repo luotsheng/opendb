@@ -115,9 +115,9 @@ public class TableStructureDesignerPane extends BrowserPane
 
         private void setupToolBar()
         {
-                saveButton.setOnAction(e -> applySave());
-                plusButton.setOnAction(e -> applyPlus());
-                minusButton.setOnAction(e -> applyMinus());
+                saveButton.setOnAction(e -> onSave());
+                plusButton.setOnAction(e -> onPlus());
+                minusButton.setOnAction(e -> onMinus());
                 reloadButton.setOnAction(e -> applyReload());
 
                 toolBar.getItems().addAll(
@@ -130,10 +130,10 @@ public class TableStructureDesignerPane extends BrowserPane
                 );
         }
 
-        private void applySave()
+        private void onSave()
         {
                 try {
-                        designer.applySave();
+                        designer.onSave();
                         applyReload();
                 } catch (Exception e) {
                         VFXDialogHelper.alert(e);
@@ -141,19 +141,19 @@ public class TableStructureDesignerPane extends BrowserPane
                 }
         }
 
-        private void applyPlus()
+        private void onPlus()
         {
                 switch (designer) {
                         case TableStructureDesigner inst -> {
                                 Column columnMetaData = new Column();
-                                inst.applyPlus(columnMetaData);
+                                inst.onPlus(columnMetaData);
                                 structureView.getItems().add(columnMetaData);
                                 structureView.refresh();
                         }
 
                         case IndexStructureDesigner inst -> {
                                 Index indexMetaData = new Index();
-                                inst.applyPlus(indexMetaData);
+                                inst.onPlus(indexMetaData);
                                 indexView.getItems().add(indexMetaData);
                                 indexView.refresh();
                         }
@@ -163,7 +163,7 @@ public class TableStructureDesignerPane extends BrowserPane
 
         }
 
-        private void applyMinus()
+        private void onMinus()
         {
                 ObservableList<?> items = switch (designer) {
                         case TableStructureDesigner ignored -> structureView.getSelectionModel().getSelectedItems();
@@ -183,8 +183,8 @@ public class TableStructureDesignerPane extends BrowserPane
                 new Thread(() -> {
                         try {
                                 switch (designer) {
-                                        case TableStructureDesigner inst -> inst.applyMinus((Collection<Column>) items);
-                                        case IndexStructureDesigner inst -> inst.applyMinus((Collection<Index>) items);
+                                        case TableStructureDesigner inst -> inst.onMinus((Collection<Column>) items);
+                                        case IndexStructureDesigner inst -> inst.onMinus((Collection<Index>) items);
                                         default -> throw new UnsupportedOperationException("Unsupported designer object instance");
                                 }
                                 doReload();
