@@ -356,13 +356,11 @@ public class DataGridViewPane extends BorderPane
                         Column columnMetaData = grid.getColumns().get(i);
                         StringBuilder labelBuilder = new StringBuilder(columnMetaData.getLabel());
 
-                        if (grid.isEditable()) {
-                                labelBuilder.append("\n# ")
-                                        .append(columnMetaData.getType());
+                        labelBuilder.append("\n# ")
+                                .append(columnMetaData.getType());
 
-                                if (columnMetaData.isPrimary())
-                                        labelBuilder.append(" ").append("PK");
-                        }
+                        if (columnMetaData.isPrimary())
+                                labelBuilder.append(" ").append("PK");
 
                         String label = labelBuilder.toString();
 
