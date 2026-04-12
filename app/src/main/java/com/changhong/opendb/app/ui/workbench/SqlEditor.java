@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileReader;
+import java.time.Duration;
 
 import static com.changhong.string.StringStaticize.strwfmt;
 
@@ -79,7 +80,6 @@ public class SqlEditor extends SplitPane
         private Button run;
         private Button stop;
         private Button beautify;
-
 
         public SqlEditor(QueryInfo queryInfo, Tab ownerTab)
         {
@@ -178,6 +178,9 @@ public class SqlEditor extends SplitPane
 
         public void setupCodeArea()
         {
+                codeArea.multiPlainChanges().successionEnds(Duration.ofMillis(500))
+                                .subscribe(ignored -> save());
+
                 codeArea.setOnKeyPressed(event -> {
                         if ((event.isControlDown() || event.isShortcutDown())
                                 && event.getCode() == KeyCode.R) {
@@ -187,7 +190,7 @@ public class SqlEditor extends SplitPane
                 });
 
                 codeArea.textProperty().addListener((obs, oldVal, newVal) -> {
-                        if (saveFlag) {
+                        if (saveFlag && queryInfo == null) {
                                 ownerTab.setText("* " + ownerTab.getText());
                                 saveFlag = false;
                         }
@@ -489,11 +492,6 @@ public class SqlEditor extends SplitPane
         private void save()
         {
                 SaveQueryScriptDialog.showDialog(this);
-        }
-
-        public boolean isSave()
-        {
-                return saveFlag;
         }
 
         public void markSaveFlag()
