@@ -1,14 +1,12 @@
 package com.changhong.opendb.app.ui.pane;
 
+import com.changhong.collection.Lists;
 import com.changhong.driver.api.Column;
 import com.changhong.driver.api.Driver;
 import com.changhong.driver.api.Session;
 import com.changhong.driver.api.Table;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Luo Tiansheng
@@ -16,7 +14,7 @@ import java.util.Set;
  */
 public class TableStructureDesigner extends Designer<Column>
 {
-        private final Set<Column> updateBuffer = new HashSet<>();
+        private final Set<Column> alterBuffer = new HashSet<>();
         private final Set<Column> primaryBuffer = new LinkedHashSet<>();
 
         private boolean primaryChange = false;
@@ -30,7 +28,7 @@ public class TableStructureDesigner extends Designer<Column>
         public void onReload(Collection<Column> values)
         {
                 primaryBuffer.clear();
-                updateBuffer.clear();
+                alterBuffer.clear();
                 primaryChange = false;
 
                 /* 重新加载页面时将原有主键保存起来 */
@@ -57,22 +55,40 @@ public class TableStructureDesigner extends Designer<Column>
                 }
 
                 if (newVal.isIntegrityValid()) {
-                        updateBuffer.remove(newVal);
+                        alterBuffer.remove(newVal);
                         return;
                 }
 
                 /* 变更记录 */
-                updateBuffer.add(newVal);
+                alterBuffer.add(newVal);
         }
 
         @Override
         public void applySave()
         {
-                if (!updateBuffer.isEmpty())
-                        driver.alterChange(session, table, updateBuffer);
+                List<Column> autoIncrements = Lists.newArrayList();
 
+                /* [1]: 如果存在自增列，先移除 */
+                for (Column column : alterBuffer) {
+                        if (column.isAutoIncrement()) {
+                                column.setAutoIncrement(false);
+                                autoIncrements.add(column);
+                        }
+                }
+
+                /* [2]: 执行字段新增或修改操作，但不包含自增选项 */
+                if (!alterBuffer.isEmpty())
+                        driver.alterChange(session, table, alterBuffer);
+
+                /* [3]: 设置表主键字段 */
                 if (primaryChange)
                         driver.alterPrimaryKey(session, table, primaryBuffer);
+
+                /* [4]: 恢复自增列 */
+                if (!autoIncrements.isEmpty()) {
+                        autoIncrements.forEach(e -> e.setAutoIncrement(true));
+                        driver.alterChange(session, table, autoIncrements);
+                }
         }
 
         @Override

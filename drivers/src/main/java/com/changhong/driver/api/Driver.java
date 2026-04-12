@@ -3,7 +3,6 @@ package com.changhong.driver.api;
 import com.changhong.collection.Lists;
 import com.changhong.driver.api.exception.DriverException;
 import com.changhong.driver.api.sql.SQLExecutor;
-import com.changhong.exception.SystemRuntimeException;
 import lombok.Getter;
 
 import javax.sql.DataSource;
@@ -308,7 +307,7 @@ public abstract class Driver implements SQLExecutor
          * @return 包含表所有列元数据的不可变列表（若表不存在或无权限，返回空列表）
          * @throws NullPointerException     如果 {@code session} 或 {@code table} 为 {@code null}
          * @throws IllegalArgumentException 如果 {@code table} 为空白字符串
-         * @throws SystemRuntimeException   如果底层 JDBC 访问发生错误（包装 {@link java.sql.SQLException}）
+         * @throws DriverException   如果底层 JDBC 访问发生错误（包装 {@link java.sql.SQLException}）
          * @see java.sql.DatabaseMetaData#getColumns(String, String, String, String)
          * @see Column
          */
@@ -346,7 +345,7 @@ public abstract class Driver implements SQLExecutor
          * @param table   目标表元数据（包含表名及所在 catalog/schema，不能为 {@code null}）
          * @return 包含表所有索引信息的列表，按索引名称及列顺序排列；若无索引则返回空列表（永不为 {@code null}）
          * @throws NullPointerException      如果 {@code session} 或 {@code table} 为 {@code null}
-         * @throws SystemRuntimeException    如果获取元数据过程中发生 {@link java.sql.SQLException}
+         * @throws DriverException    如果获取元数据过程中发生 {@link java.sql.SQLException}
          * @see java.sql.DatabaseMetaData#getIndexInfo(String, String, String, boolean, boolean)
          * @see Index
          */
@@ -402,7 +401,7 @@ public abstract class Driver implements SQLExecutor
          * @param table 要删除的表名（不能为 {@code null} 或空白字符串）
          * @throws NullPointerException     如果 {@code table} 为 {@code null}
          * @throws IllegalArgumentException 如果 {@code table} 为空白字符串
-         * @throws SystemRuntimeException   如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
+         * @throws DriverException   如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
          */
         public abstract void dropTable(Session session, String table);
 
@@ -432,7 +431,7 @@ public abstract class Driver implements SQLExecutor
          * @param columns 要删除的列集合（不能为 {@code null} 或空集合）
          * @throws NullPointerException     如果 {@code table} 或 {@code columns} 为 {@code null}
          * @throws IllegalArgumentException 如果 {@code columns} 为空集合，或任一列未绑定到该表
-         * @throws SystemRuntimeException   如果执行 DDL 失败
+         * @throws DriverException   如果执行 DDL 失败
          */
         public abstract void dropColumns(Session session, String table, Collection<Column> columns);
 
@@ -463,7 +462,7 @@ public abstract class Driver implements SQLExecutor
          * @throws NullPointerException 如果 {@code table} 或 {@code selectionItems} 为 {@code null}
          * @throws IllegalArgumentException 如果 {@code selectionItems} 为空集合，或任一索引缺少必要的名称信息
          * @throws UnsupportedOperationException 如果数据库方言不支持删除索引操作
-         * @throws SystemRuntimeException 如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
+         * @throws DriverException 如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
          * @see Index
          */
         public abstract void dropIndexKeys(Session session, String table, Collection<Index> selectionItems);
@@ -517,7 +516,7 @@ public abstract class Driver implements SQLExecutor
          *                                   或 {@code primaryKeys} 非空但与现有主键不匹配；
          *                                   或表不存在主键但方法要求删除（根据实现策略）
          * @throws UnsupportedOperationException 如果数据库方言不支持删除主键约束
-         * @throws SystemRuntimeException    如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
+         * @throws DriverException    如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
          * @see #alterPrimaryKey(Session, String, Collection)
          * @see java.sql.DatabaseMetaData#getPrimaryKeys(String, String, String)
          */
@@ -551,7 +550,7 @@ public abstract class Driver implements SQLExecutor
          * @param primaryKeys 新主键列的集合（按顺序），为空表示删除现有主键；集合中列的顺序决定了复合主键中各列的顺序
          * @throws NullPointerException     如果 {@code table} 或 {@code primaryKeys} 为 {@code null}
          * @throws IllegalArgumentException 如果任一列不属于该表，或列数量为 0 但数据库不允许无主键表
-         * @throws SystemRuntimeException   如果执行 DDL 失败
+         * @throws DriverException   如果执行 DDL 失败
          */
         public abstract void alterPrimaryKey(Session session, String table, Collection<Column> primaryKeys);
 
@@ -612,7 +611,7 @@ public abstract class Driver implements SQLExecutor
          * @throws IllegalArgumentException          如果 {@code indexes} 为空集合，或任一索引缺少名称，或索引不存在于表上，
          *                                           或新定义与现有定义相同但策略要求不忽略
          * @throws UnsupportedOperationException     如果数据库方言不支持索引修改（包括删除重建的方式）
-         * @throws SystemRuntimeException            如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
+         * @throws DriverException            如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
          * @see Index
          */
         public abstract void alterIndexKeys(Session session, String table, Collection<Index> indexes);
@@ -650,7 +649,7 @@ public abstract class Driver implements SQLExecutor
          * @throws NullPointerException             如果 {@code table} 或 {@code columns} 为 {@code null}
          * @throws IllegalArgumentException         如果 {@code columns} 为空集合，或任一列未包含必要的标识信息（如列名）
          * @throws UnsupportedOperationException    如果数据库方言不支持列修改操作
-         * @throws SystemRuntimeException           如果执行 DDL 失败
+         * @throws DriverException           如果执行 DDL 失败
          */
         public abstract void alterChange(Session session, String table, Collection<Column> columns);
 
@@ -696,7 +695,7 @@ public abstract class Driver implements SQLExecutor
          * @throws IllegalArgumentException          如果 {@code table} 为空白字符串，或 {@code indexes} 为空集合，
          *                                           或任一索引缺少名称，或指定索引不存在于表上
          * @throws UnsupportedOperationException     如果数据库方言不支持索引可见性修改
-         * @throws SystemRuntimeException            如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
+         * @throws DriverException            如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
          * @see Index#isVisible()
          */
         public abstract void alterVisible(Session session, String table, Collection<Index> indexes);
@@ -713,7 +712,7 @@ public abstract class Driver implements SQLExecutor
          *
          * @param session 当前会话上下文，包含 catalog 和 schema 信息
          * @param executeCallback 回调接口，定义具体执行逻辑
-         * @throws SystemRuntimeException 如果发生 {@link SQLException}（包装后抛出）
+         * @throws DriverException 如果发生 {@link SQLException}（包装后抛出）
          * @see Statement#execute(String)
          */
         public void execute(Session session, StatementExecuteCallback executeCallback)
@@ -723,7 +722,7 @@ public abstract class Driver implements SQLExecutor
                                 executeCallback.execute(connection, statement);
                         }
                 } catch (SQLException e) {
-                        throw new SystemRuntimeException(e);
+                        throw new DriverException(e);
                 }
         }
 
@@ -733,7 +732,7 @@ public abstract class Driver implements SQLExecutor
          * @param session 当前会话上下文
          * @param executeUpdateCallback 回调接口，返回更新计数
          * @return 受影响的行数（对于 DDL 可能返回 0）
-         * @throws SystemRuntimeException 如果发生 {@link SQLException}
+         * @throws DriverException 如果发生 {@link SQLException}
          * @see Statement#executeUpdate(String)
          */
         public int executeUpdate(Session session, StatementExecuteUpdateCallback executeUpdateCallback)
@@ -743,7 +742,7 @@ public abstract class Driver implements SQLExecutor
                                 return executeUpdateCallback.executeUpdate(connection, statement);
                         }
                 } catch (SQLException e) {
-                        throw new SystemRuntimeException(e);
+                        throw new DriverException(e);
                 }
         }
 
@@ -756,7 +755,7 @@ public abstract class Driver implements SQLExecutor
          * @param session 当前会话上下文
          * @param executeQueryCallback 回调接口，返回查询结果集
          * @return 查询结果集数据表对象
-         * @throws SystemRuntimeException 如果发生 {@link SQLException}
+         * @throws DriverException 如果发生 {@link SQLException}
          * @see Statement#executeQuery(String)
          */
         public DataGrid executeQuery(Session session, StatementExecuteQueryCallback executeQueryCallback)
@@ -766,7 +765,7 @@ public abstract class Driver implements SQLExecutor
                                 return executeQueryCallback.executeQuery(connection, statement);
                         }
                 } catch (SQLException e) {
-                        throw new SystemRuntimeException(e);
+                        throw new DriverException(e);
                 }
         }
 }
