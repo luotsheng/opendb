@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class VFXApplication extends Application
 {
-        public static final String TITLE = "OpenDB-v1.0.3-Beta";
+        public static final String TITLE = "OpenVDB v1.0.0-arch.1";
 
         private static final Class<VFXApplication> aClass = VFXApplication.class;
         private static final List<LauncherTask> tasks = new ArrayList<>();
