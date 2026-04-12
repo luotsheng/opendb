@@ -39,7 +39,7 @@ public abstract class ODBNode extends TreeItem<String>
 
         public interface SelectedEvent
         {
-                void call();
+                void call(ODBNode node);
         }
 
         @Setter
@@ -96,10 +96,10 @@ public abstract class ODBNode extends TreeItem<String>
         /**
          * 触发节点选中事件
          */
-        public void onSelectedEvent()
+        public void onSelectedEvent(ODBNode node)
         {
                 if (selectedEvent != null)
-                        selectedEvent.call();
+                        selectedEvent.call(node);
         }
 
 }

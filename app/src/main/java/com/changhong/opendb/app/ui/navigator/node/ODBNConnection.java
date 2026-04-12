@@ -142,7 +142,7 @@ public class ODBNConnection extends ODBNode
         }
 
         @Override
-        public void onSelectedEvent()
+        public void onSelectedEvent(ODBNode node)
         {
                 ODBNStatus.getInstance().selectedConnection(this);
         }

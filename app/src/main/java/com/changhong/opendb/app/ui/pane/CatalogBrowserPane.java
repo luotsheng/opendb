@@ -97,7 +97,7 @@ public class CatalogBrowserPane extends BrowserPane
 
                 if (VFXDialogHelper.askDangerous("确认删除：%s？", table.getName())) {
                         VFXDialogHelper.runWith(() -> database.dropTable(table));
-                        database.refreshTableNode();
+                        database.reloadTableNode();
                 }
         }
 

@@ -69,9 +69,9 @@ public class ODBNDatabase extends ODBNode implements EventListener
                 }
 
                 @Override
-                public void onSelectedEvent()
+                public void onSelectedEvent(ODBNode node)
                 {
-                        parent.onSelectedEvent();
+                        parent.onSelectedEvent(node);
                 }
         }
 
@@ -98,10 +98,10 @@ public class ODBNDatabase extends ODBNode implements EventListener
 
                 ContextMenu nodeContextMenu = new ContextMenu();
 
-                MenuItem refreshTableItem = new MenuItem("刷新");
-                refreshTableItem.setOnAction(event -> refreshTableNode());
+                MenuItem reloadTableItem = new MenuItem("刷新");
+                reloadTableItem.setOnAction(event -> reloadTableNode());
 
-                nodeContextMenu.getItems().addAll(refreshTableItem);
+                nodeContextMenu.getItems().addAll(reloadTableItem);
                 node.setContextMenu(nodeContextMenu);
         }
 
@@ -131,11 +131,11 @@ public class ODBNDatabase extends ODBNode implements EventListener
                                 Platform.runLater(() -> {
                                         getChildren().addAll(tableItem, queryItem);
 
-                                        refreshTableNode();
-                                        refreshQueryNode();
+                                        reloadTableNode();
+                                        reloadQueryNode();
 
                                         setExpanded(true);
-                                        onSelectedEvent();
+                                        onSelectedEvent(this);
 
                                         openFlag = true;
                                 });
@@ -159,7 +159,7 @@ public class ODBNDatabase extends ODBNode implements EventListener
                 openFlag = false;
         }
 
-        public void refreshTableNode()
+        public void reloadTableNode()
         {
                 reloadTable();
 
@@ -174,16 +174,16 @@ public class ODBNDatabase extends ODBNode implements EventListener
                 detailPane.update(tables);
         }
 
-        private void refreshQueryNode()
+        private void reloadQueryNode()
         {
                 queryItem.getChildren().clear();
                 List<QueryInfo> queryInfos = QueryScriptRepository.loadQueryInfo(connection, this);
                 queryInfos.forEach(query -> queryItem.getChildren().add(new ODBNQuery(this, query)));
         }
 
-        public void onSelected()
+        public void onSelected(ODBNode node)
         {
-                if (tables != null && openFlag)
+                if (openFlag && node == tableItem)
                         EventBus.publish(openWorkbenchPaneEvent);
                 connection.setSelectedDatabase(this);
         }
@@ -203,10 +203,10 @@ public class ODBNDatabase extends ODBNode implements EventListener
         public void onEvent(Event event)
         {
                 if (event instanceof RefreshTableNodeEvent)
-                        refreshTableNode();
+                        reloadTableNode();
 
                 if (event instanceof RefreshQueryNodeEvent)
-                        refreshQueryNode();
+                        reloadQueryNode();
         }
 
         @Override

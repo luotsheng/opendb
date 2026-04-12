@@ -154,10 +154,10 @@ public class Navigator extends VBox implements EventListener
                         .addListener((observable, oldVal, newVal) -> {
                                 TreeItem<String> treeItem = treeView.getTreeItem(newVal.intValue());
 
-                                if (!(treeItem instanceof ODBNode odbNode))
-                                        return;
+                                if (treeItem instanceof ODBNode odbNode) {
+                                        odbNode.onSelectedEvent(odbNode);
+                                }
 
-                                odbNode.onSelectedEvent();
                         });
         }
 

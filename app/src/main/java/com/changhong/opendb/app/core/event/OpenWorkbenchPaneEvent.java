@@ -9,10 +9,10 @@ import lombok.Getter;
  * @author Luo Tiansheng
  * @since 2026/3/26
  */
+@Getter
 public class OpenWorkbenchPaneEvent extends Event
 {
-        @Getter
-        private BrowserPane pane;
+        private final BrowserPane pane;
 
         public OpenWorkbenchPaneEvent(BrowserPane pane)
         {
