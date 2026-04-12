@@ -6,7 +6,7 @@
 
     <groupId>com.changhong.opensource</groupId>
     <artifactId>opendb</artifactId>
-    <version>v1.0.0-BETA</version>
+    <version>v1.0.0-arch.1</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -29,22 +29,22 @@
             <dependency>
                 <groupId>com.changhong.opensource</groupId>
                 <artifactId>utils</artifactId>
-                <version>v1.0.0-BETA</version>
+                <version>v1.0.0-arch.1</version>
             </dependency>
             <dependency>
                 <groupId>com.changhong.opensource</groupId>
                 <artifactId>app</artifactId>
-                <version>v1.0.0-BETA</version>
+                <version>v1.0.0-arch.1</version>
             </dependency>
             <dependency>
                 <groupId>com.changhong.opensource</groupId>
                 <artifactId>launcher</artifactId>
-                <version>v1.0.0-BETA</version>
+                <version>v1.0.0-arch.1</version>
             </dependency>
             <dependency>
                 <groupId>com.changhong.admin</groupId>
                 <artifactId>drivers</artifactId>
-                <version>v1.0.0-BETA</version>
+                <version>v1.0.0-arch.1</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
