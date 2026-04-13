@@ -6,7 +6,7 @@ import com.changhong.openvdb.driver.mysql.MySQLDriver;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
 import com.changhong.openvdb.app.model.VDBNodeStatus;
 import com.changhong.openvdb.app.resource.Assets;
-import com.changhong.openvdb.app.ui.dialog.connection.ConnectionDialog;
+import com.changhong.openvdb.app.ui.dialog.connection.CreateOrEditConnectionDialog;
 import com.changhong.openvdb.app.ui.navigator.VDBNode;
 import com.changhong.openvdb.app.ui.widgets.dialog.VFXDialogHelper;
 import javafx.application.Platform;
@@ -102,10 +102,10 @@ public class VDBConnectionNode extends VDBNode
                 if (openFlag) {
                         if (VFXDialogHelper.ask("编辑需要关闭当前连接，是否关闭？")) {
                                 closeConnection();
-                                new ConnectionDialog(propertyModel).showAndWait();
+                                new CreateOrEditConnectionDialog(propertyModel).showAndWait();
                         }
                 } else {
-                        new ConnectionDialog(propertyModel).showAndWait();
+                        new CreateOrEditConnectionDialog(propertyModel).showAndWait();
                 }
         }
 

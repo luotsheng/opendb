@@ -1,12 +1,15 @@
 package com.changhong.openvdb.app.ui.workbench;
 
+import com.changhong.openvdb.app.event.RefreshQueryNodeEvent;
+import com.changhong.openvdb.app.event.bus.EventBus;
+import com.changhong.openvdb.core.repository.ScriptFileRepository;
 import com.changhong.openvdb.driver.api.DataGrid;
 import com.changhong.openvdb.driver.api.Driver;
 import com.changhong.openvdb.driver.api.Session;
 import com.changhong.openvdb.driver.api.sql.SQL;
 import com.changhong.openvdb.app.model.VDBNodeStatus;
 import com.changhong.openvdb.app.resource.Assets;
-import com.changhong.openvdb.app.ui.dialog.SaveQueryScriptDialog;
+import com.changhong.openvdb.app.ui.dialog.SaveScriptDialog;
 import com.changhong.openvdb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.openvdb.app.ui.navigator.node.VDBDatabaseNode;
 import com.changhong.openvdb.app.ui.pane.DataGridViewPane;
@@ -490,12 +493,37 @@ public class ScriptEditor extends SplitPane
         private void autoSave()
         {
                 if (scriptFile != null)
-                        SaveQueryScriptDialog.showDialog(this);
+                        SaveScriptDialog.showDialog(this);
         }
 
         private void save()
         {
-                SaveQueryScriptDialog.showDialog(this);
+                if (scriptFile == null) {
+                        String saveScriptName = SaveScriptDialog.showDialog(this);
+
+                        if (saveScriptName == null)
+                                return;
+
+                        VDBConnectionNode connection = connectionComboBox.getSelectionModel()
+                                .getSelectedItem();
+
+                        VDBDatabaseNode database = databaseComboBox.getSelectionModel()
+                                .getSelectedItem();
+
+                        ScriptFile newScriptFile = ScriptFileRepository.save(
+                                connection.getName(),
+                                database.getName(),
+                                null,
+                                saveScriptName,
+                                getCodeAreaContent());
+
+                        setScriptFile(newScriptFile);
+                } else {
+                        ScriptFileRepository.save(scriptFile, getCodeAreaContent());
+                }
+
+                EventBus.publish(new RefreshQueryNodeEvent());
+                markSaveFlag();
         }
 
         public void markSaveFlag()

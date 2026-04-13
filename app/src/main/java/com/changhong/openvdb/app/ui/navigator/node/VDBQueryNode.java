@@ -6,7 +6,7 @@ import com.changhong.openvdb.app.event.OpenQueryScriptEvent;
 import com.changhong.openvdb.app.event.RefreshQueryNodeEvent;
 import com.changhong.openvdb.app.event.RemoveScriptEditorTabEvent;
 import com.changhong.openvdb.app.resource.Assets;
-import com.changhong.openvdb.app.ui.dialog.RenameQueryScriptDialog;
+import com.changhong.openvdb.app.ui.dialog.RenameScriptDialog;
 import com.changhong.openvdb.app.ui.navigator.VDBNode;
 import com.changhong.openvdb.app.ui.widgets.dialog.VFXDialogHelper;
 import com.changhong.openvdb.core.model.ScriptFile;
@@ -75,7 +75,7 @@ public class VDBQueryNode extends VDBNode
 
         private void renameQuery()
         {
-                RenameQueryScriptDialog.showDialog(scriptFile);
+                RenameScriptDialog.showDialog(scriptFile);
         }
 
         private void copyFilePath()

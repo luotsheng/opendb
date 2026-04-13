@@ -22,14 +22,14 @@ import javafx.stage.Stage;
  * @since 2026/3/27
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class RenameQueryScriptDialog extends BrowserPane
+public class RenameScriptDialog extends BrowserPane
 {
         private final Stage stage;
         private final TextField textField;
 
         private ScriptFile scriptFile;
 
-        public RenameQueryScriptDialog(Stage stage, ScriptFile scriptFile)
+        public RenameScriptDialog(Stage stage, ScriptFile scriptFile)
         {
                 this.stage = stage;
                 this.scriptFile = scriptFile;
@@ -78,7 +78,7 @@ public class RenameQueryScriptDialog extends BrowserPane
         {
                 Stage stage = Application.createByPrimaryStage();
 
-                RenameQueryScriptDialog dialog = new RenameQueryScriptDialog(stage, scriptFile);
+                RenameScriptDialog dialog = new RenameScriptDialog(stage, scriptFile);
 
                 Scene scene = new Scene(dialog, 400, 150);
                 stage.setScene(scene);

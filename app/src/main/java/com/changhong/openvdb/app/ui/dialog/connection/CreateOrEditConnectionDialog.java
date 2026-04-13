@@ -26,7 +26,7 @@ import java.sql.Connection;
  * @author Luo Tiansheng
  * @since 2026/3/26
  */
-public class ConnectionDialog extends Stage
+public class CreateOrEditConnectionDialog extends Stage
 {
         private TabPane tabPane;
         private HBox buttonBar;
@@ -38,12 +38,12 @@ public class ConnectionDialog extends Stage
         private static final int WW = 700;
         private static final int WH = 500;
 
-        public ConnectionDialog()
+        public CreateOrEditConnectionDialog()
         {
                 this(null);
         }
 
-        public ConnectionDialog(ConnectionPropertyModel newProperty)
+        public CreateOrEditConnectionDialog(ConnectionPropertyModel newProperty)
         {
                 this.isUpdate = newProperty != null;
 

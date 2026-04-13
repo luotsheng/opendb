@@ -1,14 +1,10 @@
 package com.changhong.openvdb.app.ui.dialog;
 
 import com.changhong.openvdb.app.Application;
-import com.changhong.openvdb.app.event.bus.EventBus;
-import com.changhong.openvdb.app.event.RefreshQueryNodeEvent;
 import com.changhong.openvdb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.openvdb.app.ui.navigator.node.VDBDatabaseNode;
 import com.changhong.openvdb.app.ui.pane.BrowserPane;
 import com.changhong.openvdb.app.ui.workbench.ScriptEditor;
-import com.changhong.openvdb.core.model.ScriptFile;
-import com.changhong.openvdb.core.repository.ScriptFileRepository;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -26,7 +22,7 @@ import javafx.stage.Stage;
  * @since 2026/3/27
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class SaveQueryScriptDialog extends BrowserPane
+public class SaveScriptDialog extends BrowserPane
 {
         private final Stage stage;
         private final ScriptEditor scriptEditor;
@@ -34,7 +30,9 @@ public class SaveQueryScriptDialog extends BrowserPane
         private final VFXComboBox<VDBConnectionNode> connectionComboBox;
         private final VFXComboBox<VDBDatabaseNode> databaseComboBox;
 
-        public SaveQueryScriptDialog(Stage stage, ScriptEditor scriptEditor)
+        private boolean isOk = false;
+
+        public SaveScriptDialog(Stage stage, ScriptEditor scriptEditor)
         {
                 this.stage = stage;
                 this.scriptEditor = scriptEditor;
@@ -53,7 +51,7 @@ public class SaveQueryScriptDialog extends BrowserPane
                 topBox.setPadding(new Insets(20, 10, 5, 10));
 
                 Button ok = new Button("保存");
-                ok.setOnAction(e -> save());
+                ok.setOnAction(e -> isOk = true);
                 Button cancel = new Button("取消");
                 cancel.setOnAction(e -> cancel());
                 Region spacer = new Region();
@@ -76,54 +74,28 @@ public class SaveQueryScriptDialog extends BrowserPane
                 });
         }
 
-        private void save()
-        {
-                ScriptFile scriptFile = scriptEditor.getScriptFile();
-
-                if (scriptFile == null) {
-                        VDBConnectionNode connection = connectionComboBox.getSelectionModel()
-                                .getSelectedItem();
-
-                        VDBDatabaseNode database = databaseComboBox.getSelectionModel()
-                                .getSelectedItem();
-
-                        scriptFile = ScriptFileRepository.save(
-                                connection.getName(),
-                                database.getName(),
-                                null,
-                                textField.getText(),
-                                scriptEditor.getCodeAreaContent());
-
-                        scriptEditor.setScriptFile(scriptFile);
-                } else {
-                        ScriptFileRepository.save(scriptFile, scriptEditor.getCodeAreaContent());
-                }
-
-                EventBus.publish(new RefreshQueryNodeEvent());
-                scriptEditor.markSaveFlag();
-
-                cancel();
-        }
-
         private void cancel()
         {
                 stage.close();
         }
 
-        public static void showDialog(ScriptEditor scriptEditor)
+        /**
+         * @return 返回用户输入的脚本名称， {@code null} 表示用户取消保存
+         */
+        public static String showDialog(ScriptEditor scriptEditor)
         {
                 Stage stage = Application.createByPrimaryStage();
 
-                SaveQueryScriptDialog dialog = new SaveQueryScriptDialog(stage, scriptEditor);
+                SaveScriptDialog dialog = new SaveScriptDialog(stage, scriptEditor);
 
-                if (scriptEditor.getScriptFile() == null) {
-                        Scene scene = new Scene(dialog, 600, 300);
-                        stage.setScene(scene);
-                        stage.showAndWait();
-                        return;
-                }
+                Scene scene = new Scene(dialog, 600, 300);
+                stage.setScene(scene);
+                stage.showAndWait();
 
-                dialog.save();
+                if (!dialog.isOk)
+                        return null;
+
+                return dialog.textField.getText();
         }
 
 }
