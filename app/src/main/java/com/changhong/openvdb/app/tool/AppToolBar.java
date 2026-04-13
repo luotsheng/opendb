@@ -6,6 +6,7 @@ import com.changhong.openvdb.app.model.VDBNodeStatus;
 import com.changhong.openvdb.app.navigator.node.VDBConnectionNode;
 import com.changhong.openvdb.app.widgets.VFXIconButton;
 import com.changhong.openvdb.app.widgets.VFXSeparator;
+import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 
@@ -19,6 +20,7 @@ public class AppToolBar extends ToolBar
         {
                 Button newConnectionButton = new VFXIconButton("连接", "chain");
                 newConnectionButton.setText("新建连接");
+                newConnectionButton.setOnAction(event -> VFXDialogHelper.alert("暂不支持此按钮，请在我的连接右键新增对应连接！"));
 
                 Button newQueryButton = new VFXIconButton("查询", "sql");
                 newQueryButton.setText("新建查询");
