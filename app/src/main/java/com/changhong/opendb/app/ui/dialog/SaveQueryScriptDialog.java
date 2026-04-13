@@ -4,7 +4,7 @@ import com.changhong.opendb.app.VFXApplication;
 import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.event.RefreshQueryNodeEvent;
 import com.changhong.opendb.app.repository.QueryScriptRepository;
-import com.changhong.opendb.app.ui.navigator.node.VDNConnectionNode;
+import com.changhong.opendb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.opendb.app.ui.navigator.node.VDBDatabaseNode;
 import com.changhong.opendb.app.ui.pane.BrowserPane;
 import com.changhong.opendb.app.ui.workbench.SqlEditor;
@@ -32,7 +32,7 @@ public class SaveQueryScriptDialog extends BrowserPane
         private final Stage stage;
         private final SqlEditor sqlEditor;
         private final TextField textField;
-        private final VFXComboBox<VDNConnectionNode> connectionComboBox;
+        private final VFXComboBox<VDBConnectionNode> connectionComboBox;
         private final VFXComboBox<VDBDatabaseNode> databaseComboBox;
 
         public SaveQueryScriptDialog(Stage stage, SqlEditor sqlEditor)
@@ -82,7 +82,7 @@ public class SaveQueryScriptDialog extends BrowserPane
                 File sqlFile = sqlEditor.getSqlFile();
 
                 if (sqlFile == null) {
-                        VDNConnectionNode connection = connectionComboBox.getSelectionModel()
+                        VDBConnectionNode connection = connectionComboBox.getSelectionModel()
                                 .getSelectedItem();
 
                         VDBDatabaseNode database = databaseComboBox.getSelectionModel()

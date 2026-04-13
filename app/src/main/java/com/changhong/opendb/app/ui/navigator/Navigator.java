@@ -8,7 +8,7 @@ import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.event.EventListener;
 import com.changhong.opendb.app.core.event.RefreshConnectionEvent;
 import com.changhong.opendb.app.resource.Assets;
-import com.changhong.opendb.app.ui.navigator.node.VDNConnectionNode;
+import com.changhong.opendb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.opendb.app.model.ConnectionProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -35,7 +35,7 @@ public class Navigator extends VBox implements EventListener
         private final TreeView<String> treeView;
         private final ContextMenu rootContextMenu;
 
-        private final Map<String, VDNConnectionNode> connections
+        private final Map<String, VDBConnectionNode> connections
                 = new HashMap<>();
 
         public Navigator()
@@ -197,7 +197,7 @@ public class Navigator extends VBox implements EventListener
 
         private void refreshConnectionNode()
         {
-                List<VDNConnectionNode> removeList = new ArrayList<>();
+                List<VDBConnectionNode> removeList = new ArrayList<>();
                 List<ConnectionProperty> models = ConnectionRepository.loadConnections();
 
                 connections.forEach((k, v) -> {
@@ -211,7 +211,7 @@ public class Navigator extends VBox implements EventListener
                 ObservableList<TreeItem<String>> children = treeView.getRoot().getChildren();
 
                 if (!removeList.isEmpty()) {
-                        for (VDNConnectionNode connection : removeList) {
+                        for (VDBConnectionNode connection : removeList) {
                                 children.remove(connection);
                                 connections.remove(connection.getName());
                         }
@@ -221,7 +221,7 @@ public class Navigator extends VBox implements EventListener
                         if (connections.containsKey(info.getName()))
                                 continue;
 
-                        VDNConnectionNode connection = new VDNConnectionNode(info);
+                        VDBConnectionNode connection = new VDBConnectionNode(info);
                         VDBNodeStatus.getInstance().addConnection(connection);
                         connections.put(info.getName(), connection);
                         children.add(connection);

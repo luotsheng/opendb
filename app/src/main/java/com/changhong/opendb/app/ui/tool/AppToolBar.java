@@ -3,7 +3,7 @@ package com.changhong.opendb.app.ui.tool;
 import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.event.OpenQueryScriptEvent;
 import com.changhong.opendb.app.model.VDBNodeStatus;
-import com.changhong.opendb.app.ui.navigator.node.VDNConnectionNode;
+import com.changhong.opendb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.opendb.app.ui.widgets.VFXIconButton;
 import com.changhong.opendb.app.ui.widgets.VFXSeparator;
 import javafx.scene.control.Button;
@@ -34,7 +34,7 @@ public class AppToolBar extends ToolBar
         private void newQuery()
         {
                 VDBNodeStatus instance = VDBNodeStatus.getInstance();
-                VDNConnectionNode selectedConnection = instance.getSelectedConnection();
+                VDBConnectionNode selectedConnection = instance.getSelectedConnection();
                 EventBus.publish(new OpenQueryScriptEvent(selectedConnection == null ? null : selectedConnection.getInfo()));
         }
 }

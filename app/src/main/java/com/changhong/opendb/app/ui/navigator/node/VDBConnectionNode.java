@@ -25,7 +25,7 @@ import java.util.List;
  * @since 2026/3/25
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class VDNConnectionNode extends VDBNode
+public class VDBConnectionNode extends VDBNode
 {
         @Getter
         private final ConnectionProperty info;
@@ -47,7 +47,7 @@ public class VDNConnectionNode extends VDBNode
         @Getter
         private VDBDatabaseNode selectedDatabase;
 
-        public VDNConnectionNode(ConnectionProperty info)
+        public VDBConnectionNode(ConnectionProperty info)
         {
                 super(info.getName());
                 setGraphic(Assets.use("database0"));

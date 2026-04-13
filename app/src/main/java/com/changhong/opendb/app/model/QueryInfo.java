@@ -1,6 +1,6 @@
 package com.changhong.opendb.app.model;
 
-import com.changhong.opendb.app.ui.navigator.node.VDNConnectionNode;
+import com.changhong.opendb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.opendb.app.ui.navigator.node.VDBDatabaseNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +19,7 @@ import java.io.File;
 @AllArgsConstructor
 public class QueryInfo
 {
-        private VDNConnectionNode connection;
+        private VDBConnectionNode connection;
         private VDBDatabaseNode database;
         private File sqlFile;
 

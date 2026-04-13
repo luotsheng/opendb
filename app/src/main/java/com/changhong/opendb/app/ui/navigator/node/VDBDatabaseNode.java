@@ -33,7 +33,7 @@ import java.util.List;
 public class VDBDatabaseNode extends VDBNode implements EventListener
 {
         @Getter
-        private final VDNConnectionNode connection;
+        private final VDBConnectionNode connection;
         @Getter
         private final Driver driver;
         private boolean openFlag = false;
@@ -76,7 +76,7 @@ public class VDBDatabaseNode extends VDBNode implements EventListener
                 }
         }
 
-        public VDBDatabaseNode(VDNConnectionNode connection,
+        public VDBDatabaseNode(VDBConnectionNode connection,
                                Driver driver,
                                String name)
         {

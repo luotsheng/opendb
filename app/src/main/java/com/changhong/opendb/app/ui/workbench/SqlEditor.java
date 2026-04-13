@@ -8,7 +8,7 @@ import com.changhong.opendb.app.model.VDBNodeStatus;
 import com.changhong.opendb.app.model.QueryInfo;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.dialog.SaveQueryScriptDialog;
-import com.changhong.opendb.app.ui.navigator.node.VDNConnectionNode;
+import com.changhong.opendb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.opendb.app.ui.navigator.node.VDBDatabaseNode;
 import com.changhong.opendb.app.ui.pane.DataGridViewPane;
 import com.changhong.opendb.app.ui.pane.SqlMessagePane;
@@ -72,7 +72,7 @@ public class SqlEditor extends SplitPane
         private Driver driver = null;
         private long currentTaskId = System.currentTimeMillis();
         private boolean saveFlag = true;
-        private VFXComboBox<VDNConnectionNode> connectionComboBox;
+        private VFXComboBox<VDBConnectionNode> connectionComboBox;
         private VFXComboBox<VDBDatabaseNode> databaseComboBox;
 
         private static int numberCount = 0;
@@ -130,7 +130,7 @@ public class SqlEditor extends SplitPane
                 });
         }
 
-        private static VDNConnectionNode getSelectionConnection(VDBNodeStatus instance, QueryInfo info)
+        private static VDBConnectionNode getSelectionConnection(VDBNodeStatus instance, QueryInfo info)
         {
                 return info != null ? info.getConnection() : instance.getSelectedConnection();
         }
@@ -138,7 +138,7 @@ public class SqlEditor extends SplitPane
         private void setupToolbar()
         {
                 VDBNodeStatus instance = VDBNodeStatus.getInstance();
-                VDNConnectionNode selectedConnection = getSelectionConnection(instance, queryInfo);
+                VDBConnectionNode selectedConnection = getSelectionConnection(instance, queryInfo);
 
                 run = new VFXIconButton("运行已选择", "run0");
                 run.setText("运行");
@@ -203,9 +203,9 @@ public class SqlEditor extends SplitPane
                         getItems().remove(dataGridViewPane));
         }
 
-        private VFXComboBox<VDNConnectionNode> newConnectionComboBox()
+        private VFXComboBox<VDBConnectionNode> newConnectionComboBox()
         {
-                VFXComboBox<VDNConnectionNode> connection = new VFXComboBox<>();
+                VFXComboBox<VDBConnectionNode> connection = new VFXComboBox<>();
                 configureConnectionComboBox(connection);
                 connection.setPrefWidth(200);
 
@@ -232,12 +232,12 @@ public class SqlEditor extends SplitPane
                 return database;
         }
 
-        private void configureConnectionComboBox(VFXComboBox<VDNConnectionNode> comboBox)
+        private void configureConnectionComboBox(VFXComboBox<VDBConnectionNode> comboBox)
         {
                 comboBox.setButtonCell(new ListCell<>()
                 {
                         @Override
-                        protected void updateItem(VDNConnectionNode item, boolean empty)
+                        protected void updateItem(VDBConnectionNode item, boolean empty)
                         {
                                 super.updateItem(item, empty);
 
@@ -252,7 +252,7 @@ public class SqlEditor extends SplitPane
                 comboBox.setCellFactory(list -> new ListCell<>()
                 {
                         @Override
-                        protected void updateItem(VDNConnectionNode item, boolean empty)
+                        protected void updateItem(VDBConnectionNode item, boolean empty)
                         {
                                 super.updateItem(item, empty);
 
@@ -267,13 +267,13 @@ public class SqlEditor extends SplitPane
                 comboBox.setConverter(new StringConverter<>()
                 {
                         @Override
-                        public String toString(VDNConnectionNode connection)
+                        public String toString(VDBConnectionNode connection)
                         {
                                 return connection == null ? null : connection.getName();
                         }
 
                         @Override
-                        public VDNConnectionNode fromString(String s)
+                        public VDBConnectionNode fromString(String s)
                         {
                                 return null;
                         }
@@ -379,7 +379,7 @@ public class SqlEditor extends SplitPane
                                 if (scriptText == null || scriptText.isEmpty())
                                         scriptText = codeArea.getText();
 
-                                VDNConnectionNode connection = connectionComboBox.getSelectionModel()
+                                VDBConnectionNode connection = connectionComboBox.getSelectionModel()
                                         .getSelectedItem();
 
                                 VDBDatabaseNode database = databaseComboBox.getSelectionModel()
@@ -439,9 +439,9 @@ public class SqlEditor extends SplitPane
                 return codeArea.getText();
         }
 
-        public VFXComboBox<VDNConnectionNode> copyConnectionComboBox()
+        public VFXComboBox<VDBConnectionNode> copyConnectionComboBox()
         {
-                VFXComboBox<VDNConnectionNode> dst = connectionComboBox.copyComboBox();
+                VFXComboBox<VDBConnectionNode> dst = connectionComboBox.copyComboBox();
                 configureConnectionComboBox(dst);
                 return dst;
         }
