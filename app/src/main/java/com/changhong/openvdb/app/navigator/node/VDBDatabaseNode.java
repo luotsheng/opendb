@@ -81,12 +81,12 @@ public class VDBDatabaseNode extends VDBNode implements EventListener
 
         public VDBDatabaseNode(VDBConnectionNode connection,
                                Driver driver,
-                               String name)
+                               String databaseName)
         {
-                super(name);
+                super(databaseName);
                 this.connection = connection;
                 setGraphic(Assets.use("database1"));
-                this.session = new Session(name);
+                this.session = Session.ofCatalog(databaseName);
                 this.driver = driver;
 
                 setupTableNode();

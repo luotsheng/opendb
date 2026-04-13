@@ -28,8 +28,18 @@ package com.changhong.openvdb.driver.api;
  */
 public record Session(String catalog, String schema)
 {
-        public Session(String catalog)
+        public static Session of(String catalog, String schema)
         {
-                this(catalog, null);
+                return new Session(catalog, schema);
+        }
+
+        public static Session ofCatalog(String catalog)
+        {
+                return new Session(catalog, null);
+        }
+
+        public static Session ofSchema(String schema)
+        {
+                return new Session(null, schema);
         }
 }
