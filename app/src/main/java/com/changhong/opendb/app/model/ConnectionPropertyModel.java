@@ -2,6 +2,7 @@ package com.changhong.opendb.app.model;
 
 import com.changhong.driver.api.ConnectionConfig;
 import com.changhong.driver.api.DriverType;
+import com.changhong.openvdb.core.model.ConnectionProfile;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -20,7 +21,7 @@ import static com.changhong.utils.TypeConverter.atobool;
  * @since 2026/3/26
  */
 @SuppressWarnings("unused")
-public class ConnectionProperty
+public class ConnectionPropertyModel
 {
         private final StringProperty name = new SimpleStringProperty();
         private final StringProperty type = new SimpleStringProperty();
@@ -38,12 +39,30 @@ public class ConnectionProperty
         /* jdbc url 属性 */
         private final Map<String, String> jdbcQuery = new HashMap<>();
 
-        public ConnectionProperty()
+        public ConnectionPropertyModel()
         {
                 /* DO NOTHING */
         }
 
-        public ConnectionProperty(String type)
+        public ConnectionPropertyModel(ConnectionProfile profile)
+        {
+                this.name.set(profile.getName());
+                this.type.set(profile.getType());
+                this.host.set(profile.getHost());
+                this.port.set(profile.getPort());
+                this.db.set(profile.getDb());
+                this.username.set(profile.getUsername());
+                this.password.set(profile.getPassword());
+                this.savePassword.set(profile.getSavePassword());
+                this.jdbcUrl.set(profile.getJdbcUrl());
+                this.timezone.set(profile.getTimezone());
+                this.useSSL.set(profile.getUseSSL());
+                this.tinyint1isBit.set(profile.getTinyint1isBit());
+
+                setupListener();
+        }
+
+        public ConnectionPropertyModel(String type)
         {
                 this.name.set("本地数据库");
                 this.host.set("127.0.0.1");

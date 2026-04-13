@@ -3,11 +3,12 @@ package com.changhong.opendb.app.ui.dialog;
 import com.changhong.opendb.app.VFXApplication;
 import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.event.RefreshQueryNodeEvent;
-import com.changhong.opendb.app.repository.QueryScriptRepository;
 import com.changhong.opendb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.opendb.app.ui.navigator.node.VDBDatabaseNode;
 import com.changhong.opendb.app.ui.pane.BrowserPane;
 import com.changhong.opendb.app.ui.workbench.SqlEditor;
+import com.changhong.openvdb.core.model.ScriptFile;
+import com.changhong.openvdb.core.repository.ScriptFileRepository;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -19,8 +20,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import java.io.File;
 
 /**
  * @author Luo Tiansheng
@@ -79,25 +78,25 @@ public class SaveQueryScriptDialog extends BrowserPane
 
         private void save()
         {
-                File sqlFile = sqlEditor.getSqlFile();
+                ScriptFile scriptFile = sqlEditor.getScriptFile();
 
-                if (sqlFile == null) {
+                if (scriptFile == null) {
                         VDBConnectionNode connection = connectionComboBox.getSelectionModel()
                                 .getSelectedItem();
 
                         VDBDatabaseNode database = databaseComboBox.getSelectionModel()
                                 .getSelectedItem();
 
-                        sqlFile = QueryScriptRepository.saveQueryScript(
+                        scriptFile = ScriptFileRepository.save(
                                 connection.getName(),
                                 database.getName(),
+                                null,
                                 textField.getText(),
-                                sqlEditor.getCodeAreaContent()
-                        );
+                                sqlEditor.getCodeAreaContent());
 
-                        sqlEditor.setSqlFile(sqlFile);
+                        sqlEditor.setScriptFile(scriptFile);
                 } else {
-                        QueryScriptRepository.saveQueryScript(sqlFile, sqlEditor.getCodeAreaContent());
+                        ScriptFileRepository.save(scriptFile, sqlEditor.getCodeAreaContent());
                 }
 
                 EventBus.publish(new RefreshQueryNodeEvent());
@@ -117,7 +116,7 @@ public class SaveQueryScriptDialog extends BrowserPane
 
                 SaveQueryScriptDialog dialog = new SaveQueryScriptDialog(stage, sqlEditor);
 
-                if (sqlEditor.getSqlFile() == null) {
+                if (sqlEditor.getScriptFile() == null) {
                         Scene scene = new Scene(dialog, 600, 300);
                         stage.setScene(scene);
                         stage.showAndWait();

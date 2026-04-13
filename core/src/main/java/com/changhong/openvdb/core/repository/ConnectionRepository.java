@@ -1,10 +1,11 @@
-package com.changhong.opendb.app.repository;
+package com.changhong.openvdb.core.repository;
 
-import com.changhong.opendb.app.Users;
-import com.changhong.opendb.app.model.ConnectionProperty;
-import com.changhong.opendb.app.ui.widgets.dialog.VFXDialogHelper;
-import com.changhong.opendb.app.utils.FileUtils;
-import com.changhong.opendb.app.utils.JSONUtils;
+import com.changhong.openvdb.core.Users;
+import com.changhong.openvdb.core.exception.CoreException;
+import com.changhong.openvdb.core.model.ConnectionProfile;
+import com.changhong.openvdb.core.utils.FileUtils;
+import com.changhong.openvdb.core.utils.JSONUtils;
+import com.changhong.utils.Captor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,12 +30,12 @@ public class ConnectionRepository
                 File vdbc = new File(dir, ".vdbc");
 
                 if (vdbc.exists())
-                        VFXDialogHelper.alert(name + "已存在！");
+                        throw new CoreException(name + "已存在！");
 
                 dir.mkdirs();
 
                 if (!vdbc.exists())
-                        VFXDialogHelper.runWith(vdbc::createNewFile);
+                        Captor.call(vdbc::createNewFile);
 
                 try (FileOutputStream fos = new FileOutputStream(vdbc)) {
 
@@ -43,7 +44,7 @@ public class ConnectionRepository
                 } catch (IOException e) {
                         /* 删除文件夹 */
                         FileUtils.forceDelete(dir);
-                        VFXDialogHelper.alert(e);
+                        throw new CoreException(e);
                 }
         }
 
@@ -64,10 +65,10 @@ public class ConnectionRepository
                 saveConnection(newName, content);
         }
 
-        public static List<ConnectionProperty> loadConnections()
+        public static List<ConnectionProfile> loadConnections()
         {
                 File[] files = Users.connectionDir.listFiles();
-                List<ConnectionProperty> ret = new ArrayList<>();
+                List<ConnectionProfile> ret = new ArrayList<>();
 
                 if (files == null)
                         return ret;
@@ -83,14 +84,14 @@ public class ConnectionRepository
                         try (FileInputStream fis = new FileInputStream(vdbc)) {
                                 byte[] bytes = fis.readAllBytes();
                                 String content = new String(bytes, StandardCharsets.UTF_8);
-                                ret.add(JSONUtils.toJavaObject(content, ConnectionProperty.class));
+                                ret.add(JSONUtils.toJavaObject(content, ConnectionProfile.class));
                         } catch (Exception e) {
-                                VFXDialogHelper.alert(e);
+                                throw new CoreException(e);
                         }
                 }
 
                 Collator collator = Collator.getInstance(Locale.CHINA);
-                ret.sort(Comparator.comparing(ConnectionProperty::getName, collator));
+                ret.sort(Comparator.comparing(ConnectionProfile::getName, collator));
 
                 return ret;
         }

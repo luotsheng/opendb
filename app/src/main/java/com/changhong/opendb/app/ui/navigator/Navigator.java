@@ -1,15 +1,17 @@
 package com.changhong.opendb.app.ui.navigator;
 
+import com.changhong.bean.BeanUtils;
 import com.changhong.opendb.app.model.VDBNodeStatus;
 import com.changhong.opendb.app.ui.menu.ConnectionMenuBuilder;
-import com.changhong.opendb.app.repository.ConnectionRepository;
+import com.changhong.openvdb.core.model.ConnectionProfile;
+import com.changhong.openvdb.core.repository.ConnectionRepository;
 import com.changhong.opendb.app.core.event.Event;
 import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.event.EventListener;
 import com.changhong.opendb.app.core.event.RefreshConnectionEvent;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.navigator.node.VDBConnectionNode;
-import com.changhong.opendb.app.model.ConnectionProperty;
+import com.changhong.opendb.app.model.ConnectionPropertyModel;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -198,10 +200,10 @@ public class Navigator extends VBox implements EventListener
         private void refreshConnectionNode()
         {
                 List<VDBConnectionNode> removeList = new ArrayList<>();
-                List<ConnectionProperty> models = ConnectionRepository.loadConnections();
+                List<ConnectionProfile> profiles = ConnectionRepository.loadConnections();
 
                 connections.forEach((k, v) -> {
-                        boolean isMatch = models.stream()
+                        boolean isMatch = profiles.stream()
                                 .anyMatch(e -> e.getName().equals(k));
 
                         if (!isMatch)
@@ -217,13 +219,15 @@ public class Navigator extends VBox implements EventListener
                         }
                 }
 
-                for (ConnectionProperty info : models) {
-                        if (connections.containsKey(info.getName()))
+                for (ConnectionProfile profile : profiles) {
+                        if (connections.containsKey(profile.getName()))
                                 continue;
 
-                        VDBConnectionNode connection = new VDBConnectionNode(info);
+                        ConnectionPropertyModel propertyModel = new ConnectionPropertyModel(profile);
+
+                        VDBConnectionNode connection = new VDBConnectionNode(propertyModel);
                         VDBNodeStatus.getInstance().addConnection(connection);
-                        connections.put(info.getName(), connection);
+                        connections.put(profile.getName(), connection);
                         children.add(connection);
                 }
         }

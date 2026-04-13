@@ -19,6 +19,16 @@
 
     <properties>
         <revision>v1.0.0-arch.1</revision>
+        <openjfx.version>21.0.5</openjfx.version>
+        <atlantafx.version>2.0.1</atlantafx.version>
+        <jackson.version>2.21.1</jackson.version>
+        <mysql.version>8.3.0</mysql.version>
+        <hikari.version>5.1.0</hikari.version>
+        <jsqlparser.version>5.3</jsqlparser.version>
+        <richtextfx.version>0.11.7</richtextfx.version>
+        <slf4j.version>2.0.16</slf4j.version>
+        <logback.version>1.5.32</logback.version>
+        <sqlformat.version>2.0.5</sqlformat.version>
         <lombok.version>1.18.36</lombok.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -44,7 +54,7 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>com.changhong.admin</groupId>
+                <groupId>com.changhong.openvdb</groupId>
                 <artifactId>drivers</artifactId>
                 <version>${revision}</version>
             </dependency>

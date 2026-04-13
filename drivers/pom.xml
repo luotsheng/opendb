@@ -9,7 +9,7 @@
         <version>${revision}</version>
     </parent>
 
-    <groupId>com.changhong.admin</groupId>
+    <groupId>com.changhong.openvdb</groupId>
     <artifactId>drivers</artifactId>
 
     <properties>

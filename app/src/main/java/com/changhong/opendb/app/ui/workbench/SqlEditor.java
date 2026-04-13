@@ -5,7 +5,6 @@ import com.changhong.driver.api.Driver;
 import com.changhong.driver.api.Session;
 import com.changhong.driver.api.sql.SQL;
 import com.changhong.opendb.app.model.VDBNodeStatus;
-import com.changhong.opendb.app.model.QueryInfo;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.dialog.SaveQueryScriptDialog;
 import com.changhong.opendb.app.ui.navigator.node.VDBConnectionNode;
@@ -18,6 +17,7 @@ import com.changhong.opendb.app.ui.widgets.VFXIconButton;
 import com.changhong.opendb.app.ui.widgets.VFXSeparator;
 import com.changhong.opendb.app.ui.widgets.dialog.VFXDialogHelper;
 import com.changhong.exception.Causes;
+import com.changhong.openvdb.core.model.ScriptFile;
 import com.github.vertical_blank.sqlformatter.SqlFormatter;
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
@@ -65,10 +65,9 @@ public class SqlEditor extends SplitPane
 
         @Getter
         private String name;
-        @Getter
-        private File sqlFile;
         private Node oldGraphic;
-        private QueryInfo queryInfo;
+        @Getter
+        private ScriptFile scriptFile;
         private Driver driver = null;
         private long currentTaskId = System.currentTimeMillis();
         private boolean saveFlag = true;
@@ -81,12 +80,14 @@ public class SqlEditor extends SplitPane
         private Button stop;
         private Button beautify;
 
-        public SqlEditor(QueryInfo queryInfo, Tab ownerTab)
+        public SqlEditor(VDBConnectionNode conn,
+                         ScriptFile scriptFile,
+                         Tab ownerTab)
         {
-                this.queryInfo = queryInfo;
+                this.scriptFile = scriptFile;
 
-                this.name = queryInfo != null
-                        ? queryInfo.getName()
+                this.name = scriptFile != null
+                        ? scriptFile.getName()
                         : strwfmt("查询脚本_%s.sql@[ N/A ]", (numberCount++));
 
                 this.ownerTab = ownerTab;
@@ -108,11 +109,11 @@ public class SqlEditor extends SplitPane
                 topBorderPane.setTop(toolBar);
                 topBorderPane.setCenter(virtualizedScrollPane);
 
-                if (queryInfo != null)
-                        setSqlFile(queryInfo.getSqlFile());
+                if (scriptFile != null)
+                        setScriptFile(scriptFile);
 
                 setupPane();
-                setupToolbar();
+                setupToolbar(conn);
                 setupCodeArea();
                 setupResultSetCloseEvent();
                 setOwnerTabName(name);
@@ -130,15 +131,12 @@ public class SqlEditor extends SplitPane
                 });
         }
 
-        private static VDBConnectionNode getSelectionConnection(VDBNodeStatus instance, QueryInfo info)
-        {
-                return info != null ? info.getConnection() : instance.getSelectedConnection();
-        }
-
-        private void setupToolbar()
+        private void setupToolbar(VDBConnectionNode initConnection)
         {
                 VDBNodeStatus instance = VDBNodeStatus.getInstance();
-                VDBConnectionNode selectedConnection = getSelectionConnection(instance, queryInfo);
+                VDBConnectionNode selectedConnection = initConnection != null
+                        ? initConnection
+                        : instance.getSelectedConnection();
 
                 run = new VFXIconButton("运行已选择", "run0");
                 run.setText("运行");
@@ -190,7 +188,7 @@ public class SqlEditor extends SplitPane
                 });
 
                 codeArea.textProperty().addListener((obs, oldVal, newVal) -> {
-                        if (saveFlag && sqlFile == null) {
+                        if (saveFlag && scriptFile == null) {
                                 ownerTab.setText("* " + ownerTab.getText());
                                 saveFlag = false;
                         }
@@ -453,16 +451,16 @@ public class SqlEditor extends SplitPane
                 return dst;
         }
 
-        public void setSqlFile(File sqlFile)
+        public void setScriptFile(ScriptFile file)
         {
-                if (sqlFile != null) {
-                        this.sqlFile = sqlFile;
-                        setOwnerTabName(sqlFile.getName());
+                if (file != null) {
+                        this.scriptFile = file;
+                        setOwnerTabName(file.getName());
 
                         StringBuilder builder = new StringBuilder();
-                        char[] buf = new char[(int) sqlFile.length()];
+                        char[] buf = new char[(int) file.length()];
 
-                        try (FileReader rw = new FileReader(sqlFile)) {
+                        try (FileReader rw = new FileReader(file)) {
                                 int count = rw.read(buf);
                                 builder.append(buf, 0, count);
                         } catch (Throwable e) {
@@ -491,7 +489,7 @@ public class SqlEditor extends SplitPane
 
         private void autoSave()
         {
-                if (sqlFile != null)
+                if (scriptFile != null)
                         SaveQueryScriptDialog.showDialog(this);
         }
 
@@ -511,10 +509,10 @@ public class SqlEditor extends SplitPane
 
         public boolean sqlFileEquals(File file)
         {
-                if (sqlFile == null || file == null)
+                if (scriptFile == null || file == null)
                         return false;
 
-                return sqlFile.getAbsolutePath().equals(file.getAbsolutePath());
+                return scriptFile.getAbsolutePath().equals(file.getAbsolutePath());
         }
 
         public void close()

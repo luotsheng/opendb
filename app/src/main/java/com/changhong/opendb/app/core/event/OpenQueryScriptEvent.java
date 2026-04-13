@@ -1,7 +1,7 @@
 package com.changhong.opendb.app.core.event;
 
-import com.changhong.opendb.app.model.ConnectionProperty;
-import com.changhong.opendb.app.model.QueryInfo;
+import com.changhong.opendb.app.ui.navigator.node.VDBConnectionNode;
+import com.changhong.openvdb.core.model.ScriptFile;
 
 /**
  * @author Luo Tiansheng
@@ -9,16 +9,16 @@ import com.changhong.opendb.app.model.QueryInfo;
  */
 public class OpenQueryScriptEvent extends Event
 {
-        public ConnectionProperty connectionInfo;
-        public QueryInfo queryInfo;
+        public VDBConnectionNode connection;
+        public ScriptFile scriptFile;
 
-        public OpenQueryScriptEvent(ConnectionProperty info)
+        public OpenQueryScriptEvent(VDBConnectionNode connection)
         {
-                this.connectionInfo = info;
+                this.connection = connection;
         }
 
-        public OpenQueryScriptEvent(QueryInfo info)
+        public OpenQueryScriptEvent(ScriptFile scriptFile)
         {
-                this.queryInfo = info;
+                this.scriptFile = scriptFile;
         }
 }

@@ -4,12 +4,12 @@ import com.changhong.driver.api.Driver;
 import com.changhong.driver.api.Session;
 import com.changhong.driver.api.Table;
 import com.changhong.opendb.app.core.event.*;
-import com.changhong.opendb.app.model.QueryInfo;
-import com.changhong.opendb.app.repository.QueryScriptRepository;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.navigator.VDBNode;
 import com.changhong.opendb.app.ui.pane.CatalogBrowserPane;
 import com.changhong.opendb.app.ui.widgets.dialog.VFXDialogHelper;
+import com.changhong.openvdb.core.model.ScriptFile;
+import com.changhong.openvdb.core.repository.ScriptFileRepository;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -178,8 +178,8 @@ public class VDBDatabaseNode extends VDBNode implements EventListener
         private void reloadQueryNode()
         {
                 queryItem.getChildren().clear();
-                List<QueryInfo> queryInfos = QueryScriptRepository.loadQueryInfo(connection, this);
-                queryInfos.forEach(query -> queryItem.getChildren().add(new VDBQueryNode(this, query)));
+                List<ScriptFile> scriptFiles = ScriptFileRepository.loadScriptFiles(connection.getName(), getName(), null);
+                scriptFiles.forEach(query -> queryItem.getChildren().add(new VDBQueryNode(this, query)));
         }
 
         public void onSelected(VDBNode node)
@@ -191,7 +191,7 @@ public class VDBDatabaseNode extends VDBNode implements EventListener
 
         private void newQueryScript()
         {
-                EventBus.publish(new OpenQueryScriptEvent(connection.getInfo()));
+                EventBus.publish(new OpenQueryScriptEvent(connection));
         }
 
         public void setupListenerEvent()

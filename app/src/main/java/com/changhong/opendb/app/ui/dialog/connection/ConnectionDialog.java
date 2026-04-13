@@ -3,10 +3,10 @@ package com.changhong.opendb.app.ui.dialog.connection;
 import com.changhong.driver.api.PooledDataSource;
 import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.event.RefreshConnectionEvent;
-import com.changhong.opendb.app.model.ConnectionProperty;
-import com.changhong.opendb.app.repository.ConnectionRepository;
+import com.changhong.opendb.app.model.ConnectionPropertyModel;
+import com.changhong.openvdb.core.repository.ConnectionRepository;
 import com.changhong.exception.Causes;
-import com.changhong.opendb.app.utils.JSONUtils;
+import com.changhong.openvdb.core.utils.JSONUtils;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,8 +31,8 @@ public class ConnectionDialog extends Stage
         private TabPane tabPane;
         private HBox buttonBar;
         private final boolean isUpdate;
-        private final ConnectionProperty oldProperty;
-        private final ConnectionProperty newProperty;
+        private final ConnectionPropertyModel oldProperty;
+        private final ConnectionPropertyModel newProperty;
         private final Label status = new Label();
 
         private static final int WW = 700;
@@ -43,13 +43,13 @@ public class ConnectionDialog extends Stage
                 this(null);
         }
 
-        public ConnectionDialog(ConnectionProperty newProperty)
+        public ConnectionDialog(ConnectionPropertyModel newProperty)
         {
                 this.isUpdate = newProperty != null;
 
                 this.newProperty = isUpdate
                         ? newProperty
-                        : new ConnectionProperty("MySQL");
+                        : new ConnectionPropertyModel("MySQL");
 
                 this.oldProperty = isUpdate
                         ? JSONUtils.deepCopy(newProperty)

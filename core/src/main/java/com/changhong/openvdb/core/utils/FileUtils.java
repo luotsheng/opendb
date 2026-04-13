@@ -1,6 +1,7 @@
-package com.changhong.opendb.app.utils;
+package com.changhong.openvdb.core.utils;
 
-import com.changhong.opendb.app.ui.widgets.dialog.VFXDialogHelper;
+import com.changhong.openvdb.core.exception.CoreException;
+import com.changhong.utils.Captor;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,17 +25,13 @@ public class FileUtils
         public static boolean isDeepEmptyDirectory(Path path)
         {
                 try (Stream<Path> stream = Files.walk(path)) {
-
                         return stream
                                 .filter(p -> !Files.isDirectory(p))
                                 .findFirst()
                                 .isEmpty();
-
                 } catch (IOException e) {
-                        VFXDialogHelper.alert(e);
+                        throw new CoreException(e);
                 }
-
-                return false;
         }
 
         public static void forceDelete(File file)
@@ -51,14 +48,14 @@ public class FileUtils
                 Path path = Paths.get(pathname);
 
                 if (Files.isRegularFile(path)) {
-                        VFXDialogHelper.runWith(() -> Files.deleteIfExists(path));
+                        Captor.call(() -> Files.deleteIfExists(path));
                         return;
                 }
 
-                VFXDialogHelper.runWith(() -> {
+                Captor.call(() -> {
                         Files.walk(path)
                                 .sorted(Comparator.reverseOrder())
-                                .forEach(pathVal -> VFXDialogHelper.runWith(() -> Files.delete(pathVal)));
+                                .forEach(pathVal -> Captor.call(() -> Files.delete(pathVal)));
                 });
         }
 }

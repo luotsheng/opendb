@@ -12,16 +12,6 @@
     <artifactId>app</artifactId>
 
     <properties>
-        <openjfx.version>21.0.5</openjfx.version>
-        <atlantafx.version>2.0.1</atlantafx.version>
-        <jackson.version>2.21.1</jackson.version>
-        <mysql.version>8.3.0</mysql.version>
-        <hikari.version>5.1.0</hikari.version>
-        <jsqlparser.version>5.3</jsqlparser.version>
-        <richtextfx.version>0.11.7</richtextfx.version>
-        <slf4j.version>2.0.16</slf4j.version>
-        <logback.version>1.5.32</logback.version>
-        <sqlformat.version>2.0.5</sqlformat.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <java.version>21</java.version>
@@ -40,8 +30,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.changhong.admin</groupId>
-            <artifactId>drivers</artifactId>
+            <groupId>com.changhong.openvdb</groupId>
+            <artifactId>core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -57,16 +47,6 @@
             <groupId>io.github.mkpaz</groupId>
             <artifactId>atlantafx-base</artifactId>
             <version>${atlantafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -20,7 +20,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.changhong.admin</groupId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.changhong.openvdb</groupId>
             <artifactId>drivers</artifactId>
         </dependency>
     </dependencies>

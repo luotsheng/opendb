@@ -14,14 +14,9 @@ import lombok.Setter;
 public class ConnectionConfig
 {
         private DriverType type;
-
         private String host;
-
         private String port;
-
         private String username;
-
         private String password;
-
         private String jdbcUrl;
 }

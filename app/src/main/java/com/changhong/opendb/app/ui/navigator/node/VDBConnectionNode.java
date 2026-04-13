@@ -3,7 +3,7 @@ package com.changhong.opendb.app.ui.navigator.node;
 import com.changhong.driver.api.Driver;
 import com.changhong.driver.api.PooledDataSource;
 import com.changhong.driver.mysql.MySQLDriver;
-import com.changhong.opendb.app.model.ConnectionProperty;
+import com.changhong.opendb.app.model.ConnectionPropertyModel;
 import com.changhong.opendb.app.model.VDBNodeStatus;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.dialog.connection.ConnectionDialog;
@@ -28,7 +28,7 @@ import java.util.List;
 public class VDBConnectionNode extends VDBNode
 {
         @Getter
-        private final ConnectionProperty info;
+        private final ConnectionPropertyModel propertyModel;
 
         private boolean openFlag = false;
         private PooledDataSource dataSource;
@@ -47,11 +47,11 @@ public class VDBConnectionNode extends VDBNode
         @Getter
         private VDBDatabaseNode selectedDatabase;
 
-        public VDBConnectionNode(ConnectionProperty info)
+        public VDBConnectionNode(ConnectionPropertyModel propertyModel)
         {
-                super(info.getName());
+                super(propertyModel.getName());
                 setGraphic(Assets.use("database0"));
-                this.info = info;
+                this.propertyModel = propertyModel;
                 setupListenerEvent();
         }
 
@@ -64,7 +64,7 @@ public class VDBConnectionNode extends VDBNode
 
                 new Thread(() -> {
                         try {
-                                dataSource = new PooledDataSource(info.toConnectionConfig());
+                                dataSource = new PooledDataSource(propertyModel.toConnectionConfig());
                                 driver = new MySQLDriver(dataSource);
                                 setupDatabases(driver.getCatalogs());
                                 setExpanded(true);
@@ -102,10 +102,10 @@ public class VDBConnectionNode extends VDBNode
                 if (openFlag) {
                         if (VFXDialogHelper.ask("编辑需要关闭当前连接，是否关闭？")) {
                                 closeConnection();
-                                new ConnectionDialog(info).showAndWait();
+                                new ConnectionDialog(propertyModel).showAndWait();
                         }
                 } else {
-                        new ConnectionDialog(info).showAndWait();
+                        new ConnectionDialog(propertyModel).showAndWait();
                 }
         }
 

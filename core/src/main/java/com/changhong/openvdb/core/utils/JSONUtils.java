@@ -1,6 +1,5 @@
-package com.changhong.opendb.app.utils;
+package com.changhong.openvdb.core.utils;
 
-import com.changhong.opendb.app.ui.widgets.dialog.VFXDialogHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -41,7 +40,6 @@ public class JSONUtils
                 try {
                         return objectMapper.readValue(json, aClass);
                 } catch (JsonProcessingException e) {
-                        VFXDialogHelper.alert(e);
                         return null;
                 }
         }
@@ -54,8 +52,7 @@ public class JSONUtils
 
                         return objectMapper.readValue(jsonArray, collectionType);
                 } catch (JsonProcessingException e) {
-                        VFXDialogHelper.alert(e);
-                        return null;
+                        throw new RuntimeException(e);
                 }
         }
 

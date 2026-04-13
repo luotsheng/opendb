@@ -3,9 +3,9 @@ package com.changhong.opendb.app.ui.dialog;
 import com.changhong.opendb.app.VFXApplication;
 import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.event.RefreshQueryNodeEvent;
-import com.changhong.opendb.app.model.QueryInfo;
-import com.changhong.opendb.app.repository.QueryScriptRepository;
+import com.changhong.openvdb.core.model.ScriptFile;
 import com.changhong.opendb.app.ui.pane.BrowserPane;
+import com.changhong.openvdb.core.repository.ScriptFileRepository;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,8 +17,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.File;
-
 /**
  * @author Luo Tiansheng
  * @since 2026/3/27
@@ -27,16 +25,17 @@ import java.io.File;
 public class RenameQueryScriptDialog extends BrowserPane
 {
         private final Stage stage;
-        private final QueryInfo queryInfo;
         private final TextField textField;
 
-        public RenameQueryScriptDialog(Stage stage, QueryInfo queryInfo)
+        private ScriptFile scriptFile;
+
+        public RenameQueryScriptDialog(Stage stage, ScriptFile scriptFile)
         {
                 this.stage = stage;
-                this.queryInfo = queryInfo;
+                this.scriptFile = scriptFile;
 
                 Label title = new Label("查询名称：");
-                textField = new TextField(queryInfo.getName());
+                textField = new TextField(scriptFile.getName());
                 textField.setPromptText("输入查询名称...");
                 VBox topBox = new VBox(title, textField);
                 topBox.setSpacing(10);
@@ -57,13 +56,13 @@ public class RenameQueryScriptDialog extends BrowserPane
 
         private void save()
         {
-                File sqlFile = queryInfo.getSqlFile();
+                ScriptFile newScriptFile = scriptFile;
 
-                sqlFile = QueryScriptRepository.renameQueryScript(
-                        sqlFile, textField.getText()
+                newScriptFile = ScriptFileRepository.rename(
+                        scriptFile, textField.getText()
                 );
 
-                queryInfo.setSqlFile(sqlFile);
+                scriptFile = newScriptFile;
 
                 EventBus.publish(new RefreshQueryNodeEvent());
 
@@ -75,11 +74,11 @@ public class RenameQueryScriptDialog extends BrowserPane
                 stage.close();
         }
 
-        public static void showDialog(QueryInfo queryInfo)
+        public static void showDialog(ScriptFile scriptFile)
         {
                 Stage stage = VFXApplication.createByPrimaryStage();
 
-                RenameQueryScriptDialog dialog = new RenameQueryScriptDialog(stage, queryInfo);
+                RenameQueryScriptDialog dialog = new RenameQueryScriptDialog(stage, scriptFile);
 
                 Scene scene = new Scene(dialog, 400, 150);
                 stage.setScene(scene);

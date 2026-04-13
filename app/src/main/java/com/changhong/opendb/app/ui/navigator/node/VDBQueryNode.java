@@ -5,11 +5,11 @@ import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.event.OpenQueryScriptEvent;
 import com.changhong.opendb.app.core.event.RefreshQueryNodeEvent;
 import com.changhong.opendb.app.core.event.RemoveSqlEditorTabEvent;
-import com.changhong.opendb.app.model.QueryInfo;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.dialog.RenameQueryScriptDialog;
 import com.changhong.opendb.app.ui.navigator.VDBNode;
 import com.changhong.opendb.app.ui.widgets.dialog.VFXDialogHelper;
+import com.changhong.openvdb.core.model.ScriptFile;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -24,15 +24,15 @@ import java.awt.*;
 @SuppressWarnings("FieldCanBeLocal")
 public class VDBQueryNode extends VDBNode
 {
-        private final QueryInfo queryInfo;
+        private final ScriptFile scriptFile;
         private final VDBDatabaseNode database;
 
-        public VDBQueryNode(VDBDatabaseNode database, QueryInfo queryInfo)
+        public VDBQueryNode(VDBDatabaseNode database, ScriptFile scriptFile)
         {
-                super(queryInfo.getName());
+                super(scriptFile.getName());
                 this.database = database;
                 setGraphic(Assets.use("sql"));
-                this.queryInfo = queryInfo;
+                this.scriptFile = scriptFile;
         }
 
         @Override
@@ -70,32 +70,32 @@ public class VDBQueryNode extends VDBNode
 
         private void openNewTabQuery()
         {
-                EventBus.publish(new OpenQueryScriptEvent(queryInfo));
+                EventBus.publish(new OpenQueryScriptEvent(scriptFile));
         }
 
         private void renameQuery()
         {
-                RenameQueryScriptDialog.showDialog(queryInfo);
+                RenameQueryScriptDialog.showDialog(scriptFile);
         }
 
         private void copyFilePath()
         {
-                VFXApplication.copyToClipboard(queryInfo.getSqlFile().getAbsolutePath());
+                VFXApplication.copyToClipboard(scriptFile.getAbsolutePath());
         }
 
         private void openDesktop()
         {
                 VFXDialogHelper.runWith(() -> {
                         Desktop desktop = Desktop.getDesktop();
-                        desktop.browseFileDirectory(queryInfo.getSqlFile());
+                        desktop.browseFileDirectory(scriptFile);
                 });
         }
 
         private void deleteQuery()
         {
-                queryInfo.delete();
+                scriptFile.delete();
                 database.queryItem.getChildren().remove(this);
-                EventBus.publish(new RemoveSqlEditorTabEvent(queryInfo.getSqlFile()));
+                EventBus.publish(new RemoveSqlEditorTabEvent(scriptFile));
                 EventBus.publish(new RefreshQueryNodeEvent());
         }
 

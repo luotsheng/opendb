@@ -22,7 +22,7 @@ public class AppToolBar extends ToolBar
 
                 Button newQueryButton = new VFXIconButton("查询", "sql");
                 newQueryButton.setText("新建查询");
-                newQueryButton.setOnAction(event -> newQuery());
+                newQueryButton.setOnAction(event -> newScriptEditor());
 
                 getItems().addAll(
                         newConnectionButton,
@@ -31,10 +31,10 @@ public class AppToolBar extends ToolBar
                 );
         }
 
-        private void newQuery()
+        private void newScriptEditor()
         {
                 VDBNodeStatus instance = VDBNodeStatus.getInstance();
                 VDBConnectionNode selectedConnection = instance.getSelectedConnection();
-                EventBus.publish(new OpenQueryScriptEvent(selectedConnection == null ? null : selectedConnection.getInfo()));
+                EventBus.publish(new OpenQueryScriptEvent(selectedConnection));
         }
 }

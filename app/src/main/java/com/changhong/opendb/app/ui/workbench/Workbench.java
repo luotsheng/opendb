@@ -176,10 +176,10 @@ public class Workbench extends VBox implements EventListener
                 queryTab.setGraphic(Assets.use("sql"));
                 SqlEditor sqlEditor;
 
-                if (event.queryInfo != null) {
-                        sqlEditor = new SqlEditor(event.queryInfo, queryTab);
+                if (event.scriptFile != null) {
+                        sqlEditor = new SqlEditor(null, event.scriptFile, queryTab);
                 } else {
-                        sqlEditor = new SqlEditor(null, queryTab);
+                        sqlEditor = new SqlEditor(null, null, queryTab);
                 }
 
                 queryTab.setContent(sqlEditor);

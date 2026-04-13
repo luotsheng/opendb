@@ -1,6 +1,6 @@
 package com.changhong.opendb.app.ui.dialog.connection;
 
-import com.changhong.opendb.app.model.ConnectionProperty;
+import com.changhong.opendb.app.model.ConnectionPropertyModel;
 import com.changhong.opendb.app.ui.pane.PropertyGridPane;
 import javafx.scene.control.CheckBox;
 import com.changhong.opendb.app.ui.widgets.VFXComboBox;
@@ -12,7 +12,7 @@ import javafx.scene.control.TextField;
  */
 class ConnectionAdvancedPane extends PropertyGridPane
 {
-        private final ConnectionProperty info;
+        private final ConnectionPropertyModel propertyModel;
 
         private final TextField jdbcUrl = new TextField("jdbc:mysql://");
         private final VFXComboBox<String> timezone = new VFXComboBox<>();
@@ -37,10 +37,10 @@ class ConnectionAdvancedPane extends PropertyGridPane
                 "Asia/Tokyo",
         };
 
-        public ConnectionAdvancedPane(ConnectionProperty info)
+        public ConnectionAdvancedPane(ConnectionPropertyModel propertyModel)
         {
                 super();
-                this.info = info;
+                this.propertyModel = propertyModel;
                 bindModelProperty();
                 setupTimezone();
                 setupPaneLayout();
@@ -48,10 +48,10 @@ class ConnectionAdvancedPane extends PropertyGridPane
 
         private void bindModelProperty()
         {
-                jdbcUrl.textProperty().bindBidirectional(info.jdbcUrlProperty());
-                timezone.valueProperty().bindBidirectional(info.timezoneProperty());
-                useSSL.selectedProperty().bindBidirectional(info.useSSLProperty());
-                tinyint1isBit.selectedProperty().bindBidirectional(info.tinyint1isBitProperty());
+                jdbcUrl.textProperty().bindBidirectional(propertyModel.jdbcUrlProperty());
+                timezone.valueProperty().bindBidirectional(propertyModel.timezoneProperty());
+                useSSL.selectedProperty().bindBidirectional(propertyModel.useSSLProperty());
+                tinyint1isBit.selectedProperty().bindBidirectional(propertyModel.tinyint1isBitProperty());
         }
 
         private void setupTimezone()
