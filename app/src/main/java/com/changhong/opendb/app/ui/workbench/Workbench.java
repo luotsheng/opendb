@@ -29,7 +29,7 @@ public class Workbench extends VBox implements EventListener
 {
         private final VFXTabPane tabPane = new VFXTabPane();
         private final Tab detailTab = new Tab("详情");
-        private final List<SqlEditor> editors = new ArrayList<>();
+        private final List<ScriptEditor> editors = new ArrayList<>();
         
         private final Map<String, Tab> dataGridMgr = new HashMap<>();
         private final Map<String, Tab> TableMgr = new HashMap<>();
@@ -56,7 +56,7 @@ public class Workbench extends VBox implements EventListener
                 EventBus.subscribe(CloseWorkbenchPaneEvent.class, this);
                 EventBus.subscribe(OpenQueryScriptEvent.class, this);
                 EventBus.subscribe(OpenDataGridPaneEvent.class, this);
-                EventBus.subscribe(RemoveSqlEditorTabEvent.class, this);
+                EventBus.subscribe(RemoveScriptEditorTabEvent.class, this);
                 EventBus.subscribe(OpenDesignTablePaneEvent.class, this);
         }
 
@@ -141,7 +141,7 @@ public class Workbench extends VBox implements EventListener
                 switch (event) {
                         case OpenWorkbenchPaneEvent e      -> handleOpenWorkbenchPaneEvent(e);
                         case CloseWorkbenchPaneEvent e     -> handleCloseWorkbenchPaneEvent(e);
-                        case RemoveSqlEditorTabEvent e     -> handleRemoveSqlEditorTabEvent(e);
+                        case RemoveScriptEditorTabEvent e  -> handleRemoveScriptEditorTabEvent(e);
                         case OpenQueryScriptEvent e        -> handleOpenQueryScriptEvent(e);
                         case OpenDataGridPaneEvent e       -> handleOpenDataGridPaneEvent(e);
                         case OpenDesignTablePaneEvent e    -> handleOpenDesignTablePaneEvent(e);
@@ -162,9 +162,9 @@ public class Workbench extends VBox implements EventListener
                         detailTab.setContent(null);
         }
 
-        private void handleRemoveSqlEditorTabEvent(RemoveSqlEditorTabEvent event)
+        private void handleRemoveScriptEditorTabEvent(RemoveScriptEditorTabEvent event)
         {
-                for (SqlEditor editor : editors) {
+                for (ScriptEditor editor : editors) {
                         if (editor.sqlFileEquals(event.sqlFile))
                                 tabPane.remove(editor.getOwnerTab());
                 }
@@ -174,22 +174,22 @@ public class Workbench extends VBox implements EventListener
         {
                 Tab queryTab = new Tab();
                 queryTab.setGraphic(Assets.use("sql"));
-                SqlEditor sqlEditor;
+                ScriptEditor scriptEditor;
 
                 if (event.scriptFile != null) {
-                        sqlEditor = new SqlEditor(null, event.scriptFile, queryTab);
+                        scriptEditor = new ScriptEditor(null, event.scriptFile, queryTab);
                 } else {
-                        sqlEditor = new SqlEditor(null, null, queryTab);
+                        scriptEditor = new ScriptEditor(null, null, queryTab);
                 }
 
-                queryTab.setContent(sqlEditor);
+                queryTab.setContent(scriptEditor);
                 queryTab.setOnCloseRequest(e -> {
-                        if (queryTab.getContent() instanceof SqlEditor editor) {
+                        if (queryTab.getContent() instanceof ScriptEditor editor) {
                                 editor.close();
                         }
                 });
 
-                editors.add(sqlEditor);
+                editors.add(scriptEditor);
                 tabPane.add(queryTab);
                 tabPane.select(queryTab);
         }

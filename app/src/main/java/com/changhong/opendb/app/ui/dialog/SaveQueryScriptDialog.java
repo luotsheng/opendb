@@ -6,7 +6,7 @@ import com.changhong.opendb.app.core.event.RefreshQueryNodeEvent;
 import com.changhong.opendb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.opendb.app.ui.navigator.node.VDBDatabaseNode;
 import com.changhong.opendb.app.ui.pane.BrowserPane;
-import com.changhong.opendb.app.ui.workbench.SqlEditor;
+import com.changhong.opendb.app.ui.workbench.ScriptEditor;
 import com.changhong.openvdb.core.model.ScriptFile;
 import com.changhong.openvdb.core.repository.ScriptFileRepository;
 import javafx.geometry.Insets;
@@ -29,23 +29,23 @@ import javafx.stage.Stage;
 public class SaveQueryScriptDialog extends BrowserPane
 {
         private final Stage stage;
-        private final SqlEditor sqlEditor;
+        private final ScriptEditor scriptEditor;
         private final TextField textField;
         private final VFXComboBox<VDBConnectionNode> connectionComboBox;
         private final VFXComboBox<VDBDatabaseNode> databaseComboBox;
 
-        public SaveQueryScriptDialog(Stage stage, SqlEditor sqlEditor)
+        public SaveQueryScriptDialog(Stage stage, ScriptEditor scriptEditor)
         {
                 this.stage = stage;
-                this.sqlEditor = sqlEditor;
+                this.scriptEditor = scriptEditor;
 
                 Label title = new Label("查询名称：");
                 textField = new TextField();
                 textField.setPromptText("输入查询名称...");
-                Label curName = new Label("当前名称：" + sqlEditor.getName());
+                Label curName = new Label("当前名称：" + scriptEditor.getName());
                 Label savePath = new Label("保存位置：");
-                connectionComboBox = sqlEditor.copyConnectionComboBox();
-                databaseComboBox = sqlEditor.copyDatabaseComboBox();
+                connectionComboBox = scriptEditor.copyConnectionComboBox();
+                databaseComboBox = scriptEditor.copyDatabaseComboBox();
                 connectionComboBox.setMaxWidth(Double.MAX_VALUE);
                 databaseComboBox.setMaxWidth(Double.MAX_VALUE);
                 VBox topBox = new VBox(title, textField, curName, savePath, connectionComboBox, databaseComboBox);
@@ -78,7 +78,7 @@ public class SaveQueryScriptDialog extends BrowserPane
 
         private void save()
         {
-                ScriptFile scriptFile = sqlEditor.getScriptFile();
+                ScriptFile scriptFile = scriptEditor.getScriptFile();
 
                 if (scriptFile == null) {
                         VDBConnectionNode connection = connectionComboBox.getSelectionModel()
@@ -92,15 +92,15 @@ public class SaveQueryScriptDialog extends BrowserPane
                                 database.getName(),
                                 null,
                                 textField.getText(),
-                                sqlEditor.getCodeAreaContent());
+                                scriptEditor.getCodeAreaContent());
 
-                        sqlEditor.setScriptFile(scriptFile);
+                        scriptEditor.setScriptFile(scriptFile);
                 } else {
-                        ScriptFileRepository.save(scriptFile, sqlEditor.getCodeAreaContent());
+                        ScriptFileRepository.save(scriptFile, scriptEditor.getCodeAreaContent());
                 }
 
                 EventBus.publish(new RefreshQueryNodeEvent());
-                sqlEditor.markSaveFlag();
+                scriptEditor.markSaveFlag();
 
                 cancel();
         }
@@ -110,13 +110,13 @@ public class SaveQueryScriptDialog extends BrowserPane
                 stage.close();
         }
 
-        public static void showDialog(SqlEditor sqlEditor)
+        public static void showDialog(ScriptEditor scriptEditor)
         {
                 Stage stage = VFXApplication.createByPrimaryStage();
 
-                SaveQueryScriptDialog dialog = new SaveQueryScriptDialog(stage, sqlEditor);
+                SaveQueryScriptDialog dialog = new SaveQueryScriptDialog(stage, scriptEditor);
 
-                if (sqlEditor.getScriptFile() == null) {
+                if (scriptEditor.getScriptFile() == null) {
                         Scene scene = new Scene(dialog, 600, 300);
                         stage.setScene(scene);
                         stage.showAndWait();

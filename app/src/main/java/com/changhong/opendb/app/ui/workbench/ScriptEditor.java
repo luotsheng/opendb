@@ -46,9 +46,9 @@ import static com.changhong.string.StringStaticize.strwfmt;
  * @since 2026/3/29
  */
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
-public class SqlEditor extends SplitPane
+public class ScriptEditor extends SplitPane
 {
-        private static final Logger LOG = LoggerFactory.getLogger(SqlEditor.class);
+        private static final Logger LOG = LoggerFactory.getLogger(ScriptEditor.class);
 
         static final int QUERY_RESULT_SET_FIRST = 0;
         static final int QUERY_MESSAGE_LOG_FIRST = 1;
@@ -80,9 +80,9 @@ public class SqlEditor extends SplitPane
         private Button stop;
         private Button beautify;
 
-        public SqlEditor(VDBConnectionNode conn,
-                         ScriptFile scriptFile,
-                         Tab ownerTab)
+        public ScriptEditor(VDBConnectionNode conn,
+                            ScriptFile scriptFile,
+                            Tab ownerTab)
         {
                 this.scriptFile = scriptFile;
 

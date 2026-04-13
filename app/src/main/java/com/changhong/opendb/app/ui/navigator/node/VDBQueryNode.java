@@ -4,7 +4,7 @@ import com.changhong.opendb.app.VFXApplication;
 import com.changhong.opendb.app.core.event.EventBus;
 import com.changhong.opendb.app.core.event.OpenQueryScriptEvent;
 import com.changhong.opendb.app.core.event.RefreshQueryNodeEvent;
-import com.changhong.opendb.app.core.event.RemoveSqlEditorTabEvent;
+import com.changhong.opendb.app.core.event.RemoveScriptEditorTabEvent;
 import com.changhong.opendb.app.resource.Assets;
 import com.changhong.opendb.app.ui.dialog.RenameQueryScriptDialog;
 import com.changhong.opendb.app.ui.navigator.VDBNode;
@@ -95,7 +95,7 @@ public class VDBQueryNode extends VDBNode
         {
                 scriptFile.delete();
                 database.queryItem.getChildren().remove(this);
-                EventBus.publish(new RemoveSqlEditorTabEvent(scriptFile));
+                EventBus.publish(new RemoveScriptEditorTabEvent(scriptFile));
                 EventBus.publish(new RefreshQueryNodeEvent());
         }
 
