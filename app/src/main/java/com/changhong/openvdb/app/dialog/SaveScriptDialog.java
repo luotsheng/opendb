@@ -1,8 +1,8 @@
 package com.changhong.openvdb.app.dialog;
 
 import com.changhong.openvdb.app.Application;
-import com.changhong.openvdb.app.navigator.node.VDBConnectionNode;
-import com.changhong.openvdb.app.navigator.node.VDBDatabaseNode;
+import com.changhong.openvdb.app.navigator.node.UIConnectionNode;
+import com.changhong.openvdb.app.navigator.node.UIDatabaseNode;
 import com.changhong.openvdb.app.pane.BrowserPane;
 import com.changhong.openvdb.app.workbench.ScriptEditor;
 import javafx.geometry.Insets;
@@ -27,8 +27,8 @@ public class SaveScriptDialog extends BrowserPane
         private final Stage stage;
         private final ScriptEditor scriptEditor;
         private final TextField textField;
-        private final VFXComboBox<VDBConnectionNode> connectionComboBox;
-        private final VFXComboBox<VDBDatabaseNode> databaseComboBox;
+        private final VFXComboBox<UIConnectionNode> connectionComboBox;
+        private final VFXComboBox<UIDatabaseNode> databaseComboBox;
 
         private boolean isOk = false;
 

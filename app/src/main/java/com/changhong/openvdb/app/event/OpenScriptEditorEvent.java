@@ -1,7 +1,7 @@
 package com.changhong.openvdb.app.event;
 
 import com.changhong.openvdb.app.event.bus.Event;
-import com.changhong.openvdb.app.navigator.node.VDBConnectionNode;
+import com.changhong.openvdb.app.navigator.node.UIConnectionNode;
 import com.changhong.openvdb.core.model.ScriptFile;
 
 /**
@@ -10,10 +10,10 @@ import com.changhong.openvdb.core.model.ScriptFile;
  */
 public class OpenScriptEditorEvent extends Event
 {
-        public final VDBConnectionNode connection;
+        public final UIConnectionNode connection;
         public final ScriptFile scriptFile;
 
-        public OpenScriptEditorEvent(VDBConnectionNode connection)
+        public OpenScriptEditorEvent(UIConnectionNode connection)
         {
                 this(connection, null);
         }
@@ -23,7 +23,7 @@ public class OpenScriptEditorEvent extends Event
                 this(null, scriptFile);
         }
 
-        public OpenScriptEditorEvent(VDBConnectionNode connection, ScriptFile scriptFile)
+        public OpenScriptEditorEvent(UIConnectionNode connection, ScriptFile scriptFile)
         {
                 this.connection = connection;
                 this.scriptFile = scriptFile;

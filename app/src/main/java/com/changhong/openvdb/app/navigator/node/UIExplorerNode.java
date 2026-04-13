@@ -1,4 +1,4 @@
-package com.changhong.openvdb.app.navigator;
+package com.changhong.openvdb.app.navigator.node;
 
 import com.changhong.openvdb.app.assets.Assets;
 import javafx.scene.Node;
@@ -13,7 +13,7 @@ import lombok.Setter;
  * @since 2026/3/25
  */
 
-public abstract class VDBNode extends TreeItem<String>
+public abstract class UIExplorerNode extends TreeItem<String>
 {
         /**
          *  节点名称
@@ -39,7 +39,7 @@ public abstract class VDBNode extends TreeItem<String>
 
         public interface SelectedEvent
         {
-                void call(VDBNode node);
+                void call(UIExplorerNode node);
         }
 
         @Setter
@@ -47,7 +47,7 @@ public abstract class VDBNode extends TreeItem<String>
         @Setter
         private SelectedEvent selectedEvent;
 
-        public VDBNode(String name)
+        public UIExplorerNode(String name)
         {
                 super(name);
                 this.name = name;
@@ -96,7 +96,7 @@ public abstract class VDBNode extends TreeItem<String>
         /**
          * 触发节点选中事件
          */
-        public void onSelectedEvent(VDBNode node)
+        public void onSelectedEvent(UIExplorerNode node)
         {
                 if (selectedEvent != null)
                         selectedEvent.call(node);

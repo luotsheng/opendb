@@ -1,6 +1,6 @@
 package com.changhong.openvdb.app.model;
 
-import com.changhong.openvdb.app.navigator.node.VDBConnectionNode;
+import com.changhong.openvdb.app.navigator.node.UIConnectionNode;
 import lombok.Getter;
 
 import java.util.List;
@@ -17,9 +17,9 @@ public class VDBNodeStatus
 {
         private static VDBNodeStatus status = null;
 
-        private final List<VDBConnectionNode> connections = new CopyOnWriteArrayList<>();
+        private final List<UIConnectionNode> connections = new CopyOnWriteArrayList<>();
 
-        private VDBConnectionNode selectedConnection;
+        private UIConnectionNode selectedConnection;
 
         public static synchronized VDBNodeStatus getInstance()
         {
@@ -29,17 +29,17 @@ public class VDBNodeStatus
                 return status;
         }
 
-        public void addConnection(VDBConnectionNode connection)
+        public void addConnection(UIConnectionNode connection)
         {
                 connections.add(connection);
         }
 
-        public void removeConnection(VDBConnectionNode connection)
+        public void removeConnection(UIConnectionNode connection)
         {
                 connections.remove(connection);
         }
 
-        public void selectedConnection(VDBConnectionNode connection)
+        public void selectedConnection(UIConnectionNode connection)
         {
                 selectedConnection = connection;
         }

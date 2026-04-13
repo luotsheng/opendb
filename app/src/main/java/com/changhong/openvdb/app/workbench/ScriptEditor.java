@@ -10,8 +10,8 @@ import com.changhong.openvdb.driver.api.sql.SQL;
 import com.changhong.openvdb.app.model.VDBNodeStatus;
 import com.changhong.openvdb.app.assets.Assets;
 import com.changhong.openvdb.app.dialog.SaveScriptDialog;
-import com.changhong.openvdb.app.navigator.node.VDBConnectionNode;
-import com.changhong.openvdb.app.navigator.node.VDBDatabaseNode;
+import com.changhong.openvdb.app.navigator.node.UIConnectionNode;
+import com.changhong.openvdb.app.navigator.node.UIDatabaseNode;
 import com.changhong.openvdb.app.pane.DataGridViewPane;
 import com.changhong.openvdb.app.pane.SqlMessagePane;
 import com.changhong.openvdb.app.widgets.VFXCodeArea;
@@ -74,8 +74,8 @@ public class ScriptEditor extends SplitPane
         private Driver driver = null;
         private long currentTaskId = System.currentTimeMillis();
         private boolean saveFlag = true;
-        private VFXComboBox<VDBConnectionNode> connectionComboBox;
-        private VFXComboBox<VDBDatabaseNode> databaseComboBox;
+        private VFXComboBox<UIConnectionNode> connectionComboBox;
+        private VFXComboBox<UIDatabaseNode> databaseComboBox;
 
         private static int numberCount = 0;
 
@@ -83,7 +83,7 @@ public class ScriptEditor extends SplitPane
         private Button stop;
         private Button beautify;
 
-        public ScriptEditor(VDBConnectionNode conn,
+        public ScriptEditor(UIConnectionNode conn,
                             ScriptFile scriptFile,
                             Tab ownerTab)
         {
@@ -134,10 +134,10 @@ public class ScriptEditor extends SplitPane
                 });
         }
 
-        private void setupToolbar(VDBConnectionNode initConnection)
+        private void setupToolbar(UIConnectionNode initConnection)
         {
                 VDBNodeStatus instance = VDBNodeStatus.getInstance();
-                VDBConnectionNode selectedConnection = initConnection != null
+                UIConnectionNode selectedConnection = initConnection != null
                         ? initConnection
                         : instance.getSelectedConnection();
 
@@ -204,9 +204,9 @@ public class ScriptEditor extends SplitPane
                         getItems().remove(dataGridViewPane));
         }
 
-        private VFXComboBox<VDBConnectionNode> newConnectionComboBox()
+        private VFXComboBox<UIConnectionNode> newConnectionComboBox()
         {
-                VFXComboBox<VDBConnectionNode> connection = new VFXComboBox<>();
+                VFXComboBox<UIConnectionNode> connection = new VFXComboBox<>();
                 configureConnectionComboBox(connection);
                 connection.setPrefWidth(200);
 
@@ -219,9 +219,9 @@ public class ScriptEditor extends SplitPane
                 return connection;
         }
 
-        private VFXComboBox<VDBDatabaseNode> newDatabaseComboBox()
+        private VFXComboBox<UIDatabaseNode> newDatabaseComboBox()
         {
-                VFXComboBox<VDBDatabaseNode> database = new VFXComboBox<>();
+                VFXComboBox<UIDatabaseNode> database = new VFXComboBox<>();
                 configureDatabaseComboBox(database);
                 database.setPrefWidth(200);
 
@@ -233,12 +233,12 @@ public class ScriptEditor extends SplitPane
                 return database;
         }
 
-        private void configureConnectionComboBox(VFXComboBox<VDBConnectionNode> comboBox)
+        private void configureConnectionComboBox(VFXComboBox<UIConnectionNode> comboBox)
         {
                 comboBox.setButtonCell(new ListCell<>()
                 {
                         @Override
-                        protected void updateItem(VDBConnectionNode item, boolean empty)
+                        protected void updateItem(UIConnectionNode item, boolean empty)
                         {
                                 super.updateItem(item, empty);
 
@@ -253,7 +253,7 @@ public class ScriptEditor extends SplitPane
                 comboBox.setCellFactory(list -> new ListCell<>()
                 {
                         @Override
-                        protected void updateItem(VDBConnectionNode item, boolean empty)
+                        protected void updateItem(UIConnectionNode item, boolean empty)
                         {
                                 super.updateItem(item, empty);
 
@@ -268,25 +268,25 @@ public class ScriptEditor extends SplitPane
                 comboBox.setConverter(new StringConverter<>()
                 {
                         @Override
-                        public String toString(VDBConnectionNode connection)
+                        public String toString(UIConnectionNode connection)
                         {
                                 return connection == null ? null : connection.getName();
                         }
 
                         @Override
-                        public VDBConnectionNode fromString(String s)
+                        public UIConnectionNode fromString(String s)
                         {
                                 return null;
                         }
                 });
         }
 
-        private void configureDatabaseComboBox(VFXComboBox<VDBDatabaseNode> comboBox)
+        private void configureDatabaseComboBox(VFXComboBox<UIDatabaseNode> comboBox)
         {
                 comboBox.setButtonCell(new ListCell<>()
                 {
                         @Override
-                        protected void updateItem(VDBDatabaseNode item, boolean empty)
+                        protected void updateItem(UIDatabaseNode item, boolean empty)
                         {
                                 super.updateItem(item, empty);
 
@@ -301,7 +301,7 @@ public class ScriptEditor extends SplitPane
                 comboBox.setCellFactory(list -> new ListCell<>()
                 {
                         @Override
-                        protected void updateItem(VDBDatabaseNode item, boolean empty)
+                        protected void updateItem(UIDatabaseNode item, boolean empty)
                         {
                                 super.updateItem(item, empty);
 
@@ -316,13 +316,13 @@ public class ScriptEditor extends SplitPane
                 comboBox.setConverter(new StringConverter<>()
                 {
                         @Override
-                        public String toString(VDBDatabaseNode database)
+                        public String toString(UIDatabaseNode database)
                         {
                                 return database == null ? null : database.getName();
                         }
 
                         @Override
-                        public VDBDatabaseNode fromString(String s)
+                        public UIDatabaseNode fromString(String s)
                         {
                                 return null;
                         }
@@ -380,10 +380,10 @@ public class ScriptEditor extends SplitPane
                                 if (scriptText == null || scriptText.isEmpty())
                                         scriptText = codeArea.getText();
 
-                                VDBConnectionNode connection = connectionComboBox.getSelectionModel()
+                                UIConnectionNode connection = connectionComboBox.getSelectionModel()
                                         .getSelectedItem();
 
-                                VDBDatabaseNode database = databaseComboBox.getSelectionModel()
+                                UIDatabaseNode database = databaseComboBox.getSelectionModel()
                                         .getSelectedItem();
 
                                 driver = connection.getDriver();
@@ -440,16 +440,16 @@ public class ScriptEditor extends SplitPane
                 return codeArea.getText();
         }
 
-        public VFXComboBox<VDBConnectionNode> copyConnectionComboBox()
+        public VFXComboBox<UIConnectionNode> copyConnectionComboBox()
         {
-                VFXComboBox<VDBConnectionNode> dst = connectionComboBox.copyComboBox();
+                VFXComboBox<UIConnectionNode> dst = connectionComboBox.copyComboBox();
                 configureConnectionComboBox(dst);
                 return dst;
         }
 
-        public VFXComboBox<VDBDatabaseNode> copyDatabaseComboBox()
+        public VFXComboBox<UIDatabaseNode> copyDatabaseComboBox()
         {
-                VFXComboBox<VDBDatabaseNode> dst = databaseComboBox.copyComboBox();
+                VFXComboBox<UIDatabaseNode> dst = databaseComboBox.copyComboBox();
                 configureDatabaseComboBox(dst);
                 return dst;
         }
@@ -478,7 +478,7 @@ public class ScriptEditor extends SplitPane
 
         private void setOwnerTabName(String name)
         {
-                VDBDatabaseNode database = null;
+                UIDatabaseNode database = null;
 
                 if (databaseComboBox != null)
                         database = databaseComboBox.getSelectionModel().getSelectedItem();
@@ -504,10 +504,10 @@ public class ScriptEditor extends SplitPane
                         if (saveScriptName == null)
                                 return;
 
-                        VDBConnectionNode connection = connectionComboBox.getSelectionModel()
+                        UIConnectionNode connection = connectionComboBox.getSelectionModel()
                                 .getSelectedItem();
 
-                        VDBDatabaseNode database = databaseComboBox.getSelectionModel()
+                        UIDatabaseNode database = databaseComboBox.getSelectionModel()
                                 .getSelectedItem();
 
                         ScriptFile newScriptFile = ScriptFileRepository.save(

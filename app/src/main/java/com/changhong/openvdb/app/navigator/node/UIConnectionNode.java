@@ -3,7 +3,6 @@ package com.changhong.openvdb.app.navigator.node;
 import com.changhong.openvdb.app.dialog.connection.CreateOrEditConnectionDialog;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
 import com.changhong.openvdb.app.model.VDBNodeStatus;
-import com.changhong.openvdb.app.navigator.VDBNode;
 import com.changhong.openvdb.app.assets.Assets;
 import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
 import com.changhong.openvdb.driver.api.*;
@@ -26,7 +25,7 @@ import java.util.List;
  * @since 2026/3/25
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class VDBConnectionNode extends VDBNode
+public class UIConnectionNode extends UIExplorerNode
 {
         @Getter
         private final ConnectionPropertyModel propertyModel;
@@ -42,13 +41,13 @@ public class VDBConnectionNode extends VDBNode
         private MenuItem editMenuItem;
 
         @Getter
-        private final List<VDBDatabaseNode> databases = new ArrayList<>();
+        private final List<UIDatabaseNode> databases = new ArrayList<>();
 
         @Setter
         @Getter
-        private VDBDatabaseNode selectedDatabase;
+        private UIDatabaseNode selectedDatabase;
 
-        public VDBConnectionNode(ConnectionPropertyModel propertyModel)
+        public UIConnectionNode(ConnectionPropertyModel propertyModel)
         {
                 super(propertyModel.getName());
 
@@ -102,7 +101,7 @@ public class VDBConnectionNode extends VDBNode
                 setExpanded(false);
 
                 getChildren().forEach(db -> {
-                        if (db instanceof VDBDatabaseNode vdb)
+                        if (db instanceof UIDatabaseNode vdb)
                                 vdb.closeDatabase();
                 });
 
@@ -160,7 +159,7 @@ public class VDBConnectionNode extends VDBNode
         }
 
         @Override
-        public void onSelectedEvent(VDBNode node)
+        public void onSelectedEvent(UIExplorerNode node)
         {
                 VDBNodeStatus.getInstance().selectedConnection(this);
         }
@@ -173,7 +172,7 @@ public class VDBConnectionNode extends VDBNode
         private void setupDatabases(List<String> databaseNames)
         {
                 for (String name : databaseNames)
-                        databases.add(new VDBDatabaseNode(this, driver, name));
+                        databases.add(new UIDatabaseNode(this, driver, name));
                 getChildren().addAll(databases);
         }
 

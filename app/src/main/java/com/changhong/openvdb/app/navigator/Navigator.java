@@ -2,6 +2,7 @@ package com.changhong.openvdb.app.navigator;
 
 import com.changhong.openvdb.app.model.VDBNodeStatus;
 import com.changhong.openvdb.app.menu.ConnectionMenuBuilder;
+import com.changhong.openvdb.app.navigator.node.UIExplorerNode;
 import com.changhong.openvdb.core.model.ConnectionProfile;
 import com.changhong.openvdb.core.repository.ConnectionRepository;
 import com.changhong.openvdb.app.event.bus.Event;
@@ -9,7 +10,7 @@ import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.bus.EventListener;
 import com.changhong.openvdb.app.event.RefreshConnectionEvent;
 import com.changhong.openvdb.app.assets.Assets;
-import com.changhong.openvdb.app.navigator.node.VDBConnectionNode;
+import com.changhong.openvdb.app.navigator.node.UIConnectionNode;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -36,7 +37,7 @@ public class Navigator extends VBox implements EventListener
         private final TreeView<String> treeView;
         private final ContextMenu rootContextMenu;
 
-        private final Map<String, VDBConnectionNode> connections
+        private final Map<String, UIConnectionNode> connections
                 = new HashMap<>();
 
         public Navigator()
@@ -138,7 +139,7 @@ public class Navigator extends VBox implements EventListener
                                         return;
                                 }
 
-                                if (item instanceof VDBNode vdbNode) {
+                                if (item instanceof UIExplorerNode vdbNode) {
                                         vdbNode.showContextMenu(cell, x, y);
                                         return;
                                 }
@@ -154,7 +155,7 @@ public class Navigator extends VBox implements EventListener
                         .addListener((observable, oldVal, newVal) -> {
                                 TreeItem<String> treeItem = treeView.getTreeItem(newVal.intValue());
 
-                                if (treeItem instanceof VDBNode vdbNode) {
+                                if (treeItem instanceof UIExplorerNode vdbNode) {
                                         vdbNode.onSelectedEvent(vdbNode);
                                 }
 
@@ -173,7 +174,7 @@ public class Navigator extends VBox implements EventListener
                                 if (node instanceof TreeCell<?> cell) {
                                         TreeItem<?> item = cell.getTreeItem();
 
-                                        if (!(item instanceof VDBNode vdbNode))
+                                        if (!(item instanceof UIExplorerNode vdbNode))
                                                 return;
 
                                         vdbNode.onMouseDoubleClickEvent(event);
@@ -198,7 +199,7 @@ public class Navigator extends VBox implements EventListener
 
         private void refreshConnectionNode()
         {
-                List<VDBConnectionNode> removeList = new ArrayList<>();
+                List<UIConnectionNode> removeList = new ArrayList<>();
                 List<ConnectionProfile> profiles = ConnectionRepository.loadConnections();
 
                 connections.forEach((k, v) -> {
@@ -212,7 +213,7 @@ public class Navigator extends VBox implements EventListener
                 ObservableList<TreeItem<String>> children = treeView.getRoot().getChildren();
 
                 if (!removeList.isEmpty()) {
-                        for (VDBConnectionNode connection : removeList) {
+                        for (UIConnectionNode connection : removeList) {
                                 children.remove(connection);
                                 connections.remove(connection.getName());
                         }
@@ -224,7 +225,7 @@ public class Navigator extends VBox implements EventListener
 
                         ConnectionPropertyModel propertyModel = new ConnectionPropertyModel(profile);
 
-                        VDBConnectionNode connection = new VDBConnectionNode(propertyModel);
+                        UIConnectionNode connection = new UIConnectionNode(propertyModel);
                         VDBNodeStatus.getInstance().addConnection(connection);
                         connections.put(profile.getName(), connection);
                         children.add(connection);

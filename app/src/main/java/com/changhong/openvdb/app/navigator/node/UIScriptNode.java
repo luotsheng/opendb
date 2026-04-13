@@ -7,7 +7,6 @@ import com.changhong.openvdb.app.event.RefreshQueryNodeEvent;
 import com.changhong.openvdb.app.event.RemoveScriptEditorTabEvent;
 import com.changhong.openvdb.app.assets.Assets;
 import com.changhong.openvdb.app.dialog.RenameScriptDialog;
-import com.changhong.openvdb.app.navigator.VDBNode;
 import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
 import com.changhong.openvdb.core.model.ScriptFile;
 import javafx.scene.control.ContextMenu;
@@ -22,12 +21,12 @@ import java.awt.*;
  * @since 2026/3/25
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class VDBQueryNode extends VDBNode
+public class UIScriptNode extends UIExplorerNode
 {
         private final ScriptFile scriptFile;
-        private final VDBDatabaseNode database;
+        private final UIDatabaseNode database;
 
-        public VDBQueryNode(VDBDatabaseNode database, ScriptFile scriptFile)
+        public UIScriptNode(UIDatabaseNode database, ScriptFile scriptFile)
         {
                 super(scriptFile.getName());
                 this.database = database;
@@ -100,7 +99,7 @@ public class VDBQueryNode extends VDBNode
         }
 
         @Override
-        public void onSelectedEvent(VDBNode node)
+        public void onSelectedEvent(UIExplorerNode node)
         {
                 database.getConnection().setSelectedDatabase(database);
         }

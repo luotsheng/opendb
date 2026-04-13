@@ -6,7 +6,7 @@ import com.changhong.openvdb.driver.api.Table;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.OpenDataGridPaneEvent;
 import com.changhong.openvdb.app.assets.Assets;
-import com.changhong.openvdb.app.navigator.node.VDBDatabaseNode;
+import com.changhong.openvdb.app.navigator.node.UIDatabaseNode;
 import com.changhong.openvdb.app.widgets.table.VFXTableColumn;
 import com.changhong.openvdb.app.widgets.table.VFXTableView;
 import com.changhong.openvdb.app.widgets.table.cell.VFXDateTableCell;
@@ -36,7 +36,7 @@ public class CatalogBrowserPane extends BrowserPane
         private final TableView<Table> tableView;
         private final ToolBar toolBar;
 
-        private final VDBDatabaseNode database;
+        private final UIDatabaseNode database;
 
         private TableColumn<Table, String> name;
         private TableColumn<Table, Date> createTime;
@@ -48,7 +48,7 @@ public class CatalogBrowserPane extends BrowserPane
 
         private ObservableList<Table> obs;
 
-        public CatalogBrowserPane(VDBDatabaseNode database)
+        public CatalogBrowserPane(UIDatabaseNode database)
         {
                 this.database = database;
 

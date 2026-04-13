@@ -8,7 +8,6 @@ import com.changhong.openvdb.driver.api.Driver;
 import com.changhong.openvdb.driver.api.Session;
 import com.changhong.openvdb.driver.api.Table;
 import com.changhong.openvdb.app.assets.Assets;
-import com.changhong.openvdb.app.navigator.VDBNode;
 import com.changhong.openvdb.app.pane.CatalogBrowserPane;
 import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
 import com.changhong.openvdb.core.model.ScriptFile;
@@ -33,10 +32,10 @@ import java.util.List;
 @SuppressWarnings({
         "FieldCanBeLocal"
 })
-public class VDBDatabaseNode extends VDBNode implements EventListener
+public class UIDatabaseNode extends UIExplorerNode implements EventListener
 {
         @Getter
-        private final VDBConnectionNode connection;
+        private final UIConnectionNode connection;
         @Getter
         private final Driver driver;
         private boolean openFlag = false;
@@ -61,11 +60,11 @@ public class VDBDatabaseNode extends VDBNode implements EventListener
         /**
          * 内部通用节点
          */
-        public static class VDBInternalNode extends VDBNode
+        public static class VDBInternalNode extends UIExplorerNode
         {
-                private final VDBDatabaseNode parent;
+                private final UIDatabaseNode parent;
 
-                public VDBInternalNode(VDBDatabaseNode parent, String name, ImageView icon)
+                public VDBInternalNode(UIDatabaseNode parent, String name, ImageView icon)
                 {
                         super(name);
                         setGraphic(icon);
@@ -73,15 +72,15 @@ public class VDBDatabaseNode extends VDBNode implements EventListener
                 }
 
                 @Override
-                public void onSelectedEvent(VDBNode node)
+                public void onSelectedEvent(UIExplorerNode node)
                 {
                         parent.onSelectedEvent(node);
                 }
         }
 
-        public VDBDatabaseNode(VDBConnectionNode connection,
-                               Driver driver,
-                               String databaseName)
+        public UIDatabaseNode(UIConnectionNode connection,
+                              Driver driver,
+                              String databaseName)
         {
                 super(databaseName);
                 this.connection = connection;
@@ -98,7 +97,7 @@ public class VDBDatabaseNode extends VDBNode implements EventListener
 
         private void setupTableNode()
         {
-                var node = (VDBNode) tableItem;
+                var node = (UIExplorerNode) tableItem;
 
                 ContextMenu nodeContextMenu = new ContextMenu();
 
@@ -170,7 +169,7 @@ public class VDBDatabaseNode extends VDBNode implements EventListener
                 tableItem.getChildren().clear();
 
                 for (Table table : tables) {
-                        VDBTableNode tableNode = new VDBTableNode(driver, this, table);
+                        UITableNode tableNode = new UITableNode(driver, this, table);
                         tableNode.setSelectedEvent(this::onSelected);
                         tableItem.getChildren().add(tableNode);
                 }
@@ -182,10 +181,10 @@ public class VDBDatabaseNode extends VDBNode implements EventListener
         {
                 queryItem.getChildren().clear();
                 List<ScriptFile> scriptFiles = ScriptFileRepository.loadScriptFiles(connection.getName(), getName(), null);
-                scriptFiles.forEach(query -> queryItem.getChildren().add(new VDBQueryNode(this, query)));
+                scriptFiles.forEach(query -> queryItem.getChildren().add(new UIScriptNode(this, query)));
         }
 
-        public void onSelected(VDBNode node)
+        public void onSelected(UIExplorerNode node)
         {
                 if (openFlag && node == tableItem)
                         EventBus.publish(openWorkbenchPaneEvent);
