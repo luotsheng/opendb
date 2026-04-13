@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.changhong.opensource</groupId>
+        <groupId>com.changhong.openvdb</groupId>
         <artifactId>openvdb</artifactId>
-        <version>${revision}</version>
+        <version>v1.0.0-arch.1</version>
     </parent>
 
     <artifactId>app</artifactId>
@@ -21,9 +21,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.changhong.opensource</groupId>
+                <groupId>com.changhong.openvdb</groupId>
                 <artifactId>utils</artifactId>
-                <version>${revision}</version>
+                <version>v1.0.0-arch.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -88,7 +88,7 @@
             <version>${sqlformat.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.changhong.opensource</groupId>
+            <groupId>com.changhong.openvdb</groupId>
             <artifactId>utils</artifactId>
         </dependency>
     </dependencies>
