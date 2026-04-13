@@ -36,6 +36,9 @@ public class UIConnectionNode extends UIExplorerNode
         @Getter
         private Driver driver;
 
+        @Getter
+        private DriverType driverType;
+
         // Menu Items
         private MenuItem openOrCloseMenuItem;
         private MenuItem editMenuItem;
@@ -51,7 +54,9 @@ public class UIConnectionNode extends UIExplorerNode
         {
                 super(propertyModel.getName());
 
-                ImageView graphic = switch (DriverType.toDriverType(propertyModel.getType())) {
+                this.driverType = DriverType.toDriverType(propertyModel.getType());
+
+                ImageView graphic = switch (this.driverType) {
                         case MYSQL -> Assets.use("mysql");
                         case DM -> Assets.use("dm2");
                 };

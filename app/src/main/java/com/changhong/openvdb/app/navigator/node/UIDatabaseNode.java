@@ -85,7 +85,12 @@ public class UIDatabaseNode extends UIExplorerNode implements EventListener
                 super(databaseName);
                 this.connection = connection;
                 setGraphic(Assets.use("database1"));
-                this.session = Session.ofCatalog(databaseName);
+
+                this.session = switch (connection.getDriverType()) {
+                        case MYSQL -> Session.ofCatalog(databaseName);
+                        case DM -> Session.ofSchema(databaseName);
+                };
+
                 this.driver = driver;
 
                 setupTableNode();
