@@ -105,6 +105,12 @@ public class VFXCodeArea extends CodeArea
         }
 
         @Override
+        public void copy()
+        {
+                VFXApplication.copyToClipboard(getSelectedText());
+        }
+
+        @Override
         public void paste()
         {
                 String text = VFXApplication.getClipboardText();
@@ -113,6 +119,13 @@ public class VFXCodeArea extends CodeArea
                         return;
 
                 replaceSelection(text.replaceAll("\t", "  "));
+                applyHighlightAll();
+        }
+
+        @Override
+        public void undo()
+        {
+                super.undo();
                 applyHighlightAll();
         }
 
@@ -148,6 +161,8 @@ public class VFXCodeArea extends CodeArea
                                 setStyleClass(matcher.start(), matcher.end(), styleClass);
                         }
                 }
+
+                highlightingListeners.forEach(listener -> listener.apply(this));
         }
 
         private void applyHighlightingCurrentLine() {
@@ -172,6 +187,8 @@ public class VFXCodeArea extends CodeArea
                                 setStyleClass(start, end, styleClass);
                         }
                 }
+
+                highlightingListeners.forEach(listener -> listener.apply(this));
         }
 
         private static String getHighlightStyleClass(Matcher matcher)
