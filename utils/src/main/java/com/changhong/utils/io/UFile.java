@@ -55,7 +55,7 @@ import java.util.Properties;
  * @since 1.0
  * @author Luo Tiansheng
  */
-public class MutableFile extends java.io.File {
+public class UFile extends java.io.File {
 
     /**
      * 空的 <code>File</code> 数组对象
@@ -105,7 +105,7 @@ public class MutableFile extends java.io.File {
      * @throws  NullPointerException
      *          If the <code>pathname</code> argument is <code>null</code>
      */
-    public MutableFile(String pathname) {
+    public UFile(String pathname) {
         super(quickAccessPath(pathname));
     }
 
@@ -134,7 +134,7 @@ public class MutableFile extends java.io.File {
      * @throws  NullPointerException
      *          If <code>child</code> is <code>null</code>
      */
-    public MutableFile(String parent, String child) {
+    public UFile(String parent, String child) {
         super(parent, child);
     }
 
@@ -163,7 +163,7 @@ public class MutableFile extends java.io.File {
      * @throws  NullPointerException
      *          If <code>child</code> is <code>null</code>
      */
-    public MutableFile(java.io.File parent, String child) {
+    public UFile(java.io.File parent, String child) {
         super(parent, child);
     }
 
@@ -203,17 +203,17 @@ public class MutableFile extends java.io.File {
      * @see URI
      * @since 1.4
      */
-    public MutableFile(URI uri) {
+    public UFile(URI uri) {
         super(uri);
     }
 
     /**
-     * 通过一个 {@link java.io.File} 对象来构建一个 {@link MutableFile} 对象实例，并且参数 File
+     * 通过一个 {@link java.io.File} 对象来构建一个 {@link UFile} 对象实例，并且参数 File
      * 不能是空的。
      *
      * @param file java.io 下的 File 对象实例
      */
-    public MutableFile(java.io.File file) {
+    public UFile(java.io.File file) {
         this(file.getPath());
     }
 
@@ -225,8 +225,8 @@ public class MutableFile extends java.io.File {
      * @param pathname 要包装的文件路径名字符串。
      * @return 一个新的 `File` 对象，包装了传入的文件路径名字符串。
      */
-    public static MutableFile wrap(String pathname) {
-        return new MutableFile(pathname);
+    public static UFile wrap(String pathname) {
+        return new UFile(pathname);
     }
 
     /**
@@ -237,8 +237,8 @@ public class MutableFile extends java.io.File {
      * @param file 要包装的 `java.io.File` 对象。
      * @return 一个新的 `File` 对象，包装了传入的 `java.io.File` 对象。
      */
-    public static MutableFile wrap(java.io.File file) {
-        return new MutableFile(file);
+    public static UFile wrap(java.io.File file) {
+        return new UFile(file);
     }
 
     /**
@@ -258,7 +258,7 @@ public class MutableFile extends java.io.File {
      * @since 1.2
      */
     @Override
-    public MutableFile getParentFile() {
+    public UFile getParentFile() {
         java.io.File parentFile = super.getParentFile();
         return parentFile != null ? wrap(parentFile) : null;
     }
@@ -272,7 +272,7 @@ public class MutableFile extends java.io.File {
      * is returned, one for each file or directory in the directory.  Pathnames
      * denoting the directory itself and the directory's parent directory are
      * not included in the result.  Each resulting abstract pathname is
-     * constructed from this abstract pathname using the {@link #MutableFile(java.io.File,
+     * constructed from this abstract pathname using the {@link #UFile(java.io.File,
      * String) File(File,&nbsp;String)} constructor.  Therefore if this
      * pathname is absolute then each resulting pathname is absolute; if this
      * pathname is relative then each resulting pathname will be relative to
@@ -297,9 +297,9 @@ public class MutableFile extends java.io.File {
      * @since  1.2
      */
     @Override
-    public MutableFile[] listFiles() {
-        List<MutableFile> list = Lists.map(super.listFiles(), MutableFile::wrap);
-        MutableFile[] fs = new MutableFile[list.size()];
+    public UFile[] listFiles() {
+        List<UFile> list = Lists.map(super.listFiles(), UFile::wrap);
+        UFile[] fs = new UFile[list.size()];
         list.toArray(fs);
         return fs;
     }
@@ -350,9 +350,9 @@ public class MutableFile extends java.io.File {
         return StaticLibrary.strcut(getName(), index, 0);
     }
 
-    private boolean forceDeleteDirectory(MutableFile dir) {
-        List<MutableFile> children = Lists.map(dir.listFiles(), MutableFile::new);
-        for (MutableFile child : children) {
+    private boolean forceDeleteDirectory(UFile dir) {
+        List<UFile> children = Lists.map(dir.listFiles(), UFile::new);
+        for (UFile child : children) {
             if (child.isFile()) {
                 child.forceDeleteFile();
             } else {

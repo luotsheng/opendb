@@ -116,7 +116,7 @@ public class IOUtils {
      */
     public static byte[] read(File file) {
         Assert.isTrue(file != null && file.isFile(), "文件不能为空且不能是目录！");
-        return read(new MutableFile(file).openByteReader());
+        return read(new UFile(file).openByteReader());
     }
 
     /**
@@ -220,7 +220,7 @@ public class IOUtils {
      * @return 从文件描述符中读取到的字符串文本
      */
     public static String strread(String filepath) {
-        return strread(new MutableFile(filepath));
+        return strread(new UFile(filepath));
     }
 
     /**
@@ -266,9 +266,9 @@ public class IOUtils {
      *        输入流
      *
      * @param mutableFile
-     *        {@link MutableFile} 文件对象实例（如果文件不存在，则会创建）
+     *        {@link UFile} 文件对象实例（如果文件不存在，则会创建）
      */
-    public static void write(InputStream input, MutableFile mutableFile) {
+    public static void write(InputStream input, UFile mutableFile) {
         FileByteWriter writer = null;
         try {
             writer = mutableFile.openByteWriter();
@@ -291,9 +291,9 @@ public class IOUtils {
      *        字符串
      *
      * @param mutableFile
-     *        {@link MutableFile} 文件对象实例（如果文件不存在，则会创建）
+     *        {@link UFile} 文件对象实例（如果文件不存在，则会创建）
      */
-    public static void write(String input, MutableFile mutableFile) {
+    public static void write(String input, UFile mutableFile) {
         write(input.getBytes(), mutableFile);
     }
 
@@ -309,7 +309,7 @@ public class IOUtils {
      * @param mutableFile
      *        指定输出流
      */
-    public static void write(byte[] b, MutableFile mutableFile) {
+    public static void write(byte[] b, UFile mutableFile) {
         FileByteWriter writer = null;
         try {
             writer = mutableFile.openByteWriterDisabled();

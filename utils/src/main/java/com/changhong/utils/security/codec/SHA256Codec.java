@@ -1,7 +1,7 @@
 package com.changhong.utils.security.codec;
 
 import com.changhong.utils.io.IOUtils;
-import com.changhong.utils.io.MutableFile;
+import com.changhong.utils.io.UFile;
 import com.changhong.utils.Captor;
 import com.changhong.utils.exception.SystemRuntimeException;
 import com.changhong.utils.security.Codec;
@@ -25,7 +25,7 @@ public class SHA256Codec implements SHA256 {
     @SuppressWarnings("resource")
     public String encode(File f0) {
         return Captor.icall(() -> {
-            MutableFile mutableFile = new MutableFile(f0);
+            UFile mutableFile = new UFile(f0);
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             mutableFile.openByteReader().call(reader -> {
                 int len = 0;

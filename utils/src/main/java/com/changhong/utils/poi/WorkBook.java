@@ -18,7 +18,7 @@ package com.changhong.utils.poi;
 |*                                                                                  *|
 \* -------------------------------------------------------------------------------- */
 
-import com.changhong.utils.io.MutableFile;
+import com.changhong.utils.io.UFile;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -98,7 +98,7 @@ public class WorkBook implements Iterable<Row> {
      * @param pathname Excel 文件的路径
      */
     private WorkBook(String pathname) {
-        this(new MutableFile(pathname));
+        this(new UFile(pathname));
     }
 
     /**
@@ -110,7 +110,7 @@ public class WorkBook implements Iterable<Row> {
      *
      * @param mutableFile Excel 文件对象
      */
-    private WorkBook(MutableFile mutableFile) {
+    private WorkBook(UFile mutableFile) {
         this(Captor.call(() -> new XSSFWorkbook(mutableFile)));
     }
 
@@ -195,7 +195,7 @@ public class WorkBook implements Iterable<Row> {
      * @return 加载的 Workbook 实例
      */
     public static WorkBook load(String pathname) {
-        return load(new MutableFile(pathname));
+        return load(new UFile(pathname));
     }
 
     /**
@@ -208,7 +208,7 @@ public class WorkBook implements Iterable<Row> {
      * @param mutableFile Excel 文件对象
      * @return 加载的 Workbook 实例
      */
-    public static WorkBook load(MutableFile mutableFile) {
+    public static WorkBook load(UFile mutableFile) {
         return new WorkBook(mutableFile);
     }
 
@@ -585,18 +585,18 @@ public class WorkBook implements Iterable<Row> {
      * @param pathname 目标文件的路径
      */
     public void transferTo(String pathname) {
-        transferTo(new MutableFile(pathname));
+        transferTo(new UFile(pathname));
     }
 
     /**
      * #brief: 将数据转移到指定的可变文件
      *
-     * <p>将当前数据写入到指定的 {@link MutableFile} 对象中。
+     * <p>将当前数据写入到指定的 {@link UFile} 对象中。
      * 通过文件对象的字节写入器将数据写入文件。
      *
      * @param file 目标可变文件对象
      */
-    public void transferTo(MutableFile file) {
+    public void transferTo(UFile file) {
         file.openByteWriter().call(writer -> writer.write(toByteArray()));
     }
 

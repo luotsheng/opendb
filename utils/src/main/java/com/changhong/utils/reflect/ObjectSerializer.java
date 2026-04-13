@@ -20,7 +20,7 @@ package com.changhong.utils.reflect;
 
 import com.changhong.utils.io.FileByteReader;
 import com.changhong.utils.io.FileByteWriter;
-import com.changhong.utils.io.MutableFile;
+import com.changhong.utils.io.UFile;
 import com.changhong.utils.exception.SerializationException;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ import java.io.ObjectOutputStream;
  * 或恢复对象状态。
  *
  * @author Luo Tiansheng
- * @see MutableFile
+ * @see UFile
  */
 public class ObjectSerializer {
 
@@ -50,7 +50,7 @@ public class ObjectSerializer {
      * @param object 要序列化的对象
      * @param mutableFile 要写入的文件
      */
-    public static void serialize(Object object, MutableFile mutableFile) {
+    public static void serialize(Object object, UFile mutableFile) {
         try (FileByteWriter fileByteWriter = mutableFile.openByteWriter();
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileByteWriter)) {
             objectOutputStream.writeObject(object);
@@ -69,7 +69,7 @@ public class ObjectSerializer {
      * @return 反序列化得到的对象
      * @throws SerializationException 如果反序列化失败
      */
-    public static Object deserialize(MutableFile mutableFile) {
+    public static Object deserialize(UFile mutableFile) {
         try (FileByteReader fileByteReader = mutableFile.openByteReader();
              ObjectInputStream objectInputStream = new ObjectInputStream(fileByteReader)) {
             return objectInputStream.readObject();

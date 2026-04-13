@@ -1,6 +1,6 @@
 package com.changhong.openvdb.core.model;
 
-import com.changhong.utils.io.MutableFile;
+import com.changhong.utils.io.UFile;
 
 import java.io.File;
 import java.net.URI;
@@ -11,7 +11,7 @@ import java.net.URI;
  * @author Luo Tiansheng
  * @since 2026/3/31
  */
-public class ScriptFile extends MutableFile
+public class ScriptFile extends UFile
 {
         public ScriptFile(File file)
         {

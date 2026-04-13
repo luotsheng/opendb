@@ -20,7 +20,7 @@ package com.changhong.utils.security.key;
 
 /* Creates on 2025/2/20. */
 
-import com.changhong.utils.io.MutableFile;
+import com.changhong.utils.io.UFile;
 import com.changhong.utils.Captor;
 
 import java.security.Key;
@@ -50,7 +50,7 @@ public class RSAPublicKey extends AbstractKey {
     }
 
     public static RSAPublicKey fromKeyFile(String filepath) {
-        MutableFile keyfile = new MutableFile(filepath);
+        UFile keyfile = new UFile(filepath);
         return fromPEMFormat(keyfile.strread());
     }
 
