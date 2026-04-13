@@ -194,7 +194,7 @@ public class VDBDatabaseNode extends VDBNode implements EventListener
 
         private void newQueryScript()
         {
-                EventBus.publish(new OpenQueryScriptEvent(connection));
+                EventBus.publish(new OpenScriptEditorEvent(connection));
         }
 
         public void setupListenerEvent()

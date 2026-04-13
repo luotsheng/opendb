@@ -6,9 +6,11 @@ import com.changhong.openvdb.app.event.bus.Event;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.bus.EventListener;
 import com.changhong.openvdb.app.resource.Assets;
+import com.changhong.openvdb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.openvdb.app.ui.pane.TableStructureDesignerPane;
 import com.changhong.openvdb.app.ui.pane.PreviewTableDataPane;
 import com.changhong.openvdb.app.ui.widgets.VFXTabPane;
+import com.changhong.openvdb.core.model.ScriptFile;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
@@ -57,7 +59,7 @@ public class Workbench extends VBox implements EventListener
                 // 订阅事件
                 EventBus.subscribe(OpenWorkbenchPaneEvent.class, this);
                 EventBus.subscribe(CloseWorkbenchPaneEvent.class, this);
-                EventBus.subscribe(OpenQueryScriptEvent.class, this);
+                EventBus.subscribe(OpenScriptEditorEvent.class, this);
                 EventBus.subscribe(OpenDataGridPaneEvent.class, this);
                 EventBus.subscribe(RemoveScriptEditorTabEvent.class, this);
                 EventBus.subscribe(OpenDesignTablePaneEvent.class, this);
@@ -145,7 +147,7 @@ public class Workbench extends VBox implements EventListener
                         case OpenWorkbenchPaneEvent e      -> handleOpenWorkbenchPaneEvent(e);
                         case CloseWorkbenchPaneEvent e     -> handleCloseWorkbenchPaneEvent(e);
                         case RemoveScriptEditorTabEvent e  -> handleRemoveScriptEditorTabEvent(e);
-                        case OpenQueryScriptEvent e        -> handleOpenQueryScriptEvent(e);
+                        case OpenScriptEditorEvent e       -> handleOpenScriptEditorEvent(e);
                         case OpenDataGridPaneEvent e       -> handleOpenDataGridPaneEvent(e);
                         case OpenDesignTablePaneEvent e    -> handleOpenDesignTablePaneEvent(e);
                         default -> {}
@@ -173,17 +175,16 @@ public class Workbench extends VBox implements EventListener
                 }
         }
 
-        private void handleOpenQueryScriptEvent(OpenQueryScriptEvent event)
+        private void handleOpenScriptEditorEvent(OpenScriptEditorEvent event)
         {
                 Tab queryTab = new Tab();
                 queryTab.setGraphic(Assets.use("sql"));
                 ScriptEditor scriptEditor;
 
-                if (event.scriptFile != null) {
-                        scriptEditor = new ScriptEditor(null, event.scriptFile, queryTab);
-                } else {
-                        scriptEditor = new ScriptEditor(null, null, queryTab);
-                }
+                VDBConnectionNode connection = event.connection;
+                ScriptFile scriptFile = event.scriptFile;
+
+                scriptEditor = new ScriptEditor(connection, scriptFile, queryTab);
 
                 queryTab.setContent(scriptEditor);
                 queryTab.setOnCloseRequest(e -> {

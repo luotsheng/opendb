@@ -1,8 +1,6 @@
 package com.changhong.openvdb.core.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.changhong.utils.io.MutableFile;
 
 import java.io.File;
 import java.net.URI;
@@ -13,7 +11,7 @@ import java.net.URI;
  * @author Luo Tiansheng
  * @since 2026/3/31
  */
-public class ScriptFile extends File
+public class ScriptFile extends MutableFile
 {
         public ScriptFile(File file)
         {

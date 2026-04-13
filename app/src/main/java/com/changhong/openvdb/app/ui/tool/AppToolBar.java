@@ -1,7 +1,7 @@
 package com.changhong.openvdb.app.ui.tool;
 
 import com.changhong.openvdb.app.event.bus.EventBus;
-import com.changhong.openvdb.app.event.OpenQueryScriptEvent;
+import com.changhong.openvdb.app.event.OpenScriptEditorEvent;
 import com.changhong.openvdb.app.model.VDBNodeStatus;
 import com.changhong.openvdb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.openvdb.app.ui.widgets.VFXIconButton;
@@ -35,6 +35,6 @@ public class AppToolBar extends ToolBar
         {
                 VDBNodeStatus instance = VDBNodeStatus.getInstance();
                 VDBConnectionNode selectedConnection = instance.getSelectedConnection();
-                EventBus.publish(new OpenQueryScriptEvent(selectedConnection));
+                EventBus.publish(new OpenScriptEditorEvent(selectedConnection));
         }
 }

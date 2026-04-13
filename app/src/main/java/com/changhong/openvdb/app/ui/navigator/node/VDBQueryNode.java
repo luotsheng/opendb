@@ -2,7 +2,7 @@ package com.changhong.openvdb.app.ui.navigator.node;
 
 import com.changhong.openvdb.app.Application;
 import com.changhong.openvdb.app.event.bus.EventBus;
-import com.changhong.openvdb.app.event.OpenQueryScriptEvent;
+import com.changhong.openvdb.app.event.OpenScriptEditorEvent;
 import com.changhong.openvdb.app.event.RefreshQueryNodeEvent;
 import com.changhong.openvdb.app.event.RemoveScriptEditorTabEvent;
 import com.changhong.openvdb.app.resource.Assets;
@@ -41,7 +41,7 @@ public class VDBQueryNode extends VDBNode
                 ContextMenu menu = new ContextMenu();
 
                 MenuItem openNewTabQueryItem = new MenuItem("打开查询脚本");
-                openNewTabQueryItem.setOnAction(event -> openNewTabQuery());
+                openNewTabQueryItem.setOnAction(event -> openScriptEditor());
 
                 MenuItem renameQueryItem = new MenuItem("重命名查询");
                 renameQueryItem.setOnAction(event -> renameQuery());
@@ -68,9 +68,9 @@ public class VDBQueryNode extends VDBNode
                 return menu;
         }
 
-        private void openNewTabQuery()
+        private void openScriptEditor()
         {
-                EventBus.publish(new OpenQueryScriptEvent(scriptFile));
+                EventBus.publish(new OpenScriptEditorEvent(database.getConnection(), scriptFile));
         }
 
         private void renameQuery()
@@ -93,15 +93,21 @@ public class VDBQueryNode extends VDBNode
 
         private void deleteQuery()
         {
-                scriptFile.delete();
+                scriptFile.forceDelete();
                 database.queryItem.getChildren().remove(this);
                 EventBus.publish(new RemoveScriptEditorTabEvent(scriptFile));
                 EventBus.publish(new RefreshQueryNodeEvent());
         }
 
         @Override
+        public void onSelectedEvent(VDBNode node)
+        {
+                database.getConnection().setSelectedDatabase(database);
+        }
+
+        @Override
         public void onMouseDoubleClickEvent(MouseEvent event)
         {
-                openNewTabQuery();
+                openScriptEditor();
         }
 }
