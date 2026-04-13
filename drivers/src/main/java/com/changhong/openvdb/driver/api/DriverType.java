@@ -1,6 +1,6 @@
 package com.changhong.openvdb.driver.api;
 
-import static com.changhong.string.StringStaticize.uppercase;
+import static com.changhong.utils.string.StaticLibrary.uppercase;
 
 /**
  * @author Luo Tiansheng

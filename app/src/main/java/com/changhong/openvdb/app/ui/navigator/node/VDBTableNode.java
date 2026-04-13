@@ -2,10 +2,10 @@ package com.changhong.openvdb.app.ui.navigator.node;
 
 import com.changhong.openvdb.driver.api.Driver;
 import com.changhong.openvdb.driver.api.Table;
-import com.changhong.openvdb.app.VFXApplication;
-import com.changhong.openvdb.app.core.event.EventBus;
-import com.changhong.openvdb.app.core.event.OpenDataGridPaneEvent;
-import com.changhong.openvdb.app.core.event.OpenDesignTablePaneEvent;
+import com.changhong.openvdb.app.Application;
+import com.changhong.openvdb.app.event.bus.EventBus;
+import com.changhong.openvdb.app.event.OpenDataGridPaneEvent;
+import com.changhong.openvdb.app.event.OpenDesignTablePaneEvent;
 import com.changhong.openvdb.app.resource.Assets;
 import com.changhong.openvdb.app.ui.navigator.VDBNode;
 import javafx.scene.control.ContextMenu;
@@ -48,7 +48,7 @@ public class VDBTableNode extends VDBNode
 
                 MenuItem copyTableNameItem = new MenuItem("复制表名");
                 copyTableNameItem.setOnAction(event -> {
-                        VFXApplication.copyToClipboard(getName());
+                        Application.copyToClipboard(getName());
                 });
 
                 MenuItem designTableItem = new MenuItem("设计表");

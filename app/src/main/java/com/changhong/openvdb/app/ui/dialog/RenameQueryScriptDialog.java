@@ -1,8 +1,8 @@
 package com.changhong.openvdb.app.ui.dialog;
 
-import com.changhong.openvdb.app.VFXApplication;
-import com.changhong.openvdb.app.core.event.EventBus;
-import com.changhong.openvdb.app.core.event.RefreshQueryNodeEvent;
+import com.changhong.openvdb.app.Application;
+import com.changhong.openvdb.app.event.bus.EventBus;
+import com.changhong.openvdb.app.event.RefreshQueryNodeEvent;
 import com.changhong.openvdb.core.model.ScriptFile;
 import com.changhong.openvdb.app.ui.pane.BrowserPane;
 import com.changhong.openvdb.core.repository.ScriptFileRepository;
@@ -76,7 +76,7 @@ public class RenameQueryScriptDialog extends BrowserPane
 
         public static void showDialog(ScriptFile scriptFile)
         {
-                Stage stage = VFXApplication.createByPrimaryStage();
+                Stage stage = Application.createByPrimaryStage();
 
                 RenameQueryScriptDialog dialog = new RenameQueryScriptDialog(stage, scriptFile);
 

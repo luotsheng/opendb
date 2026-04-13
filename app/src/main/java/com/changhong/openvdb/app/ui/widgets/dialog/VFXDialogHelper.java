@@ -1,9 +1,9 @@
 package com.changhong.openvdb.app.ui.widgets.dialog;
 
-import com.changhong.exception.SystemRuntimeException;
-import com.changhong.openvdb.app.VFXApplication;
+import com.changhong.utils.exception.SystemRuntimeException;
+import com.changhong.openvdb.app.Application;
 import com.changhong.openvdb.app.resource.Assets;
-import com.changhong.exception.Causes;
+import com.changhong.utils.exception.Causes;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.changhong.string.StringStaticize.strwfmt;
+import static com.changhong.utils.string.StaticLibrary.strwfmt;
 
 /**
  * Dialog
@@ -100,7 +100,7 @@ public class VFXDialogHelper
                 Toolkit.getDefaultToolkit().beep();
 
                 stage.initModality(Modality.APPLICATION_MODAL);
-                stage.setTitle(VFXApplication.TITLE);
+                stage.setTitle(Application.TITLE);
 
                 Label label = new Label(message);
 
@@ -128,7 +128,7 @@ public class VFXDialogHelper
 
         private static boolean showCheckDialog(String fmt, Object... args)
         {
-                Stage stage = VFXApplication.createByPrimaryStage();
+                Stage stage = Application.createByPrimaryStage();
 
                 AtomicBoolean flag = new AtomicBoolean(true);
 
@@ -165,7 +165,7 @@ public class VFXDialogHelper
 
         private static boolean showDialog(String fmt, Object... args)
         {
-                Stage stage = VFXApplication.createByPrimaryStage();
+                Stage stage = Application.createByPrimaryStage();
 
                 AtomicBoolean flag = new AtomicBoolean(true);
 
@@ -190,14 +190,14 @@ public class VFXDialogHelper
 
         private static void showAlert(String fmt, Object... args)
         {
-                Stage stage = VFXApplication.createByPrimaryStage();
+                Stage stage = Application.createByPrimaryStage();
 
                 String text = strwfmt(fmt, args);
 
                 Button copyText = new Button("复制并关闭");
                 copyText.setDefaultButton(true);
                 copyText.setOnAction(e -> {
-                        VFXApplication.copyToClipboard(text);
+                        Application.copyToClipboard(text);
                         stage.close();
                 });
 

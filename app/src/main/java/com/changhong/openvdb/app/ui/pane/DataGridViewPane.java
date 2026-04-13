@@ -3,7 +3,7 @@ package com.changhong.openvdb.app.ui.pane;
 import com.changhong.openvdb.driver.api.Column;
 import com.changhong.openvdb.driver.api.DataGrid;
 import com.changhong.openvdb.driver.api.GridRow;
-import com.changhong.openvdb.app.VFXApplication;
+import com.changhong.openvdb.app.Application;
 import com.changhong.openvdb.app.resource.Assets;
 import com.changhong.openvdb.app.ui.widgets.VFXIconButton;
 import com.changhong.openvdb.app.ui.widgets.VFXSeparator;
@@ -28,8 +28,8 @@ import lombok.Setter;
 
 import java.util.List;
 
-import static com.changhong.string.StringStaticize.strnempty;
-import static com.changhong.string.StringStaticize.strwfmt;
+import static com.changhong.utils.string.StaticLibrary.strnempty;
+import static com.changhong.utils.string.StaticLibrary.strwfmt;
 
 /**
  * @author Luo Tiansheng
@@ -302,7 +302,7 @@ public class DataGridViewPane extends BorderPane
 
                 builder.deleteCharAt(builder.length() - 1);
 
-                VFXApplication.copyToClipboard(builder.toString());
+                Application.copyToClipboard(builder.toString());
         }
 
         public void selectResultSetFirst()

@@ -20,9 +20,9 @@ package com.changhong.utils;
 
 /* Creates on 2023/4/29. */
 
-import com.changhong.iface.ActionFunction;
-import com.changhong.iface.CallableFunction;
-import com.changhong.string.StringStaticize;
+import com.changhong.utils.iface.ActionFunction;
+import com.changhong.utils.iface.CallableFunction;
+import com.changhong.utils.string.StaticLibrary;
 
 /**
  * @author Luo Tiansheng
@@ -67,7 +67,7 @@ public class Optional {
      * @return 如果 {@code value} 为 null，则返回 {@code orBlank}，否则返回 {@code value}
      */
     public static String ifBlank(String value, String orBlank) {
-        return StringStaticize.strempty(value) ? orBlank : value;
+        return StaticLibrary.strempty(value) ? orBlank : value;
     }
 
     /**

@@ -23,7 +23,7 @@ import net.sf.jsqlparser.util.TablesNamesFinder;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.changhong.string.StringStaticize.strcut;
+import static com.changhong.utils.string.StaticLibrary.strcut;
 
 /**
  * @author Luo Tiansheng

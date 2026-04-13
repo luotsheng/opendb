@@ -1,6 +1,6 @@
 package com.changhong.openvdb.driver.api;
 
-import static com.changhong.string.StringStaticize.streq;
+import static com.changhong.utils.string.StaticLibrary.streq;
 
 /**
  * 可封存完整性码的抽象基类。

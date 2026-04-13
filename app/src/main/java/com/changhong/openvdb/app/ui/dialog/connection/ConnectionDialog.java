@@ -1,11 +1,11 @@
 package com.changhong.openvdb.app.ui.dialog.connection;
 
 import com.changhong.openvdb.driver.api.PooledDataSource;
-import com.changhong.openvdb.app.core.event.EventBus;
-import com.changhong.openvdb.app.core.event.RefreshConnectionEvent;
+import com.changhong.openvdb.app.event.bus.EventBus;
+import com.changhong.openvdb.app.event.RefreshConnectionEvent;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
 import com.changhong.openvdb.core.repository.ConnectionRepository;
-import com.changhong.exception.Causes;
+import com.changhong.utils.exception.Causes;
 import com.changhong.openvdb.core.utils.JSONUtils;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.geometry.Insets;

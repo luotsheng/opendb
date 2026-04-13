@@ -18,10 +18,10 @@ package com.changhong.utils;
 |*                                                                                  *|
 \* -------------------------------------------------------------------------------- */
 
-import com.changhong.iface.ActionFunction;
-import com.changhong.iface.CallableFunction;
-import com.changhong.exception.AssertException;
-import com.changhong.exception.SystemRuntimeException;
+import com.changhong.utils.iface.ActionFunction;
+import com.changhong.utils.iface.CallableFunction;
+import com.changhong.utils.exception.AssertException;
+import com.changhong.utils.exception.SystemRuntimeException;
 
 /**
  * @author Luo Tiansheng

@@ -1,7 +1,7 @@
 package com.changhong.openvdb.app.ui.tool;
 
-import com.changhong.openvdb.app.core.event.EventBus;
-import com.changhong.openvdb.app.core.event.OpenQueryScriptEvent;
+import com.changhong.openvdb.app.event.bus.EventBus;
+import com.changhong.openvdb.app.event.OpenQueryScriptEvent;
 import com.changhong.openvdb.app.model.VDBNodeStatus;
 import com.changhong.openvdb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.openvdb.app.ui.widgets.VFXIconButton;

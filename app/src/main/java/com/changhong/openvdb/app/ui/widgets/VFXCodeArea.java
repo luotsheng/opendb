@@ -1,8 +1,8 @@
 package com.changhong.openvdb.app.ui.widgets;
 
-import com.changhong.openvdb.app.VFXApplication;
+import com.changhong.openvdb.app.Application;
 import com.changhong.openvdb.app.ui.workbench.SqlKeyWordDefine;
-import com.changhong.openvdb.app.utils.OS;
+import com.changhong.utils.system.OS;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.changhong.string.StringStaticize.strempty;
+import static com.changhong.utils.string.StaticLibrary.strempty;
 
 /**
  * @author Luo Tiansheng
@@ -55,7 +55,7 @@ public class VFXCodeArea extends CodeArea
         {
                 setStyle("-fx-font-weight: normal;");
 
-                if (OS.isMac())
+                if (OS.isMacOS())
                         setStyle("-fx-font-family: 'Menlo'; -fx-font-size: 16px;");
 
                 if (OS.isWindows())
@@ -107,13 +107,13 @@ public class VFXCodeArea extends CodeArea
         @Override
         public void copy()
         {
-                VFXApplication.copyToClipboard(getSelectedText());
+                Application.copyToClipboard(getSelectedText());
         }
 
         @Override
         public void paste()
         {
-                String text = VFXApplication.getClipboardText();
+                String text = Application.getClipboardText();
 
                 if (text == null)
                         return;

@@ -18,13 +18,13 @@ package com.changhong.utils;
 |*                                                                                  *|
 \* -------------------------------------------------------------------------------- */
 
-import com.changhong.iface.TypeMapper;
-import com.changhong.io.ByteBuffer;
-import com.changhong.exception.InvalidArgumentException;
-import com.changhong.exception.UnsupportedOperationException;
-import com.changhong.reflect.UClass;
-import com.changhong.string.StringInterface;
-import com.changhong.string.StringStaticize;
+import com.changhong.utils.iface.TypeMapper;
+import com.changhong.utils.io.ByteBuffer;
+import com.changhong.utils.exception.InvalidArgumentException;
+import com.changhong.utils.exception.UnsupportedOperationException;
+import com.changhong.utils.reflect.UClass;
+import com.changhong.utils.string.StringInterface;
+import com.changhong.utils.string.StaticLibrary;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -392,8 +392,8 @@ public class TypeConverter
             return (Boolean) obj;
         if (obj instanceof Number)
             return ((Number) obj).intValue() > 0;
-        String bool = atos(obj, StringStaticize::uppercase);
-        return StringStaticize.strxmatch(bool, "TRUE|ON|Y|YES");
+        String bool = atos(obj, StaticLibrary::uppercase);
+        return StaticLibrary.strxmatch(bool, "TRUE|ON|Y|YES");
     }
 
     /**

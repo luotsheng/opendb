@@ -1,12 +1,12 @@
 package com.changhong.openvdb.driver.api;
 
-import com.changhong.security.Codec;
+import com.changhong.utils.security.Codec;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 
-import static com.changhong.string.StringStaticize.strip;
+import static com.changhong.utils.string.StaticLibrary.strip;
 
 /**
  * @author Luo Tiansheng

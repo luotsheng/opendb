@@ -1,6 +1,6 @@
 package com.changhong.openvdb.driver.api.sql;
 
-import com.changhong.collection.Lists;
+import com.changhong.utils.collection.Lists;
 import com.changhong.utils.Captor;
 import lombok.Getter;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -10,7 +10,7 @@ import net.sf.jsqlparser.statement.Statements;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.changhong.collection.Lists.end;
+import static com.changhong.utils.collection.Lists.end;
 
 /**
  * SQL 执行单元

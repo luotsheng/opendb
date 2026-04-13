@@ -1,6 +1,6 @@
 package com.changhong.openvdb.app.ui.menu;
 
-import com.changhong.openvdb.app.utils.OS;
+import com.changhong.utils.system.OS;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -14,7 +14,7 @@ public class AppMenuBar extends MenuBar
 {
         public AppMenuBar()
         {
-                if (OS.isMac()) {
+                if (OS.isMacOS()) {
                         setUseSystemMenuBar(true);
                         setMinHeight(0);
                         setMaxHeight(0);

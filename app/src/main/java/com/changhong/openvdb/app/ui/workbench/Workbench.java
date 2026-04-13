@@ -1,7 +1,10 @@
 package com.changhong.openvdb.app.ui.workbench;
 
-import com.changhong.openvdb.app.VFXApplication;
-import com.changhong.openvdb.app.core.event.*;
+import com.changhong.openvdb.app.Application;
+import com.changhong.openvdb.app.event.*;
+import com.changhong.openvdb.app.event.bus.Event;
+import com.changhong.openvdb.app.event.bus.EventBus;
+import com.changhong.openvdb.app.event.bus.EventListener;
 import com.changhong.openvdb.app.resource.Assets;
 import com.changhong.openvdb.app.ui.pane.TableStructureDesignerPane;
 import com.changhong.openvdb.app.ui.pane.PreviewTableDataPane;
@@ -18,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.changhong.string.StringStaticize.strwfmt;
+import static com.changhong.utils.string.StaticLibrary.strwfmt;
 
 /**
  * @author Luo Tiansheng
@@ -90,7 +93,7 @@ public class Workbench extends VBox implements EventListener
                         closeRight,
                         closeOther);
 
-                VFXApplication.runLater((stage, scene) -> {
+                Application.runLater((stage, scene) -> {
                         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
                                 if (tabPaneContextMenu.isShowing())
                                         tabPaneContextMenu.hide();

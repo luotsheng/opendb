@@ -1,10 +1,10 @@
 package com.changhong.openvdb.app.ui.navigator.node;
 
-import com.changhong.openvdb.app.VFXApplication;
-import com.changhong.openvdb.app.core.event.EventBus;
-import com.changhong.openvdb.app.core.event.OpenQueryScriptEvent;
-import com.changhong.openvdb.app.core.event.RefreshQueryNodeEvent;
-import com.changhong.openvdb.app.core.event.RemoveScriptEditorTabEvent;
+import com.changhong.openvdb.app.Application;
+import com.changhong.openvdb.app.event.bus.EventBus;
+import com.changhong.openvdb.app.event.OpenQueryScriptEvent;
+import com.changhong.openvdb.app.event.RefreshQueryNodeEvent;
+import com.changhong.openvdb.app.event.RemoveScriptEditorTabEvent;
 import com.changhong.openvdb.app.resource.Assets;
 import com.changhong.openvdb.app.ui.dialog.RenameQueryScriptDialog;
 import com.changhong.openvdb.app.ui.navigator.VDBNode;
@@ -80,7 +80,7 @@ public class VDBQueryNode extends VDBNode
 
         private void copyFilePath()
         {
-                VFXApplication.copyToClipboard(scriptFile.getAbsolutePath());
+                Application.copyToClipboard(scriptFile.getAbsolutePath());
         }
 
         private void openDesktop()

@@ -1,8 +1,8 @@
 package com.changhong.openvdb.app.ui.dialog;
 
-import com.changhong.openvdb.app.VFXApplication;
-import com.changhong.openvdb.app.core.event.EventBus;
-import com.changhong.openvdb.app.core.event.RefreshQueryNodeEvent;
+import com.changhong.openvdb.app.Application;
+import com.changhong.openvdb.app.event.bus.EventBus;
+import com.changhong.openvdb.app.event.RefreshQueryNodeEvent;
 import com.changhong.openvdb.app.ui.navigator.node.VDBConnectionNode;
 import com.changhong.openvdb.app.ui.navigator.node.VDBDatabaseNode;
 import com.changhong.openvdb.app.ui.pane.BrowserPane;
@@ -112,7 +112,7 @@ public class SaveQueryScriptDialog extends BrowserPane
 
         public static void showDialog(ScriptEditor scriptEditor)
         {
-                Stage stage = VFXApplication.createByPrimaryStage();
+                Stage stage = Application.createByPrimaryStage();
 
                 SaveQueryScriptDialog dialog = new SaveQueryScriptDialog(stage, scriptEditor);
 

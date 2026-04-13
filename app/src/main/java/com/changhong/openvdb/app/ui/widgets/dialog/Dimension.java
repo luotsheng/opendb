@@ -1,6 +1,6 @@
 package com.changhong.openvdb.app.ui.widgets.dialog;
 
-import static com.changhong.string.StringStaticize.*;
+import static com.changhong.utils.string.StaticLibrary.*;
 
 /**
  * 提示框常量定义

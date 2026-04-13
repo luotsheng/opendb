@@ -1,7 +1,7 @@
 package com.changhong.openvdb.driver.mysql;
 
-import com.changhong.collection.Lists;
-import com.changhong.collection.Sets;
+import com.changhong.utils.collection.Lists;
+import com.changhong.utils.collection.Sets;
 import com.changhong.openvdb.driver.api.*;
 import com.changhong.openvdb.driver.api.exception.DriverException;
 import com.changhong.openvdb.driver.api.sql.SQL;
@@ -24,10 +24,10 @@ import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.changhong.collection.Lists.beg;
-import static com.changhong.string.StringStaticize.*;
-import static com.changhong.utils.TypeConverter.atobool;
+import static com.changhong.utils.collection.Lists.beg;
+import static com.changhong.utils.TypeConverter.*;
 import static com.changhong.utils.TypeConverter.atos;
+import static com.changhong.utils.string.StaticLibrary.*;
 
 /**
  * MySQL 驱动层实现

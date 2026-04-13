@@ -12,7 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import static com.changhong.string.StringStaticize.strnempty;
+import static com.changhong.utils.string.StaticLibrary.strnempty;
 
 /**
  * 脚本数据

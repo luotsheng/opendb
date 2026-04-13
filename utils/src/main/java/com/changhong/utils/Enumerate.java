@@ -20,9 +20,9 @@ package com.changhong.utils;
 
 /* Create on 2019/6/14 */
 
-import com.changhong.exception.InvalidArgumentException;
-import com.changhong.reflect.UClass;
-import com.changhong.string.StringStaticize;
+import com.changhong.utils.exception.InvalidArgumentException;
+import com.changhong.utils.reflect.UClass;
+import com.changhong.utils.string.StaticLibrary;
 
 /**
  * `Enumerates` 是一个工具类，提供了获取和查找枚举值的方法。主要包括获取指定枚举类的所有
@@ -116,7 +116,7 @@ public class Enumerate {
     public static <E extends Enum<E>> E find(Class<? extends Enum<E>> enumClass, String name) {
         Enum<E>[] values = values(enumClass);
         for (Enum<E> value : values)
-            if (StringStaticize.strieq(value.name(), name))
+            if (StaticLibrary.strieq(value.name(), name))
                 return (E) value;
         return null;
     }

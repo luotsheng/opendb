@@ -1,8 +1,8 @@
 package com.changhong.openvdb.app.ui.pane;
 
 import com.changhong.openvdb.driver.api.Table;
-import com.changhong.openvdb.app.core.event.EventBus;
-import com.changhong.openvdb.app.core.event.OpenDataGridPaneEvent;
+import com.changhong.openvdb.app.event.bus.EventBus;
+import com.changhong.openvdb.app.event.OpenDataGridPaneEvent;
 import com.changhong.openvdb.app.resource.Assets;
 import com.changhong.openvdb.app.ui.navigator.node.VDBDatabaseNode;
 import com.changhong.openvdb.app.ui.widgets.*;

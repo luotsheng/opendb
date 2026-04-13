@@ -5,7 +5,7 @@ import com.changhong.openvdb.app.ui.workbench.Workbench;
 import javafx.application.Platform;
 import javafx.scene.control.SplitPane;
 
-import static com.changhong.collection.Lists.beg;
+import static com.changhong.utils.collection.Lists.beg;
 
 /**
  * @author Luo Tiansheng

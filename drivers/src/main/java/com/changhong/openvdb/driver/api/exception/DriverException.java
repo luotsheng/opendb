@@ -1,6 +1,6 @@
 package com.changhong.openvdb.driver.api.exception;
 
-import com.changhong.exception.Causes;
+import com.changhong.utils.exception.Causes;
 import lombok.Getter;
 
 import java.sql.SQLException;

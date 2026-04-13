@@ -16,7 +16,7 @@ import com.changhong.openvdb.app.ui.widgets.VFXComboBox;
 import com.changhong.openvdb.app.ui.widgets.VFXIconButton;
 import com.changhong.openvdb.app.ui.widgets.VFXSeparator;
 import com.changhong.openvdb.app.ui.widgets.dialog.VFXDialogHelper;
-import com.changhong.exception.Causes;
+import com.changhong.utils.exception.Causes;
 import com.changhong.openvdb.core.model.ScriptFile;
 import com.github.vertical_blank.sqlformatter.SqlFormatter;
 import javafx.application.Platform;
@@ -37,7 +37,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.time.Duration;
 
-import static com.changhong.string.StringStaticize.strwfmt;
+import static com.changhong.utils.string.StaticLibrary.strwfmt;
 
 /**
  * SQL 脚本编辑器

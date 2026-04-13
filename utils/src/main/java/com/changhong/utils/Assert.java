@@ -18,10 +18,10 @@ package com.changhong.utils;
 |*                                                                                  *|
 \* -------------------------------------------------------------------------------- */
 
-import com.changhong.collection.Lists;
-import com.changhong.collection.Maps;
-import com.changhong.exception.AssertException;
-import com.changhong.string.StringStaticize;
+import com.changhong.utils.collection.Lists;
+import com.changhong.utils.collection.Maps;
+import com.changhong.utils.exception.AssertException;
+import com.changhong.utils.string.StaticLibrary;
 
 import java.util.Collection;
 import java.util.Map;
@@ -165,7 +165,7 @@ public class Assert {
      * @throws AssertException 如果字符串为 null 或空字符串
      */
     public static void notEmpty(String source, String fmt, Object... args) {
-        if (StringStaticize.strempty(source))
+        if (StaticLibrary.strempty(source))
             throw new AssertException(fmt, args);
     }
 
@@ -317,7 +317,7 @@ public class Assert {
      * @throws AssertException 如果不存在文本就抛出异常
      */
     public static void hasText(String text, String message, Object... args) {
-        if (StringStaticize.strempty(text))
+        if (StaticLibrary.strempty(text))
             throw new AssertException(message, args);
     }
 
