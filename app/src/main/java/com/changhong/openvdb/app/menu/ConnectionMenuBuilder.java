@@ -16,7 +16,7 @@ public class ConnectionMenuBuilder
                 Menu newConnectionMenu = new Menu("新建连接");
 
                 MenuItem mysqlItem = new MenuItem(DriverType.MYSQL.getAlias());
-                mysqlItem.setOnAction(e -> openConnectionDialog(DriverType.DM));
+                mysqlItem.setOnAction(e -> openConnectionDialog(DriverType.MYSQL));
 
                 MenuItem postgreSQLItem = new MenuItem(DriverType.DM.getAlias());
                 postgreSQLItem.setOnAction(e -> openConnectionDialog(DriverType.DM));
