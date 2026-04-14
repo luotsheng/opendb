@@ -97,32 +97,6 @@ public class MySQLDriver extends Driver
         }
 
         @Override
-        public List<Column> getColumns(Session session, String table)
-        {
-                try {
-                        List<Column> columns = selectByPage(session, table, 0, 0).getColumns();
-
-                        Map<String, Column> columnMap = new HashMap<>();
-
-                        for (Column column : columns) {
-                                column.setOriginalName(column.getName());
-                                columnMap.put(column.getName(), column);
-                        }
-
-                        String createTableDDL = showCreateTable(session, table);
-
-                        SQLUtils.parseColumnDefSpec(createTableDDL, columnMap);
-
-                        /* 防篡改码生成 */
-                        columns.forEach(Column::finalIntegrityCode);
-
-                        return columns;
-                } catch (Exception e) {
-                        throw new DriverException(e);
-                }
-        }
-
-        @Override
         public List<Index> getIndexes(Session session, Table table)
         {
                 SQL sql = new SQL("SHOW INDEX FROM " + dialect.quote(table.getName()) + ";");

@@ -1,6 +1,7 @@
 package com.changhong.openvdb.driver.utils;
 
 import com.changhong.openvdb.driver.api.Column;
+import com.changhong.openvdb.driver.api.Dialect;
 import com.changhong.utils.exception.SystemRuntimeException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
@@ -23,7 +24,7 @@ public class SQLUtils
         /**
          * 从 DDL 中解析字段权威类型和默认值
          */
-        public static void parseColumnDefSpec(String ddl, Map<String, Column> metas)
+        public static void parseColumnDefSpec(String ddl, Dialect dialect, Map<String, Column> metas)
         {
                 try {
                         var createTable = (CreateTable) CCJSqlParserUtil.parse(ddl);
@@ -31,7 +32,7 @@ public class SQLUtils
                         List<ColumnDefinition> definitions = createTable.getColumnDefinitions();
 
                         for (ColumnDefinition definition : definitions) {
-                                Column columnMetaData = metas.get(toColumnName(definition));
+                                Column columnMetaData = metas.get(toColumnName(dialect, definition));
 
                                 if (columnMetaData == null)
                                         continue;
@@ -70,9 +71,9 @@ public class SQLUtils
                 }
         }
 
-        private static String toColumnName(ColumnDefinition definition)
+        private static String toColumnName(Dialect dialect, ColumnDefinition definition)
         {
-                return definition.getColumnName().replaceAll("`", "");
+                return dialect.removeQuote(definition.getColumnName());
         }
 
         private static String toDataType(ColumnDefinition definition)

@@ -5,6 +5,7 @@ import com.changhong.openvdb.driver.api.sql.SQL;
 import com.changhong.openvdb.driver.api.sql.SQLExecutor;
 import com.changhong.openvdb.driver.api.sql.SQLParsedStatement;
 import com.changhong.openvdb.driver.utils.ResultSets;
+import com.changhong.openvdb.driver.utils.SQLUtils;
 import com.changhong.utils.Captor;
 import com.changhong.utils.Optional;
 import com.changhong.utils.collection.Lists;
@@ -351,7 +352,30 @@ public abstract class Driver implements SQLExecutor
          * @see java.sql.DatabaseMetaData#getColumns(String, String, String, String)
          * @see Column
          */
-        public abstract List<Column> getColumns(Session session, String table);
+        public List<Column> getColumns(Session session, String table)
+        {
+                try {
+                        List<Column> columns = selectByPage(session, table, 0, 0).getColumns();
+
+                        Map<String, Column> columnMap = new HashMap<>();
+
+                        for (Column column : columns) {
+                                column.setOriginalName(column.getName());
+                                columnMap.put(column.getName(), column);
+                        }
+
+                        String createTableDDL = dialect.normalize(showCreateTable(session, table));
+
+                        SQLUtils.parseColumnDefSpec(createTableDDL, dialect, columnMap);
+
+                        /* 防篡改码生成 */
+                        columns.forEach(Column::finalIntegrityCode);
+
+                        return columns;
+                } catch (Exception e) {
+                        throw new DriverException(e);
+                }
+        }
 
         public List<Column> getColumns(Session session, Table table)
         {
@@ -855,6 +879,7 @@ public abstract class Driver implements SQLExecutor
         }
 
         @Override
+        @SuppressWarnings("resource")
         public void cancel(long jobId)
         {
                 if (taskQueue.containsKey(jobId))

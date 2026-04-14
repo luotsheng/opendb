@@ -17,6 +17,12 @@ public class MySQLDialect implements Dialect
         }
 
         @Override
+        public String normalize(String sql)
+        {
+                return sql;
+        }
+
+        @Override
         public String quote(String identifier)
         {
                 if (identifier.startsWith("`") && identifier.endsWith("`"))

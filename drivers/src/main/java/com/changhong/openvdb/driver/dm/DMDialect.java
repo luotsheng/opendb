@@ -17,6 +17,14 @@ public class DMDialect implements Dialect
         }
 
         @Override
+        public String normalize(String sql)
+        {
+                sql = sql.replaceAll("NOT\\s+CLUSTER\\s+PRIMARY\\s+KEY", "PRIMARY KEY");
+                sql = sql.replaceAll("STORAGE\\s*\\([^)]*\\)", "");
+                return sql;
+        }
+
+        @Override
         public String quote(String identifier)
         {
                 if (identifier.startsWith("\"") && identifier.endsWith("\""))

@@ -49,6 +49,23 @@ public interface Dialect
         String limit(String sql, int off, int size);
 
         /**
+         * 对 SQL 语句进行规范化处理。
+         * <p>
+         * 该方法用于将传入的 SQL 语句转换为当前方言所期望的标准形式，以消除不同书写风格或数据库兼容性差异带来的影响。
+         * 典型处理包括但不限于：
+         * <ul>
+         *   <li>移除 SQL 中不同数据库的独有语法</li>
+         *   <li>统一换行符和空白字符（将连续空白压缩为单个空格）</li>
+         *   <li>将标识符（表名、列名）中的引号统一为当前方言的转义风格</li>
+         * </ul>
+         *
+         * @param sql 原始 SQL 语句（不能为 {@code null}）
+         * @return 规范化后的 SQL 语句
+         * @throws NullPointerException 如果 {@code sql} 为 {@code null}
+         */
+        String normalize(String sql);
+
+        /**
          * 转义数据库标识符（如表名、列名）。
          * <p>
          * 根据数据库的引号规则，将标识符包裹在合适的引号中，以处理：

@@ -3,15 +3,13 @@ package com.changhong.openvdb.driver.dm;
 import com.changhong.openvdb.driver.api.*;
 import com.changhong.openvdb.driver.api.exception.DriverException;
 import com.changhong.openvdb.driver.api.sql.SQL;
+import com.changhong.openvdb.driver.utils.SQLUtils;
 import com.changhong.utils.collection.Lists;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.changhong.utils.collection.Lists.beg;
 import static com.changhong.utils.string.StaticLibrary.strfmt;
@@ -51,7 +49,7 @@ public class DMDriver extends Driver
                                 """, table, session.schema())
                 ));
 
-                return beg(dataGrid.getRows()).get(0);
+                return beg(beg(dataGrid.getRows()));
         }
 
         @Override
@@ -115,12 +113,6 @@ public class DMDriver extends Driver
                 });
 
                 return tables;
-        }
-
-        @Override
-        public List<Column> getColumns(Session session, String table)
-        {
-                return List.of();
         }
 
         @Override
