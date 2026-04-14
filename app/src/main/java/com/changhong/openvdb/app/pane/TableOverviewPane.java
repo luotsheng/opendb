@@ -100,6 +100,13 @@ public class TableOverviewPane extends BorderPane
                 tableView.setRowFactory(tv -> {
                         TableRow<Table> r = new TableRow<>();
 
+                        r.setOnMouseClicked(e -> {
+                                if (e.getClickCount() == 2 && !r.isEmpty()) {
+                                        Table data = r.getItem();
+                                        EventBus.publish(new OpenTableDataPaneEvent(database, data));
+                                }
+                        });
+
                         r.itemProperty().addListener((obs, oldItem, table) -> {
                                 if (table == null) {
                                         r.setContextMenu(null);
@@ -165,21 +172,6 @@ public class TableOverviewPane extends BorderPane
                         rows,
                         comment
                 );
-
-                tableView.setRowFactory(tv -> {
-                        TableRow<Table> row = new TableRow<>();
-
-                        row.setOnMouseClicked(e -> {
-
-                                if (e.getClickCount() == 2 && !row.isEmpty()) {
-                                        Table data = row.getItem();
-                                        EventBus.publish(new OpenTableDataPaneEvent(database, data));
-                                }
-
-                        });
-
-                        return row;
-                });
 
                 tableView.getColumns().forEach(col -> col.setReorderable(false));
         }
