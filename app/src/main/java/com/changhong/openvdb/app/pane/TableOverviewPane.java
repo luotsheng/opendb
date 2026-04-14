@@ -18,6 +18,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -26,13 +27,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Catalog 预览面板
+ * 数据表信息在详情页的预览面板
  *
  * @author Luo Tiansheng
  * @since 2026/3/27
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class CatalogBrowserPane extends BrowserPane
+public class TableOverviewPane extends BorderPane
 {
         private final TableView<Table> tableView;
         private final ToolBar toolBar;
@@ -49,7 +50,7 @@ public class CatalogBrowserPane extends BrowserPane
 
         private ObservableList<Table> obs;
 
-        public CatalogBrowserPane(UICatalogNode database)
+        public TableOverviewPane(UICatalogNode database)
         {
                 this.database = database;
 

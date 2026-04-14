@@ -1,5 +1,6 @@
-package com.changhong.openvdb.app.pane;
+package com.changhong.openvdb.app.pane.designer;
 
+import com.changhong.openvdb.app.pane.Designer;
 import com.changhong.openvdb.driver.api.Driver;
 import com.changhong.openvdb.driver.api.Index;
 import com.changhong.openvdb.driver.api.Session;
@@ -14,12 +15,12 @@ import java.util.Set;
  * @author Luo Tiansheng
  * @since 2026/4/10
  */
-public class IndexStructureDesigner extends Designer<Index>
+public class TableIndexDesignerPane extends Designer<Index>
 {
         private final Set<Index> alterBuffer = new LinkedHashSet<>();
         private final Set<Index> visibleBuffer = new LinkedHashSet<>();
 
-        public IndexStructureDesigner(Session session, Driver driver, Table table, String name)
+        public TableIndexDesignerPane(Session session, Driver driver, Table table, String name)
         {
                 super(session, driver, table, name);
         }

@@ -1,5 +1,6 @@
-package com.changhong.openvdb.app.pane;
+package com.changhong.openvdb.app.pane.designer;
 
+import com.changhong.openvdb.app.pane.Designer;
 import com.changhong.utils.collection.Lists;
 import com.changhong.openvdb.driver.api.Column;
 import com.changhong.openvdb.driver.api.Driver;
@@ -12,14 +13,14 @@ import java.util.*;
  * @author Luo Tiansheng
  * @since 2026/4/10
  */
-public class TableStructureDesigner extends Designer<Column>
+public class TableColumnDesignerPane extends Designer<Column>
 {
         private final Set<Column> alterBuffer = new HashSet<>();
         private final Set<Column> primaryBuffer = new LinkedHashSet<>();
 
         private boolean primaryChange = false;
 
-        public TableStructureDesigner(Session session, Driver driver, Table table, String name)
+        public TableColumnDesignerPane(Session session, Driver driver, Table table, String name)
         {
                 super(session, driver, table, name);
         }

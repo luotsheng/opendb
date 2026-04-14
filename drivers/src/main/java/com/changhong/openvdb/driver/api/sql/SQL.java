@@ -55,8 +55,7 @@ public class SQL implements Iterable<SQLParsedStatement>
                 this.raw = raw;
 
                 try {
-                        Statements statements =
-                                Captor.call(() -> CCJSqlParserUtil.parseStatements(raw));
+                        Statements statements = CCJSqlParserUtil.parseStatements(raw);
 
                         for (Statement statement : statements) {
                                 SQLParsedStatement sqlParsedStatement = new SQLParsedStatement(statement);

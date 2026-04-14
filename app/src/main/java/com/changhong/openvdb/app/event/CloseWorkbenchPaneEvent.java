@@ -1,7 +1,7 @@
 package com.changhong.openvdb.app.event;
 
 import com.changhong.openvdb.app.event.bus.Event;
-import com.changhong.openvdb.app.pane.BrowserPane;
+import javafx.scene.Node;
 import lombok.Getter;
 
 /**
@@ -10,12 +10,12 @@ import lombok.Getter;
  * @author Luo Tiansheng
  * @since 2026/3/26
  */
+@Getter
 public class CloseWorkbenchPaneEvent extends Event
 {
-        @Getter
-        private BrowserPane pane;
+        private Node pane;
 
-        public CloseWorkbenchPaneEvent(BrowserPane pane)
+        public CloseWorkbenchPaneEvent(Node pane)
         {
                 this.pane = pane;
         }

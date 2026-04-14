@@ -1,5 +1,7 @@
 package com.changhong.openvdb.app.pane;
 
+import com.changhong.openvdb.app.pane.designer.TableColumnDesignerPane;
+import com.changhong.openvdb.app.pane.designer.TableIndexDesignerPane;
 import com.changhong.openvdb.driver.api.*;
 import com.changhong.openvdb.driver.mysql.MySQL;
 import com.changhong.openvdb.app.assets.Assets;
@@ -26,7 +28,7 @@ import java.util.*;
  * @since 2026/4/3
  */
 @SuppressWarnings("unchecked")
-public class TableStructureDesignerPane extends BrowserPane
+public class TableDesignerPane extends BorderPane
 {
         private final Tab ownerTab;
         private final Session session;
@@ -56,10 +58,10 @@ public class TableStructureDesignerPane extends BrowserPane
         /* 当前选中标签对应的设计接口 */
         private Designer<?> designer;
 
-        public TableStructureDesignerPane(Tab ownerTab,
-                                          Session session,
-                                          Driver driver,
-                                          Table table)
+        public TableDesignerPane(Tab ownerTab,
+                                 Session session,
+                                 Driver driver,
+                                 Table table)
         {
                 this.ownerTab = ownerTab;
                 this.session = session;
@@ -68,8 +70,8 @@ public class TableStructureDesignerPane extends BrowserPane
                 this.columnMetaDatas = driver.getColumns(session, table.getName());
                 this.indexes = driver.getIndexes(session, table);
 
-                this.tableStructureDesigner = new TableStructureDesigner(session, driver, table, "表结构");
-                this.indexColumnDesigner = new IndexStructureDesigner(session, driver, table, "索引");
+                this.tableStructureDesigner = new TableColumnDesignerPane(session, driver, table, "表结构");
+                this.indexColumnDesigner = new TableIndexDesignerPane(session, driver, table, "索引");
 
                 setupToolBar();
 
@@ -144,14 +146,14 @@ public class TableStructureDesignerPane extends BrowserPane
         private void onPlus()
         {
                 switch (designer) {
-                        case TableStructureDesigner inst -> {
+                        case TableColumnDesignerPane inst -> {
                                 Column columnMetaData = new Column();
                                 inst.onPlus(columnMetaData);
                                 structureView.getItems().add(columnMetaData);
                                 structureView.refresh();
                         }
 
-                        case IndexStructureDesigner inst -> {
+                        case TableIndexDesignerPane inst -> {
                                 Index indexMetaData = new Index();
                                 inst.onPlus(indexMetaData);
                                 indexView.getItems().add(indexMetaData);
@@ -166,8 +168,8 @@ public class TableStructureDesignerPane extends BrowserPane
         private void onMinus()
         {
                 ObservableList<?> items = switch (designer) {
-                        case TableStructureDesigner ignored -> structureView.getSelectionModel().getSelectedItems();
-                        case IndexStructureDesigner ignored -> indexView.getSelectionModel().getSelectedItems();
+                        case TableColumnDesignerPane ignored -> structureView.getSelectionModel().getSelectedItems();
+                        case TableIndexDesignerPane ignored -> indexView.getSelectionModel().getSelectedItems();
                         default -> FXCollections.emptyObservableList();
                 };
 
@@ -183,8 +185,8 @@ public class TableStructureDesignerPane extends BrowserPane
                 new Thread(() -> {
                         try {
                                 switch (designer) {
-                                        case TableStructureDesigner inst -> inst.onMinus((Collection<Column>) items);
-                                        case IndexStructureDesigner inst -> inst.onMinus((Collection<Index>) items);
+                                        case TableColumnDesignerPane inst -> inst.onMinus((Collection<Column>) items);
+                                        case TableIndexDesignerPane inst -> inst.onMinus((Collection<Index>) items);
                                         default -> throw new UnsupportedOperationException("Unsupported designer object instance");
                                 }
                                 doReload();

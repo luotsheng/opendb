@@ -12,11 +12,13 @@ import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 
 /**
+ * 打开表数据展示面板
+ *
  * @author Luo Tiansheng
  * @since 2026/3/30
  */
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
-public class PreviewTableDataPane extends BorderPane
+public class TableDataPane extends BorderPane
 {
         private int start = 0;
         private int size = 1024;
@@ -28,10 +30,10 @@ public class PreviewTableDataPane extends BorderPane
         private final Table table;
         private final DataGridViewPane dataGridViewPane;
 
-        public PreviewTableDataPane(Tab ownerTab,
-                                    Session session,
-                                    Driver driver,
-                                    Table table)
+        public TableDataPane(Tab ownerTab,
+                             Session session,
+                             Driver driver,
+                             Table table)
         {
                 this.ownerTab = ownerTab;
                 this.session = session;

@@ -7,8 +7,8 @@ import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.bus.EventListener;
 import com.changhong.openvdb.app.assets.Assets;
 import com.changhong.openvdb.app.explorer.UIConnectionNode;
-import com.changhong.openvdb.app.pane.TableStructureDesignerPane;
-import com.changhong.openvdb.app.pane.PreviewTableDataPane;
+import com.changhong.openvdb.app.pane.TableDesignerPane;
+import com.changhong.openvdb.app.pane.TableDataPane;
 import com.changhong.openvdb.app.widgets.VFXTabPane;
 import com.changhong.openvdb.core.model.ScriptFile;
 import javafx.scene.Node;
@@ -215,7 +215,7 @@ public class Workbench extends VBox implements EventListener
                         tab = new Tab(id);
                 }
 
-                PreviewTableDataPane pane = new PreviewTableDataPane(
+                TableDataPane pane = new TableDataPane(
                         tab,
                         event.session,
                         event.driver,
@@ -241,7 +241,7 @@ public class Workbench extends VBox implements EventListener
 
                 if (tab == null) {
                         tab = new Tab(e.id());
-                        tab.setContent(new TableStructureDesignerPane(tab, e.session, e.driver, e.table));
+                        tab.setContent(new TableDesignerPane(tab, e.session, e.driver, e.table));
                         tab.setGraphic(Assets.use("struct1"));
                         TableMgr.put(e.id(), tab);
                 }

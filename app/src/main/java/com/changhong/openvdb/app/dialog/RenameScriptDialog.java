@@ -4,17 +4,13 @@ import com.changhong.openvdb.app.Application;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.RefreshQueryNodeEvent;
 import com.changhong.openvdb.core.model.ScriptFile;
-import com.changhong.openvdb.app.pane.BrowserPane;
 import com.changhong.openvdb.core.repository.ScriptFileRepository;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 /**
@@ -22,7 +18,7 @@ import javafx.stage.Stage;
  * @since 2026/3/27
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class RenameScriptDialog extends BrowserPane
+public class RenameScriptDialog extends BorderPane
 {
         private final Stage stage;
         private final TextField textField;
