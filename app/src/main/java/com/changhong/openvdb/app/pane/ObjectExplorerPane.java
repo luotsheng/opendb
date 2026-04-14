@@ -1,17 +1,18 @@
 package com.changhong.openvdb.app.pane;
 
-import com.changhong.openvdb.app.model.UINodeGlobalStatus;
-import com.changhong.openvdb.app.menu.ConnectionMenuBuilder;
-import com.changhong.openvdb.app.explorer.UIExplorerNode;
-import com.changhong.openvdb.core.model.ConnectionProfile;
-import com.changhong.openvdb.core.repository.ConnectionRepository;
+import com.changhong.openvdb.app.assets.Assets;
+import com.changhong.openvdb.app.event.RefreshConnectionEvent;
 import com.changhong.openvdb.app.event.bus.Event;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.bus.EventListener;
-import com.changhong.openvdb.app.event.RefreshConnectionEvent;
-import com.changhong.openvdb.app.assets.Assets;
 import com.changhong.openvdb.app.explorer.UIConnectionNode;
+import com.changhong.openvdb.app.explorer.UIExplorerNode;
+import com.changhong.openvdb.app.menu.ConnectionMenuBuilder;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
+import com.changhong.openvdb.app.model.UINodeGlobalStatus;
+import com.changhong.openvdb.core.model.ConnectionProfile;
+import com.changhong.openvdb.core.repository.ConnectionRepository;
+import com.changhong.utils.thread.ThreadPool;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -100,9 +101,11 @@ public class ObjectExplorerPane extends VBox implements EventListener
                 ContextMenu rootContextMenu = new ContextMenu();
 
                 Menu newConnectionMenu = ConnectionMenuBuilder.buildNewConnectionMenu();
-                MenuItem openAllItem =  new MenuItem("打开所有连接");
-                MenuItem closeAllItem =  new MenuItem("关闭所有连接");
-                MenuItem refreshAllItem =  new MenuItem("刷新连接");
+                MenuItem openAllItem = new MenuItem("打开所有连接");
+                openAllItem.setOnAction(event -> batchOpenConnection());
+                MenuItem closeAllItem = new MenuItem("关闭所有连接");
+                closeAllItem.setOnAction(event -> batchCloseConnection());
+                MenuItem refreshAllItem = new MenuItem("刷新连接");
 
                 rootContextMenu.getItems().addAll(
                         newConnectionMenu,
@@ -115,6 +118,22 @@ public class ObjectExplorerPane extends VBox implements EventListener
                 refreshAllItem.setOnAction(event -> refreshConnectionNode());
 
                 return rootContextMenu;
+        }
+
+        private void batchOpenConnection()
+        {
+                for (UIConnectionNode node : connections.values()) {
+                        if (!node.isOpen())
+                                ThreadPool.taskSubmit(node::openConnection);
+                }
+        }
+
+        private void batchCloseConnection()
+        {
+                for (UIConnectionNode node : connections.values()) {
+                        if (node.isOpen())
+                                ThreadPool.taskSubmit(node::closeConnection);
+                }
         }
 
         private void setupContextMenu()
