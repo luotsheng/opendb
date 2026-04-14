@@ -57,7 +57,7 @@ public class ScriptEditor extends SplitPane
         static final int QUERY_MESSAGE_LOG_FIRST = 1;
 
         @Getter
-        private final Tab ownerTab;
+        private final Tab owner;
         private final ToolBar toolBar;
         private final VFXCodeArea codeArea;
         private final VirtualizedScrollPane<CodeArea> virtualizedScrollPane;
@@ -83,9 +83,7 @@ public class ScriptEditor extends SplitPane
         private Button stop;
         private Button beautify;
 
-        public ScriptEditor(UIConnectionNode conn,
-                            ScriptFile scriptFile,
-                            Tab ownerTab)
+        public ScriptEditor(UIConnectionNode conn, ScriptFile scriptFile, Tab owner)
         {
                 this.scriptFile = scriptFile;
 
@@ -93,7 +91,7 @@ public class ScriptEditor extends SplitPane
                         ? scriptFile.getName()
                         : strfmt("查询脚本_%s.sql@[ N/A ]", (numberCount++));
 
-                this.ownerTab = ownerTab;
+                this.owner = owner;
 
                 setOrientation(Orientation.VERTICAL);
 
@@ -192,7 +190,7 @@ public class ScriptEditor extends SplitPane
 
                 codeArea.textProperty().addListener((obs, oldVal, newVal) -> {
                         if (saveFlag && scriptFile == null) {
-                                ownerTab.setText("* " + ownerTab.getText());
+                                owner.setText("* " + owner.getText());
                                 saveFlag = false;
                         }
                 });
@@ -338,13 +336,13 @@ public class ScriptEditor extends SplitPane
 
         private void setLoadingIndicator()
         {
-                oldGraphic = ownerTab.getGraphic();
-                ownerTab.setGraphic(Assets.newProgressIndicator());
+                oldGraphic = owner.getGraphic();
+                owner.setGraphic(Assets.newProgressIndicator());
         }
 
         private void removeLoadingIndicator()
         {
-                ownerTab.setGraphic(oldGraphic);
+                owner.setGraphic(oldGraphic);
         }
 
         private void showResultSetTableViewPane(int flag)
@@ -487,7 +485,7 @@ public class ScriptEditor extends SplitPane
                         ? ""
                         : "@" + database.getName();
 
-                ownerTab.setText(name + tail);
+                owner.setText(name + tail);
         }
 
         private void autoSave()
@@ -532,9 +530,9 @@ public class ScriptEditor extends SplitPane
         {
                 saveFlag = true;
 
-                var text = ownerTab.getText();
+                var text = owner.getText();
                 if (text.startsWith("* "))
-                        ownerTab.setText(text.substring(2));
+                        owner.setText(text.substring(2));
         }
 
         public boolean sqlFileEquals(File file)
@@ -548,7 +546,7 @@ public class ScriptEditor extends SplitPane
         public void close()
         {
                 if (!saveFlag) {
-                        if (VFXDialogHelper.ask("%s 未保存，是否保存？", ownerTab.getText()))
+                        if (VFXDialogHelper.ask("%s 未保存，是否保存？", owner.getText()))
                                 save();
                 }
         }

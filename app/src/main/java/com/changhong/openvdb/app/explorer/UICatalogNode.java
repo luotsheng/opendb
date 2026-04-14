@@ -4,6 +4,8 @@ import com.changhong.openvdb.app.event.*;
 import com.changhong.openvdb.app.event.bus.Event;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.bus.EventListener;
+import com.changhong.openvdb.app.event.workbench.OpenScriptEditorPaneEvent;
+import com.changhong.openvdb.app.event.workbench.OpenNavigationPaneEvent;
 import com.changhong.openvdb.driver.api.Driver;
 import com.changhong.openvdb.driver.api.Session;
 import com.changhong.openvdb.driver.api.Table;
@@ -56,8 +58,7 @@ public class UICatalogNode extends UIExplorerNode implements EventListener
         private MenuItem newQueryMenuItem;
 
         private final TableOverviewPane detailPane = new TableOverviewPane(this);
-        private final OpenWorkbenchPaneEvent openWorkbenchPaneEvent = new OpenWorkbenchPaneEvent(detailPane);
-        private final CloseWorkbenchPaneEvent closeWorkbenchPaneEvent = new CloseWorkbenchPaneEvent(detailPane);
+        private final OpenNavigationPaneEvent openWorkbenchPaneEvent = new OpenNavigationPaneEvent(detailPane);
 
         /**
          * 内部通用节点
@@ -166,7 +167,6 @@ public class UICatalogNode extends UIExplorerNode implements EventListener
                 setExpanded(false);
 
                 getChildren().clear();
-                EventBus.publish(closeWorkbenchPaneEvent);
 
                 openFlag = false;
         }
@@ -204,7 +204,7 @@ public class UICatalogNode extends UIExplorerNode implements EventListener
 
         private void newQueryScript()
         {
-                EventBus.publish(new OpenScriptEditorEvent(connection));
+                EventBus.publish(new OpenScriptEditorPaneEvent(connection));
         }
 
         public void setupListenerEvent()

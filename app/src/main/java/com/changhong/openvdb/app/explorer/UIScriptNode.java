@@ -2,9 +2,8 @@ package com.changhong.openvdb.app.explorer;
 
 import com.changhong.openvdb.app.Application;
 import com.changhong.openvdb.app.event.bus.EventBus;
-import com.changhong.openvdb.app.event.OpenScriptEditorEvent;
+import com.changhong.openvdb.app.event.workbench.OpenScriptEditorPaneEvent;
 import com.changhong.openvdb.app.event.RefreshQueryNodeEvent;
-import com.changhong.openvdb.app.event.RemoveScriptEditorTabEvent;
 import com.changhong.openvdb.app.assets.Assets;
 import com.changhong.openvdb.app.dialog.RenameScriptDialog;
 import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
@@ -69,7 +68,7 @@ public class UIScriptNode extends UIExplorerNode
 
         private void openScriptEditor()
         {
-                EventBus.publish(new OpenScriptEditorEvent(catalog.getConnection(), scriptFile));
+                EventBus.publish(new OpenScriptEditorPaneEvent(catalog.getConnection(), scriptFile));
         }
 
         private void renameQuery()
@@ -94,7 +93,6 @@ public class UIScriptNode extends UIExplorerNode
         {
                 scriptFile.forceDelete();
                 catalog.queryItem.getChildren().remove(this);
-                EventBus.publish(new RemoveScriptEditorTabEvent(scriptFile));
                 EventBus.publish(new RefreshQueryNodeEvent());
         }
 

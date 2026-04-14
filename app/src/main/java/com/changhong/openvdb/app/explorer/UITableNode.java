@@ -2,8 +2,8 @@ package com.changhong.openvdb.app.explorer;
 
 import com.changhong.openvdb.app.Application;
 import com.changhong.openvdb.app.assets.Assets;
-import com.changhong.openvdb.app.event.OpenDataGridPaneEvent;
-import com.changhong.openvdb.app.event.OpenTableDesignerPaneEvent;
+import com.changhong.openvdb.app.event.workbench.OpenTableDataPaneEvent;
+import com.changhong.openvdb.app.event.workbench.OpenTableDesignerPaneEvent;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.driver.api.Driver;
 import com.changhong.openvdb.driver.api.Table;
@@ -75,11 +75,7 @@ public class UITableNode extends UIExplorerNode
 
         public void openDataGridBrowserPane()
         {
-                EventBus.publish(new OpenDataGridPaneEvent(catalog.getSession(),
-                        driver,
-                        catalog.getName(),
-                        table,
-                        catalog.getConnection().getName()));
+                EventBus.publish(new OpenTableDataPaneEvent(catalog, table));
         }
 
         public void openTableDesignerPane()

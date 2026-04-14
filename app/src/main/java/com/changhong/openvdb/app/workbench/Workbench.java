@@ -1,29 +1,18 @@
 package com.changhong.openvdb.app.workbench;
 
 import com.changhong.openvdb.app.Application;
-import com.changhong.openvdb.app.event.*;
 import com.changhong.openvdb.app.event.bus.Event;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.bus.EventListener;
-import com.changhong.openvdb.app.assets.Assets;
-import com.changhong.openvdb.app.explorer.UIConnectionNode;
-import com.changhong.openvdb.app.pane.TableDesignerPane;
-import com.changhong.openvdb.app.pane.TableDataPane;
+import com.changhong.openvdb.app.event.workbench.*;
+import com.changhong.openvdb.app.exception.ApplicationException;
 import com.changhong.openvdb.app.widgets.VFXTabPane;
-import com.changhong.openvdb.core.model.ScriptFile;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.changhong.utils.string.StaticLibrary.strfmt;
 
 /**
  * @author Luo Tiansheng
@@ -33,11 +22,7 @@ import static com.changhong.utils.string.StaticLibrary.strfmt;
 public class Workbench extends VBox implements EventListener
 {
         private final VFXTabPane tabPane = new VFXTabPane();
-        private final Tab detailTab = new Tab("详情");
-        private final List<ScriptEditor> editors = new ArrayList<>();
-        
-        private final Map<String, Tab> dataGridMgr = new HashMap<>();
-        private final Map<String, Tab> TableMgr = new HashMap<>();
+        private final Tab navigationTab = new Tab("导航");
 
         private final ContextMenu tabPaneContextMenu = new ContextMenu();
         private final MenuItem closeCurrent = new MenuItem("关闭当前");;
@@ -54,15 +39,11 @@ public class Workbench extends VBox implements EventListener
 
                 setupTabPane();
                 setupContextMenu();
-                setupDetailTab();
+                setuphomeTab();
 
                 // 订阅事件
-                EventBus.subscribe(OpenWorkbenchPaneEvent.class, this);
-                EventBus.subscribe(CloseWorkbenchPaneEvent.class, this);
-                EventBus.subscribe(OpenScriptEditorEvent.class, this);
-                EventBus.subscribe(OpenDataGridPaneEvent.class, this);
-                EventBus.subscribe(RemoveScriptEditorTabEvent.class, this);
-                EventBus.subscribe(OpenTableDesignerPaneEvent.class, this);
+                EventBus.subscribe(OpenTabEvent.class, this);
+                EventBus.subscribe(OpenNavigationPaneEvent.class, this);
         }
 
         private void setupTabPane()
@@ -74,7 +55,7 @@ public class Workbench extends VBox implements EventListener
                                 if (node.getStyleClass().contains("tab")) {
                                         Tab tab = (Tab) node.getProperties().get(Tab.class);
 
-                                        if (tab == detailTab)
+                                        if (tab == navigationTab)
                                                 return;
 
                                         showMenu(tabPane, tab, event);
@@ -103,10 +84,10 @@ public class Workbench extends VBox implements EventListener
                 });
         }
 
-        private void setupDetailTab()
+        private void setuphomeTab()
         {
-                detailTab.setClosable(false);
-                tabPane.add(detailTab);
+                navigationTab.setClosable(false);
+                tabPane.add(navigationTab);
         }
 
         private void showMenu(VFXTabPane tabPane, Tab tab, ContextMenuEvent e)
@@ -144,108 +125,22 @@ public class Workbench extends VBox implements EventListener
         public void onEvent(Event event)
         {
                 switch (event) {
-                        case OpenWorkbenchPaneEvent e      -> handleOpenWorkbenchPaneEvent(e);
-                        case CloseWorkbenchPaneEvent e     -> handleCloseWorkbenchPaneEvent(e);
-                        case RemoveScriptEditorTabEvent e  -> handleRemoveScriptEditorTabEvent(e);
-                        case OpenScriptEditorEvent e       -> handleOpenScriptEditorEvent(e);
-                        case OpenDataGridPaneEvent e       -> handleOpenDataGridPaneEvent(e);
-                        case OpenTableDesignerPaneEvent e  -> handleOpenDesignTablePaneEvent(e);
-                        default -> {}
+                        case OpenTabEvent e -> handleOpenTabEvent(e);
+                        case OpenNavigationPaneEvent e -> handleOpenWorkbenchPaneEvent(e);
+                        default -> throw new ApplicationException("unsupported event type");
                 }
         }
 
-        private void handleOpenWorkbenchPaneEvent(OpenWorkbenchPaneEvent event)
+        private void handleOpenTabEvent(OpenTabEvent e)
         {
-                detailTab.setContent(event.getPane());
-                tabPane.select(detailTab);
-        }
-
-        @SuppressWarnings("unused")
-        private void handleCloseWorkbenchPaneEvent(CloseWorkbenchPaneEvent event)
-        {
-                if (detailTab.getContent() == event.getPane())
-                        detailTab.setContent(null);
-        }
-
-        private void handleRemoveScriptEditorTabEvent(RemoveScriptEditorTabEvent event)
-        {
-                for (ScriptEditor editor : editors) {
-                        if (editor.sqlFileEquals(event.sqlFile))
-                                tabPane.remove(editor.getOwnerTab());
-                }
-        }
-
-        private void handleOpenScriptEditorEvent(OpenScriptEditorEvent event)
-        {
-                Tab queryTab = new Tab();
-                queryTab.setGraphic(Assets.use("sql"));
-                ScriptEditor scriptEditor;
-
-                UIConnectionNode connection = event.connection;
-                ScriptFile scriptFile = event.scriptFile;
-
-                scriptEditor = new ScriptEditor(connection, scriptFile, queryTab);
-
-                queryTab.setContent(scriptEditor);
-                queryTab.setOnCloseRequest(e -> {
-                        if (queryTab.getContent() instanceof ScriptEditor editor) {
-                                editor.close();
-                        }
-                });
-
-                editors.add(scriptEditor);
-                tabPane.add(queryTab);
-                tabPane.select(queryTab);
-        }
-
-        private void handleOpenDataGridPaneEvent(OpenDataGridPaneEvent event)
-        {
-                String id = strfmt("%s@%s (%s)",
-                        event.table.getName(),
-                        event.session.catalog(),
-                        event.connectionName);
-
-                Tab tab;
-
-                if (dataGridMgr.containsKey(id)) {
-                        tab = dataGridMgr.get(id);
-                        tabPane.select(tab);
-                        return;
-                } else {
-                        tab = new Tab(id);
-                }
-
-                TableDataPane pane = new TableDataPane(
-                        tab,
-                        event.session,
-                        event.driver,
-                        event.table
-                );
-
-                tab.setGraphic(Assets.use("table"));
-                tab.setContent(pane);
-                tab.setOnCloseRequest(closeEvent -> {
-                        Tab closeTab = (Tab) closeEvent.getTarget();
-                        dataGridMgr.remove(closeTab.getText());
-                });
-
+                Tab tab = new Tab(e.tabId());
+                tab.setContent(e.createPane(tab));
                 tabPane.addAndSelect(tab);
-                dataGridMgr.put(id, tab);
-
-                pane.asyncUpdate();
         }
 
-        private void handleOpenDesignTablePaneEvent(OpenTableDesignerPaneEvent e)
+        private void handleOpenWorkbenchPaneEvent(OpenNavigationPaneEvent event)
         {
-                Tab tab = TableMgr.get(e.id());
-
-                if (tab == null) {
-                        tab = new Tab(e.id());
-                        tab.setContent(new TableDesignerPane(tab, e.session, e.driver, e.table));
-                        tab.setGraphic(Assets.use("struct1"));
-                        TableMgr.put(e.id(), tab);
-                }
-
-                tabPane.addAndSelect(tab);
+                navigationTab.setContent(event.getPane());
+                tabPane.select(navigationTab);
         }
 }

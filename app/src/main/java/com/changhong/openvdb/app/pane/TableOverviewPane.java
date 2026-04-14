@@ -5,7 +5,7 @@ import com.changhong.openvdb.app.widgets.VFXIconButton;
 import com.changhong.openvdb.app.widgets.VFXSeparator;
 import com.changhong.openvdb.driver.api.Table;
 import com.changhong.openvdb.app.event.bus.EventBus;
-import com.changhong.openvdb.app.event.OpenDataGridPaneEvent;
+import com.changhong.openvdb.app.event.workbench.OpenTableDataPaneEvent;
 import com.changhong.openvdb.app.assets.Assets;
 import com.changhong.openvdb.app.explorer.UICatalogNode;
 import com.changhong.openvdb.app.widgets.table.VFXTableColumn;
@@ -173,11 +173,7 @@ public class TableOverviewPane extends BorderPane
 
                                 if (e.getClickCount() == 2 && !row.isEmpty()) {
                                         Table data = row.getItem();
-                                        EventBus.publish(new OpenDataGridPaneEvent(database.getSession(),
-                                                database.getDriver(),
-                                                database.getName(),
-                                                data,
-                                                database.getConnection().getName()));
+                                        EventBus.publish(new OpenTableDataPaneEvent(database, data));
                                 }
 
                         });

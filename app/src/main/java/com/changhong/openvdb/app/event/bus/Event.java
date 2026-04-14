@@ -10,12 +10,11 @@ import java.util.Date;
  * @author Luo Tiansheng
  * @since 2026/3/26
  */
+@Getter
 public abstract class Event
 {
-        @Getter
         protected boolean consume = false;
 
-        @Getter
         private final Date createTime = new Date();
 
         /**

@@ -1,5 +1,6 @@
 package com.changhong.openvdb.app.event.bus;
 
+import com.changhong.openvdb.app.event.workbench.OpenTabEvent;
 import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,11 @@ public class EventBus
         public static void publish(Event event)
         {
                 Platform.runLater(() -> {
-                        CopyOnWriteArrayList<EventListener> copyOnWriteEventListeners = eventListeners.get(event.getClass());
+                        Class<? extends Event> eventClass = event instanceof OpenTabEvent
+                                ? OpenTabEvent.class
+                                : event.getClass();
+
+                        CopyOnWriteArrayList<EventListener> copyOnWriteEventListeners = eventListeners.get(eventClass);
 
                         copyOnWriteEventListeners.forEach(listener -> {
                                 try {

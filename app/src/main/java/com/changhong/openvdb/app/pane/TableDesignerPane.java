@@ -58,10 +58,7 @@ public class TableDesignerPane extends BorderPane
         /* 当前选中标签对应的设计接口 */
         private Designer<?> designer;
 
-        public TableDesignerPane(Tab ownerTab,
-                                 Session session,
-                                 Driver driver,
-                                 Table table)
+        public TableDesignerPane(Tab ownerTab, Session session, Driver driver, Table table)
         {
                 this.ownerTab = ownerTab;
                 this.session = session;

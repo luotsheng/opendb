@@ -42,4 +42,9 @@ public record Session(String catalog, String schema)
         {
                 return new Session(null, schema);
         }
+
+        public String scope()
+        {
+                return schema == null ? catalog : schema;
+        }
 }
