@@ -8,6 +8,8 @@ import java.sql.*;
 @SuppressWarnings("SqlSourceToSinkFlow")
 public class StatementProxy implements Statement
 {
+        private int batchCount = 0;
+
         private static final Logger LOG = LoggerFactory.getLogger(StatementProxy.class);
 
         private final Statement statement;
@@ -19,13 +21,13 @@ public class StatementProxy implements Statement
 
         @Override
         public ResultSet executeQuery(String sql) throws SQLException {
-                LOG.info("Statement executeQuery: {}", sql);
+                LOG.info("driver execute query: {}", sql);
                 return statement.executeQuery(sql);
         }
 
         @Override
         public int executeUpdate(String sql) throws SQLException {
-                LOG.info("Statement executeUpdate: {}", sql);
+                LOG.info("driver execute update: {}", sql);
                 return statement.executeUpdate(sql);
         }
 
@@ -91,7 +93,7 @@ public class StatementProxy implements Statement
 
         @Override
         public boolean execute(String sql) throws SQLException {
-                LOG.info("Statement execute: {}", sql);
+                LOG.info("driver execute: {}", sql);
                 return statement.execute(sql);
         }
 
@@ -142,6 +144,8 @@ public class StatementProxy implements Statement
 
         @Override
         public void addBatch(String sql) throws SQLException {
+                LOG.info("driver add batch: {}", sql);
+                batchCount++;
                 statement.addBatch(sql);
         }
 
@@ -152,6 +156,7 @@ public class StatementProxy implements Statement
 
         @Override
         public int[] executeBatch() throws SQLException {
+                LOG.info("driver execute batch, sql count: {}", batchCount);
                 return statement.executeBatch();
         }
 

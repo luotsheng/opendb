@@ -3,16 +3,20 @@ package com.changhong.openvdb.driver.dm;
 import com.changhong.openvdb.driver.api.*;
 import com.changhong.openvdb.driver.api.exception.DriverException;
 import com.changhong.openvdb.driver.api.sql.SQL;
-import com.changhong.openvdb.driver.utils.SQLUtils;
 import com.changhong.utils.collection.Lists;
+import com.changhong.utils.collection.Sets;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
+import static com.changhong.utils.TypeConverter.atos;
 import static com.changhong.utils.collection.Lists.beg;
-import static com.changhong.utils.string.StaticLibrary.strfmt;
+import static com.changhong.utils.string.StaticLibrary.*;
 
 /**
  * @author Luo Tiansheng
@@ -124,7 +128,12 @@ public class DMDriver extends Driver
         @Override
         public Set<String> getIndexTypes()
         {
-                return Set.of();
+                return Sets.newLinkedHashSet(
+                        "NORMAL",
+                        "UNIQUE",
+                        "BITMAP",
+                        "CLUSTER"
+                );
         }
 
         @Override
@@ -166,12 +175,65 @@ public class DMDriver extends Driver
         @Override
         public void alterChange(Session session, String table, Collection<Column> columns)
         {
+                List<String> sqls = Lists.newArrayList();
 
+                // DM 和 MySQL 列名修改是不同的语句，MySQL 支持一条语句同时修改
+                // 列的信息和列名称。但 DM 不行，所以需要便利两次字段信息来分别不
+                // 同执行列名的修改和列结构的修改
+                for (Column column : columns) {
+                        if (strne(column.getOriginalName(), column.getName())) {
+                                sqls.add(strfmt("ALTER TABLE %s RENAME COLUMN %s TO %s;",
+                                        dialect.quote(table),
+                                        dialect.quote(column.getOriginalName()),
+                                        dialect.quote(column.getName())
+                                ));
+                        }
+                }
+
+                // 配置列信息
+                for (Column column : columns) {
+                        StringBuilder builder = new StringBuilder();
+
+                        builder.append(strfmt("ALTER TABLE %s MODIFY %s ",
+                                dialect.quote(table),
+                                dialect.quote(column.getName())
+                        ));
+
+                        builder.append(column.getType());
+
+                        if (!column.isNullable())
+                                builder.append(" NOT NULL");
+
+                        if (strnempty(column.getDefaultValue()))
+                                builder.append(" DEFAULT ").append(column.getDefaultValue());
+
+                        if (strnempty(column.getComment()))
+                                builder.append(" COMMENT ").append(column.getComment());
+
+                        builder.append(";");
+
+                        sqls.add(atos(builder));
+                }
+
+                /* 批量执行 */
+                executeBatch(session, ((connection, statement) -> {
+                        if (sqls.isEmpty())
+                                return new int[] {0};
+
+                        for (String sql : sqls)
+                                statement.addBatch(sql);
+
+                        return statement.executeBatch();
+                }));
         }
 
         @Override
         public void alterVisible(Session session, String table, Collection<Index> indexes)
         {
-
+                for (Index index : indexes) {
+                        execute(session, "ALTER INDEX %s %s;",
+                                dialect.quote(index.getName()),
+                                index.isVisible() ? "VISIBLE" : "INVISIBLE");
+                }
         }
 }
