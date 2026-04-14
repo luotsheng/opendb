@@ -22,8 +22,11 @@ import javafx.scene.image.ImageView;
 import lombok.Getter;
 
 import java.sql.SQLException;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Luo Tiansheng
@@ -117,6 +120,7 @@ public class UIDatabaseNode extends UIExplorerNode implements EventListener
         {
                 tables.clear();
                 tables.addAll(driver.getTables(session));
+                tables.sort(Comparator.comparing(Table::getName, Collator.getInstance(Locale.CHINA)));
         }
 
         public final void dropTable(Table table) throws SQLException
