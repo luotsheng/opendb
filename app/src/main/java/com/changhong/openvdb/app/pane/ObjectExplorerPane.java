@@ -20,10 +20,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.Collator;
+import java.util.*;
 
 /**
  * 导航面板
@@ -232,6 +230,10 @@ public class ObjectExplorerPane extends VBox implements EventListener
                         connections.put(profile.getName(), connection);
                         children.add(connection);
                 }
+
+                Collator collator = Collator.getInstance(Locale.CHINA);
+                children.sort(Comparator.comparing(
+                        node -> ((UIConnectionNode) node).getName(), collator));
         }
 
 }
