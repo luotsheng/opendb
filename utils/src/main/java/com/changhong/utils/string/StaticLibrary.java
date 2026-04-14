@@ -516,6 +516,20 @@ public class StaticLibrary
     }
 
     /**
+     * 检查字符串是否与正则表达式匹配。(忽略大小写)
+     *
+     * <p>此方法用于确定输入字符串是否符合指定的正则表达式规则。
+     * 常用于格式验证。
+     *
+     * @param obj 要检查的字符串对象
+     * @param regexp 用于匹配的正则表达式
+     * @return 如果字符串匹配则返回 true；否则返回 false
+     */
+    public static boolean strimatch(Object obj, String regexp) {
+        return strmatch(lowercase(obj), lowercase(regexp));
+    }
+
+    /**
      * 检查字符串是否与正则表达式匹配。
      *
      * <p>此方法用于确定输入字符串是否符合指定的正则表达式规则。

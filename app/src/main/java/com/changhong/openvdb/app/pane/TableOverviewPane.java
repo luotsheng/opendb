@@ -12,6 +12,8 @@ import com.changhong.openvdb.app.widgets.table.VFXTableColumn;
 import com.changhong.openvdb.app.widgets.table.VFXTableView;
 import com.changhong.openvdb.app.widgets.table.cell.VFXDateTableCell;
 import com.changhong.openvdb.driver.api.Table;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -22,9 +24,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.util.Duration;
 
 import java.util.Date;
 import java.util.List;
+
+import static com.changhong.utils.string.StaticLibrary.*;
 
 /**
  * 数据表信息在详情页的预览面板
@@ -39,6 +44,7 @@ public class TableOverviewPane extends BorderPane
         private final ToolBar toolBar;
 
         private final UICatalogNode database;
+        private List<Table> tables;
 
         private TableColumn<Table, String> name;
         private TableColumn<Table, Date> createTime;
@@ -48,13 +54,16 @@ public class TableOverviewPane extends BorderPane
         private TableColumn<Table, String> rows;
         private TableColumn<Table, String> comment;
 
-        private ObservableList<Table> obs;
+        private final ObservableList<Table> observable = FXCollections.observableArrayList();
+        private final PauseTransition searchDelay = new PauseTransition(Duration.millis(200));
+
 
         public TableOverviewPane(UICatalogNode database)
         {
                 this.database = database;
 
                 tableView = new VFXTableView<>(VFXTableView.LITE_STYLE);
+                tableView.setItems(observable);
                 toolBar = new ToolBar();
 
                 // setup
@@ -82,6 +91,25 @@ public class TableOverviewPane extends BorderPane
                 TextField search = new TextField();
                 search.setPromptText("搜索...");
                 search.setPrefWidth(300);
+
+                search.textProperty().addListener((obs, oldVal, newVal) -> {
+                        searchDelay.setOnFinished(e -> {
+                                if (strempty(newVal)) {
+                                        update(tables);
+                                        return;
+                                }
+
+                                var kw = newVal.trim();
+
+                                List<Table> ret = tables.stream()
+                                        .filter(t -> strmatch(t.getName(), kw) || strmatch(t.getComment(), kw))
+                                        .toList();
+
+                                update(ret);
+                        });
+
+                        searchDelay.playFromStart();
+                });
 
                 HBox searchBox = new HBox(5, Assets.use("search"), search);
                 searchBox.setAlignment(Pos.CENTER_LEFT);
@@ -220,14 +248,15 @@ public class TableOverviewPane extends BorderPane
                 updateTime.setCellFactory(col -> new VFXDateTableCell<>());
         }
 
-        public void update(List<Table> tables)
+        private void update(List<Table> tables)
         {
-                if (obs == null) {
-                        obs = FXCollections.observableArrayList();
-                        tableView.setItems(obs);
-                }
-
-                obs.setAll(tables);
+                observable.setAll(tables);
                 tableView.refresh();
+        }
+
+        public void setAndUpdate(List<Table> tables)
+        {
+                this.tables = tables;
+                update(tables);
         }
 }

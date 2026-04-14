@@ -196,7 +196,7 @@ public class UICatalogNode extends UIExplorerNode implements EventListener
                         tableItem.getChildren().add(tableNode);
                 }
 
-                overviewPane.update(tables);
+                overviewPane.setAndUpdate(tables);
         }
 
         private void reloadQueryNode()
