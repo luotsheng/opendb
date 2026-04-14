@@ -1,5 +1,6 @@
 package com.changhong.openvdb.app.pane;
 
+import com.changhong.openvdb.app.navigator.node.UITableNode;
 import com.changhong.openvdb.app.widgets.VFXIconButton;
 import com.changhong.openvdb.app.widgets.VFXSeparator;
 import com.changhong.openvdb.driver.api.Table;
@@ -11,6 +12,7 @@ import com.changhong.openvdb.app.widgets.table.VFXTableColumn;
 import com.changhong.openvdb.app.widgets.table.VFXTableView;
 import com.changhong.openvdb.app.widgets.table.cell.VFXDateTableCell;
 import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -59,6 +61,7 @@ public class CatalogBrowserPane extends BrowserPane
                 setupToolBar();
                 initializeColumn();
                 setupCellFactory();
+                setupTableView();
 
                 setTop(toolBar);
                 setCenter(tableView);
@@ -90,6 +93,26 @@ public class CatalogBrowserPane extends BrowserPane
                         new VFXSeparator(),
                         spacer,
                         searchBox);
+        }
+
+        private void setupTableView()
+        {
+                tableView.setRowFactory(tv -> {
+                        TableRow<Table> r = new TableRow<>();
+
+                        r.itemProperty().addListener((obs, oldItem, table) -> {
+                                if (table == null) {
+                                        r.setContextMenu(null);
+                                        return;
+                                }
+
+                                UITableNode uiTableNode = database.getUITableNode(table.getName());
+                                if (uiTableNode != null)
+                                        r.setContextMenu(uiTableNode.getContextMenu());
+                        });
+
+                        return r;
+                });
         }
 
         private void deleteTable()

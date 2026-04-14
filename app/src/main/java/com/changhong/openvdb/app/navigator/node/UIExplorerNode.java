@@ -28,6 +28,7 @@ public abstract class UIExplorerNode extends TreeItem<String>
 
          */
         @Setter
+        @Getter
         protected ContextMenu contextMenu;
 
         private Node oldGraphic;

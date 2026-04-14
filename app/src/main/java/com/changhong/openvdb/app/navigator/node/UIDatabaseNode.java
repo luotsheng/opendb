@@ -12,6 +12,7 @@ import com.changhong.openvdb.app.pane.CatalogBrowserPane;
 import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
 import com.changhong.openvdb.core.model.ScriptFile;
 import com.changhong.openvdb.core.repository.ScriptFileRepository;
+import com.changhong.utils.collection.Maps;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -23,10 +24,7 @@ import lombok.Getter;
 
 import java.sql.SQLException;
 import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * @author Luo Tiansheng
@@ -43,6 +41,7 @@ public class UIDatabaseNode extends UIExplorerNode implements EventListener
         private final Driver driver;
         private boolean openFlag = false;
         private final List<Table> tables = new ArrayList<>();
+        private final Map<String, UITableNode> tableNodes = Maps.newHashMap();
         @Getter
         private final Session session;
 
@@ -176,11 +175,13 @@ public class UIDatabaseNode extends UIExplorerNode implements EventListener
         {
                 reloadTable();
 
+                tableNodes.clear();
                 tableItem.getChildren().clear();
 
                 for (Table table : tables) {
                         UITableNode tableNode = new UITableNode(driver, this, table);
                         tableNode.setSelectedEvent(this::onSelected);
+                        tableNodes.put(table.getName(), tableNode);
                         tableItem.getChildren().add(tableNode);
                 }
 
@@ -254,6 +255,11 @@ public class UIDatabaseNode extends UIExplorerNode implements EventListener
                 }
 
                 super.showContextMenu(node, x, y);
+        }
+
+        public UITableNode getUITableNode(String name)
+        {
+                return tableNodes.get(name);
         }
 
         public boolean isOpen()
