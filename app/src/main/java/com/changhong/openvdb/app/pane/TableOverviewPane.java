@@ -20,6 +20,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -54,8 +55,9 @@ public class TableOverviewPane extends BorderPane
         private TableColumn<Table, String> rows;
         private TableColumn<Table, String> comment;
 
+        private final TextField search = new TextField();
         private final ObservableList<Table> observable = FXCollections.observableArrayList();
-        private final PauseTransition searchDelay = new PauseTransition(Duration.millis(200));
+        private final PauseTransition searchDelay = new PauseTransition(Duration.millis(100));
 
 
         public TableOverviewPane(UICatalogNode database)
@@ -88,7 +90,6 @@ public class TableOverviewPane extends BorderPane
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                TextField search = new TextField();
                 search.setPromptText("搜索...");
                 search.setPrefWidth(300);
 
@@ -102,7 +103,7 @@ public class TableOverviewPane extends BorderPane
                                 var kw = newVal.trim();
 
                                 List<Table> ret = tables.stream()
-                                        .filter(t -> strmatch(t.getName(), kw) || strmatch(t.getComment(), kw))
+                                        .filter(t -> strimatch(t.getName(), kw) || strimatch(t.getComment(), kw))
                                         .toList();
 
                                 update(ret);
@@ -125,6 +126,29 @@ public class TableOverviewPane extends BorderPane
 
         private void setupTableView()
         {
+                tableView.addEventFilter(KeyEvent.KEY_TYPED, e -> {
+                        if ((!tableView.isFocused() && !tableView.isHover()) || search.isFocused())
+                                return;
+
+                        if (e.isControlDown()
+                                || e.isShiftDown()
+                                || e.isShortcutDown()
+                                || e.isAltDown()
+                                || e.isMetaDown())
+                                return;
+
+                        var ch = e.getCharacter();
+
+                        if (ch == null || ch.isBlank())
+                                return;
+
+                        search.requestFocus();
+                        search.appendText(ch);
+                        search.positionCaret(search.getText().length());
+
+                        e.consume();
+                });
+
                 tableView.setRowFactory(tv -> {
                         TableRow<Table> r = new TableRow<>();
 
