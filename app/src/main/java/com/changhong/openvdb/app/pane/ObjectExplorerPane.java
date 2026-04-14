@@ -1,8 +1,8 @@
-package com.changhong.openvdb.app.navigator;
+package com.changhong.openvdb.app.pane;
 
 import com.changhong.openvdb.app.model.UINodeGlobalStatus;
 import com.changhong.openvdb.app.menu.ConnectionMenuBuilder;
-import com.changhong.openvdb.app.navigator.node.UIExplorerNode;
+import com.changhong.openvdb.app.explorer.UIExplorerNode;
 import com.changhong.openvdb.core.model.ConnectionProfile;
 import com.changhong.openvdb.core.repository.ConnectionRepository;
 import com.changhong.openvdb.app.event.bus.Event;
@@ -10,7 +10,7 @@ import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.bus.EventListener;
 import com.changhong.openvdb.app.event.RefreshConnectionEvent;
 import com.changhong.openvdb.app.assets.Assets;
-import com.changhong.openvdb.app.navigator.node.UIConnectionNode;
+import com.changhong.openvdb.app.explorer.UIConnectionNode;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -26,11 +26,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 导航面板
+ *
  * @author Luo Tiansheng
  * @since 2026/3/25
  */
 @SuppressWarnings({"FieldCanBeLocal"})
-public class Navigator extends VBox implements EventListener
+public class ObjectExplorerPane extends VBox implements EventListener
 {
         private final TabPane tabPane;
         private final TextField searchField;
@@ -40,7 +42,7 @@ public class Navigator extends VBox implements EventListener
         private final Map<String, UIConnectionNode> connections
                 = new HashMap<>();
 
-        public Navigator()
+        public ObjectExplorerPane()
         {
                 this.tabPane = createTabPane();
                 this.searchField = createSearchField();

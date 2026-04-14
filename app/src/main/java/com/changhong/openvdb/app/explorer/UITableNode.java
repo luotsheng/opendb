@@ -1,4 +1,4 @@
-package com.changhong.openvdb.app.navigator.node;
+package com.changhong.openvdb.app.explorer;
 
 import com.changhong.openvdb.driver.api.Driver;
 import com.changhong.openvdb.driver.api.Table;

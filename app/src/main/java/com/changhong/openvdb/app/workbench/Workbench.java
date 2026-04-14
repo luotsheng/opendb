@@ -6,7 +6,7 @@ import com.changhong.openvdb.app.event.bus.Event;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.bus.EventListener;
 import com.changhong.openvdb.app.assets.Assets;
-import com.changhong.openvdb.app.navigator.node.UIConnectionNode;
+import com.changhong.openvdb.app.explorer.UIConnectionNode;
 import com.changhong.openvdb.app.pane.TableStructureDesignerPane;
 import com.changhong.openvdb.app.pane.PreviewTableDataPane;
 import com.changhong.openvdb.app.widgets.VFXTabPane;

@@ -1,6 +1,6 @@
 package com.changhong.openvdb.app.model;
 
-import com.changhong.openvdb.app.navigator.node.UIConnectionNode;
+import com.changhong.openvdb.app.explorer.UIConnectionNode;
 import lombok.Getter;
 
 import java.util.List;

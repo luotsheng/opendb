@@ -1,6 +1,6 @@
 package com.changhong.openvdb.app.layout;
 
-import com.changhong.openvdb.app.navigator.Navigator;
+import com.changhong.openvdb.app.pane.ObjectExplorerPane;
 import com.changhong.openvdb.app.workbench.Workbench;
 import javafx.application.Platform;
 import javafx.scene.control.SplitPane;
@@ -17,7 +17,7 @@ public class ContainerLayout extends SplitPane
 
         public ContainerLayout()
         {
-                Navigator navigator = new Navigator();
+                ObjectExplorerPane navigator = new ObjectExplorerPane();
                 Workbench workbench = new Workbench();
 
                 getItems().addAll(navigator, workbench);
