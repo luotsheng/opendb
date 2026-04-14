@@ -12,11 +12,20 @@ import javafx.util.Duration;
  */
 public class VFXTableView<S> extends TableView<S>
 {
+        public static final String FULL_STYLE = "vfx-table-view-full";
+
+        public static final String LITE_STYLE = "vfx-table-view-lite";
+
         private TablePosition<?, ?> start;
 
         public VFXTableView()
         {
-                getStyleClass().add("vfx-table-view");
+                this(FULL_STYLE);
+        }
+
+        public VFXTableView(String style)
+        {
+                getStyleClass().add(style);
                 setFixedCellSize(26);
         }
 

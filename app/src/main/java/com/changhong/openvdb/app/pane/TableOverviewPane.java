@@ -54,7 +54,7 @@ public class TableOverviewPane extends BorderPane
         {
                 this.database = database;
 
-                tableView = new VFXTableView<>();
+                tableView = new VFXTableView<>(VFXTableView.LITE_STYLE);
                 toolBar = new ToolBar();
 
                 // setup

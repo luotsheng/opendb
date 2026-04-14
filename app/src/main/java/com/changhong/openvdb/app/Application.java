@@ -1,6 +1,9 @@
 package com.changhong.openvdb.app;
 
 import atlantafx.base.theme.CupertinoLight;
+import atlantafx.base.theme.NordDark;
+import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.PrimerLight;
 import com.changhong.openvdb.app.layout.MainLayout;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -83,7 +86,7 @@ public class Application extends javafx.application.Application
         {
                 primaryStage = stage;
 
-                javafx.application.Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
+                javafx.application.Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
                 Scene scene = new Scene(new MainLayout(), 1200, 800);
                 initializeVFX(scene);
                 stage.setTitle(TITLE);
