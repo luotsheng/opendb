@@ -62,11 +62,17 @@ public class UITableNode extends UIExplorerNode
                         Application.copyToClipboard(getName());
                 });
 
+                MenuItem copyCreateTableDLLItem = new MenuItem("复制建表语句");
+                copyCreateTableDLLItem.setOnAction(event -> {
+                        Application.copyToClipboard(driver.showCreateTable(catalog.getSession(), getName()));
+                });
+
                 contextMenu.getItems().addAll(
                         openTableItem,
                         designTableItem,
                         new SeparatorMenuItem(),
-                        copyTableNameItem
+                        copyTableNameItem,
+                        copyCreateTableDLLItem
                 );
 
                 return contextMenu;
