@@ -564,61 +564,6 @@ public abstract class Driver implements SQLExecutor
         }
 
         /**
-         * 删除指定表的主键约束。
-         * <p>
-         * 执行 DDL 操作移除表的主键约束。不同数据库的语法略有差异：
-         * <ul>
-         *   <li>MySQL: {@code ALTER TABLE table_name DROP PRIMARY KEY}</li>
-         *   <li>PostgreSQL: {@code ALTER TABLE table_name DROP CONSTRAINT constraint_name}</li>
-         *   <li>Oracle: {@code ALTER TABLE table_name DROP PRIMARY KEY}</li>
-         *   <li>SQL Server: {@code ALTER TABLE table_name DROP CONSTRAINT constraint_name}</li>
-         * </ul>
-         * <p>
-         * <b>参数 {@code primaryKeys} 说明：</b>
-         * <ul>
-         *   <li>该参数用于安全校验：如果提供且非空，实现应验证当前表的主键列集合与 {@code primaryKeys}
-         *       中的列集合完全匹配（名称、顺序），匹配成功才执行删除操作，否则抛出 {@link IllegalArgumentException}。</li>
-         *   <li>如果 {@code primaryKeys} 为 {@code null} 或空集合，则直接删除主键约束（不进行校验）。</li>
-         *   <li>这种设计可避免因表结构变更或误解导致的误删除。</li>
-         * </ul>
-         * <p>
-         * <b>实现要求：</b>
-         * <ul>
-         *   <li>删除主键前应先获取当前主键约束名称（通过 {@link java.sql.DatabaseMetaData#getPrimaryKeys}）</li>
-         *   <li>若表没有主键约束，实现应静默忽略或根据策略抛出异常（建议抛出 {@link IllegalArgumentException}）</li>
-         *   <li>删除主键后，之前依赖该主键的外键约束行为取决于数据库的级联设置，实现应给出明确日志或警告</li>
-         *   <li>建议将操作包装在事务中（如果数据库支持 DDL 事务）以保证一致性</li>
-         * </ul>
-         * <p>
-         * <b>使用示例：</b>
-         * <pre>{@code
-         * Session session = new Session("my_db", "public");
-         * List<Column> expectedPk = List.of(new Column("id"));
-         * // 安全删除：只有当主键确为 (id) 时才执行
-         * dialect.dropPrimaryKey(session, "user_table", expectedPk);
-         *
-         * // 强制删除：不校验现有主键
-         * dialect.dropPrimaryKey(session, "user_table", null);
-         * }</pre>
-         *
-         * @param session     会话上下文，用于获取连接及设置 catalog/schema（不能为 {@code null}）
-         * @param table       目标表名称（不能为 {@code null} 或空白字符串）
-         * @throws NullPointerException      如果 {@code session} 或 {@code table} 为 {@code null}
-         * @throws IllegalArgumentException  如果 {@code table} 为空白字符串；
-         *                                   或 {@code primaryKeys} 非空但与现有主键不匹配；
-         *                                   或表不存在主键但方法要求删除（根据实现策略）
-         * @throws UnsupportedOperationException 如果数据库方言不支持删除主键约束
-         * @throws DriverException    如果执行 DDL 失败（包装 {@link java.sql.SQLException}）
-         * @see #alterPrimaryKey(Session, String, Collection)
-         * @see java.sql.DatabaseMetaData#getPrimaryKeys(String, String, String)
-         */
-        public abstract void dropPrimaryKey(Session session, String table);
-
-        public void dropPrimaryKey(Session session, Table table) {
-                dropPrimaryKey(session, table.getName());
-        }
-
-        /**
          * 修改表的主键约束。
          * <p>
          * 重新定义指定表的主键，通常需要先删除旧的主键约束，再添加新的主键约束。
@@ -644,10 +589,10 @@ public abstract class Driver implements SQLExecutor
          * @throws IllegalArgumentException 如果任一列不属于该表，或列数量为 0 但数据库不允许无主键表
          * @throws DriverException   如果执行 DDL 失败
          */
-        public abstract void alterPrimaryKey(Session session, String table, Collection<Column> primaryKeys);
+        public abstract void updatePrimaryKey(Session session, String table, Collection<Column> primaryKeys);
 
-        public void alterPrimaryKey(Session session, Table table, Collection<Column> primaryKeys) {
-                alterPrimaryKey(session, table.getName(), primaryKeys);
+        public void updatePrimaryKey(Session session, Table table, Collection<Column> primaryKeys) {
+                updatePrimaryKey(session, table.getName(), primaryKeys);
         }
 
         /**

@@ -211,8 +211,11 @@ public class MySQLDriver extends Driver
         }
 
         @Override
-        public void dropPrimaryKey(Session session, String table)
+        public void updatePrimaryKey(Session session, String table, Collection<Column> primaryKeys)
         {
+                if (primaryKeys.isEmpty())
+                        return;
+
                 try {
                         String sql = strfmt("ALTER TABLE %s DROP PRIMARY KEY;", dialect.quote(table));
                         execute(session, new SQL(sql));
@@ -220,13 +223,6 @@ public class MySQLDriver extends Driver
                         if (e.getErrorCode() != MySQL.KEY_NOT_FOUND)
                                 throw e;
                 }
-        }
-
-        @Override
-        public void alterPrimaryKey(Session session, String table, Collection<Column> primaryKeys)
-        {
-                if (primaryKeys.isEmpty())
-                        return;
 
                 /* 重建主键 */
                 StringBuilder script = new StringBuilder();

@@ -85,8 +85,7 @@ public class TableColumnDesignerPane extends Designer<Column>
 
                 /* [Step 3]: 设置表主键字段 */
                 if (primaryChange) {
-                        driver.dropPrimaryKey(session, table);
-                        driver.alterPrimaryKey(session, table, primaryBuffer);
+                        driver.updatePrimaryKey(session, table, primaryBuffer);
                         /* [Step 3.1]: 恢复自增列 */
                         if (!autoIncrements.isEmpty()) {
                                 autoIncrements.forEach(e -> e.setAutoIncrement(true));
