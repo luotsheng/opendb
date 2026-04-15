@@ -43,11 +43,10 @@ public class DataGridViewPane extends BorderPane
         private final VFXTableView<GridRow> tableView = new VFXTableView<>();
         private final ToolBar toolBar = new ToolBar();
         private final VBox vContainer;
-        private final boolean isPreview;
 
         private final Button plus = new VFXIconButton("新增", "plus");
         private final Button minus = new VFXIconButton("删除", "minus");
-        private final Button check = new VFXIconButton("应用", "check");
+        private final Button submit = new VFXIconButton("提交", "check");
         private final Button cross = new VFXIconButton("取消", "cross");
         private final Button reload = new VFXIconButton("刷新", "reload");
 
@@ -72,8 +71,6 @@ public class DataGridViewPane extends BorderPane
 
         public DataGridViewPane(boolean isPreview)
         {
-                this.isPreview = isPreview;
-
                 if (isPreview)
                         dataGridTab.setClosable(false);
 
@@ -83,7 +80,7 @@ public class DataGridViewPane extends BorderPane
                 toolBar.getItems().addAll(
                         plus, minus,
                         new VFXSeparator(),
-                        check, cross,
+                        submit, cross,
                         new VFXSeparator(),
                         reload);
 
@@ -138,7 +135,7 @@ public class DataGridViewPane extends BorderPane
         {
                 boolean disable = (grid == null || !grid.isUpdatable());
 
-                check.setDisable(disable);
+                submit.setDisable(disable);
                 cross.setDisable(disable);
         }
 
@@ -148,7 +145,7 @@ public class DataGridViewPane extends BorderPane
 
                 minus.setOnAction(event -> onMinus());
 
-                check.setOnAction(event -> applyCheck());
+                submit.setOnAction(event -> applySubmit());
                 cross.setOnAction(event -> applyCross());
 
                 reload.setOnAction(event -> reloadAndBlinkTable(true));
@@ -184,7 +181,7 @@ public class DataGridViewPane extends BorderPane
                 }).start();
         }
 
-        private void applyCheck()
+        private void applySubmit()
         {
                 grid.update();
                 updateCheckCross();
@@ -252,7 +249,7 @@ public class DataGridViewPane extends BorderPane
                         if ((event.isControlDown() || event.isShortcutDown())
                                 && event.getCode() == KeyCode.S) {
                                 if (grid.isUpdatable())
-                                        applyCheck();
+                                        applySubmit();
                                 event.consume();
                         }
                 });
@@ -380,6 +377,8 @@ public class DataGridViewPane extends BorderPane
                 tableView.setItems(
                         FXCollections.observableArrayList(grid.getRows())
                 );
+
+                tableView.playFlash();
         }
 
         private static int calcColWidth(String colText, List<GridRow> values, int index)
