@@ -1,0 +1,7 @@
+-Xms128m
+-Xmx512m
+-Dprism.verbose=true
+-Xlog:gc*,safepoint:stdout:time,level,tags
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:HeapDumpPath=./logs
+-XX:ErrorFile=./logs/hs_err_pid%p.log

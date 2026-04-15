@@ -15,6 +15,7 @@ import com.changhong.openvdb.core.model.ConnectionProfile;
 import com.changhong.openvdb.core.repository.ConnectionRepository;
 import com.changhong.utils.thread.ThreadPool;
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -165,7 +166,7 @@ public class ObjectExplorerPane extends VBox implements EventListener
         {
                 for (UIConnectionNode node : connections.values()) {
                         if (!node.isOpen())
-                                ThreadPool.taskSubmit(node::openConnection);
+                                ThreadPool.taskSubmit(() -> Platform.runLater(node::openConnection));
                 }
         }
 
