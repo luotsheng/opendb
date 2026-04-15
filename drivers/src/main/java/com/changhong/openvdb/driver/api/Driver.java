@@ -186,6 +186,17 @@ public abstract class Driver implements SQLExecutor
         }
 
         /**
+         * 返回当前驱动实现的数据库类型。
+         * <p>
+         * 该类型用于标识底层数据库产品（如 MySQL、PostgreSQL、Oracle 等），
+         * 以便上层模块根据不同的数据库类型执行特定的逻辑分支或优化策略。
+         *
+         * @return 当前驱动对应的数据库类型枚举值（永不返回 {@code null}）
+         * @see DriverType
+         */
+        public abstract DriverType getType();
+
+        /**
          * 创建并返回当前环境适用的数据库方言实例。
          * <p>
          * 该方法是一个模板方法（Template Method），由子类实现以提供具体的方言对象。

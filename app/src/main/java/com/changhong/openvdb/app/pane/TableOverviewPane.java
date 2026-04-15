@@ -14,7 +14,6 @@ import com.changhong.openvdb.app.widgets.table.VFXTableView;
 import com.changhong.openvdb.app.widgets.table.cell.VFXDateTableCell;
 import com.changhong.openvdb.driver.api.Table;
 import javafx.animation.PauseTransition;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -32,7 +31,8 @@ import javafx.util.Duration;
 import java.util.Date;
 import java.util.List;
 
-import static com.changhong.utils.string.StaticLibrary.*;
+import static com.changhong.utils.string.StaticLibrary.strempty;
+import static com.changhong.utils.string.StaticLibrary.strimatch;
 
 /**
  * 数据表信息在详情页的预览面板
@@ -46,7 +46,7 @@ public class TableOverviewPane extends BorderPane
         private final TableView<Table> tableView;
         private final ToolBar toolBar;
 
-        private final UICatalogNode database;
+        private final UICatalogNode catalog;
         private List<Table> tables;
 
         private TableColumn<Table, String> name;
@@ -62,9 +62,9 @@ public class TableOverviewPane extends BorderPane
         private final PauseTransition searchDelay = new PauseTransition(Duration.millis(100));
 
 
-        public TableOverviewPane(UICatalogNode database)
+        public TableOverviewPane(UICatalogNode catalog)
         {
-                this.database = database;
+                this.catalog = catalog;
 
                 tableView = new VFXTableView<>(VFXTableView.LITE_STYLE);
                 tableView.setItems(observable);
@@ -161,7 +161,7 @@ public class TableOverviewPane extends BorderPane
                         r.setOnMouseClicked(e -> {
                                 if (e.getClickCount() == 2 && !r.isEmpty()) {
                                         Table data = r.getItem();
-                                        EventBus.publish(new OpenTableDataPaneEvent(database, data));
+                                        EventBus.publish(new OpenTableDataPaneEvent(catalog, data));
                                 }
                         });
 
@@ -171,7 +171,7 @@ public class TableOverviewPane extends BorderPane
                                         return;
                                 }
 
-                                UITableNode uiTableNode = database.getUITableNode(table.getName());
+                                UITableNode uiTableNode = catalog.getUITableNode(table.getName());
                                 if (uiTableNode != null)
                                         r.setContextMenu(uiTableNode.getContextMenu());
                         });
@@ -191,8 +191,8 @@ public class TableOverviewPane extends BorderPane
                 Table table = tableView.getSelectionModel().getSelectedItem();
 
                 if (VFXDialogHelper.askDangerous("确认删除：%s？", table.getName())) {
-                        VFXDialogHelper.runWith(() -> database.dropTable(table));
-                        database.reloadTableNode();
+                        VFXDialogHelper.runWith(() -> catalog.dropTable(table));
+                        catalog.reloadTableNode();
                 }
         }
 

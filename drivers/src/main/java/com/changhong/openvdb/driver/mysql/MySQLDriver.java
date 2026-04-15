@@ -39,6 +39,12 @@ public class MySQLDriver extends Driver
         }
 
         @Override
+        public DriverType getType()
+        {
+                return DriverType.MYSQL;
+        }
+
+        @Override
         protected Dialect createDialect()
         {
                 return new MySQLDialect();

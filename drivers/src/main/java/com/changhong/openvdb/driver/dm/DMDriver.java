@@ -33,6 +33,12 @@ public class DMDriver extends Driver
         }
 
         @Override
+        public DriverType getType()
+        {
+                return DriverType.DM;
+        }
+
+        @Override
         protected Dialect createDialect()
         {
                 return new DMDialect();
