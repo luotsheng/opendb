@@ -248,6 +248,6 @@ public abstract class AbstractByteBuffer extends ByteBuffer {
 
     @Override
     public String toString() {
-        return StaticLibrary.strfmt("%s [size=%s, cap=%s, index=%s]", super.toString(), size(), capacity(), index());
+        return StaticLibrary.fmt("%s [size=%s, cap=%s, index=%s]", super.toString(), size(), capacity(), index());
     }
 }

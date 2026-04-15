@@ -16,7 +16,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.changhong.utils.string.StaticLibrary.strfmt;
+import static com.changhong.utils.string.StaticLibrary.fmt;
 
 /**
  * JDBC 驱动抽象层。
@@ -874,7 +874,7 @@ public abstract class Driver implements SQLExecutor
         @Override
         public DataGrid selectByPage(Session session, String table, int off, int size)
         {
-                String sql = strfmt("SELECT * FROM %s", dialect.quote(table));
+                String sql = fmt("SELECT * FROM %s", dialect.quote(table));
                 return execute(session, new SQL(dialect.limit(sql, off, size)));
         }
 

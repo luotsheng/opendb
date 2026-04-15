@@ -18,7 +18,7 @@ import java.util.Set;
 import static com.changhong.utils.TypeConverter.atos;
 import static com.changhong.utils.collection.Lists.beg;
 import static com.changhong.utils.string.StaticLibrary.*;
-import static com.changhong.utils.string.StaticLibrary.strfmt;
+import static com.changhong.utils.string.StaticLibrary.fmt;
 
 /**
  * @author Luo Tiansheng
@@ -56,7 +56,7 @@ public class DMDriver extends Driver
         public String showCreateTable(Session session, String table)
         {
                 DataGrid dataGrid = execute(session, new SQL(
-                        strfmt("""
+                        fmt("""
                                 SELECT DBMS_METADATA.GET_DDL('TABLE', '%s', '%s') AS "DDL" FROM DUAL
                                 """, table, session.schema())
                 ));
@@ -165,7 +165,7 @@ public class DMDriver extends Driver
         @SuppressWarnings("TrailingWhitespacesInTextBlock")
         private String getConstraintId(Session session, String table)
         {
-                var sql = strfmt("""
+                var sql = fmt("""
                         SELECT
                           CONSTRAINT_NAME
                         FROM
@@ -191,7 +191,7 @@ public class DMDriver extends Driver
 
                 try {
                         String temp = "ALTER TABLE %s DROP CONSTRAINT %s;";
-                        var dropSql = strfmt(temp, dialect.quote(table), dialect.quote(constraintId));
+                        var dropSql = fmt(temp, dialect.quote(table), dialect.quote(constraintId));
                         execute(session, ((connection, statement) -> statement.execute(dropSql)));
                         return Err.OK;
                 } catch (DriverException e) {
@@ -206,7 +206,7 @@ public class DMDriver extends Driver
                         dropPrimaryKey(session, table);
                         // 新增主键
                         StringBuilder builder = new StringBuilder();
-                        builder.append(strfmt("ALTER TABLE %s ADD CONSTRAINT PRIMARY KEY (", dialect.quote(table)));
+                        builder.append(fmt("ALTER TABLE %s ADD CONSTRAINT PRIMARY KEY (", dialect.quote(table)));
 
                         for (Column pk : primaryKeys)
                                 builder.append(dialect.quote(pk.getName())).append(",");
@@ -234,7 +234,7 @@ public class DMDriver extends Driver
                 // 同执行列名的修改和列结构的修改
                 for (Column column : columns) {
                         if (strne(column.getOriginalName(), column.getName())) {
-                                sqls.add(strfmt("ALTER TABLE %s RENAME COLUMN %s TO %s;",
+                                sqls.add(fmt("ALTER TABLE %s RENAME COLUMN %s TO %s;",
                                         dialect.quote(table),
                                         dialect.quote(column.getOriginalName()),
                                         dialect.quote(column.getName())
@@ -244,14 +244,14 @@ public class DMDriver extends Driver
 
                 // 删除自增
                 execute(session, (connection, statement) -> Captor.icall(() ->
-                        statement.execute(strfmt("ALTER TABLE %s DROP IDENTITY;", dialect.quote(table)))
+                        statement.execute(fmt("ALTER TABLE %s DROP IDENTITY;", dialect.quote(table)))
                 ));
 
                 // 设置自增
                 execute(session, (connection, statement) -> {
                         for (Column column : columns) {
                                 if (column.isAutoIncrement())
-                                        statement.execute(strfmt("ALTER TABLE %s ADD COLUMN %s IDENTITY(1, 1);",
+                                        statement.execute(fmt("ALTER TABLE %s ADD COLUMN %s IDENTITY(1, 1);",
                                                 dialect.quote(table), dialect.quote(column.getName())));
                         }
                 });
@@ -265,7 +265,7 @@ public class DMDriver extends Driver
                         // MODIFY
                         StringBuilder modifyBuilder = new StringBuilder();
 
-                        modifyBuilder.append(strfmt("ALTER TABLE %s MODIFY %s ",
+                        modifyBuilder.append(fmt("ALTER TABLE %s MODIFY %s ",
                                 dialect.quote(table),
                                 dialect.quote(column.getName())
                         ));
@@ -283,7 +283,7 @@ public class DMDriver extends Driver
 
                         // COMMENT
                         var comment = column.getComment();
-                        sqls.add(strfmt("COMMENT ON COLUMN %s.%s IS '%s';",
+                        sqls.add(fmt("COMMENT ON COLUMN %s.%s IS '%s';",
                                 dialect.quote(table),
                                 dialect.quote(column.getName()),
                                 strempty(comment) ? "" : comment));

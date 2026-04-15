@@ -28,7 +28,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-import static com.changhong.utils.string.StaticLibrary.strfmt;
+import static com.changhong.utils.string.StaticLibrary.fmt;
 import static com.changhong.utils.string.StaticLibrary.strnempty;
 
 /**
@@ -348,7 +348,7 @@ public class DataGridViewPane extends BorderPane
 
                 setToolButtonStatus(grid.isAddable(), grid.isEditable());
 
-                dataGridTab.setText(strfmt("查询结果集 (%d条)", grid.getRows().size()));
+                dataGridTab.setText(fmt("查询结果集 (%d条)", grid.getRows().size()));
 
                 for (int i = 0; i < grid.getColumns().size(); i++) {
                         int index = i;

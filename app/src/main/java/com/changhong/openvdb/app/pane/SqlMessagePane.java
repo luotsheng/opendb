@@ -8,7 +8,7 @@ import org.fxmisc.flowless.VirtualizedScrollPane;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.changhong.utils.string.StaticLibrary.strfmt;
+import static com.changhong.utils.string.StaticLibrary.fmt;
 
 /**
  * @author Luo Tiansheng
@@ -66,17 +66,17 @@ public class SqlMessagePane extends VirtualizedScrollPane<VFXCodeArea>
 
         public void appendInfo(String text)
         {
-                appendText(strfmt("[  OK  ] %s\n", text));
+                appendText(fmt("[  OK  ] %s\n", text));
         }
 
         public void appendSkip(String text)
         {
-                appendText(strfmt("[ SKIP ] %s\n", text));
+                appendText(fmt("[ SKIP ] %s\n", text));
         }
 
         public void appendError(String text)
         {
-                appendText(strfmt("[ FAIL ] %s\n", text));
+                appendText(fmt("[ FAIL ] %s\n", text));
         }
 
         private void appendText(String text)

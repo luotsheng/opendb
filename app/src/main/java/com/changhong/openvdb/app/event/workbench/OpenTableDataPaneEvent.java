@@ -9,7 +9,7 @@ import com.changhong.openvdb.driver.api.Table;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 
-import static com.changhong.utils.string.StaticLibrary.strfmt;
+import static com.changhong.utils.string.StaticLibrary.fmt;
 
 /**
  * 打开数据库表预览面板
@@ -45,7 +45,7 @@ public class OpenTableDataPaneEvent extends OpenTabEvent
         @Override
         public String tabId()
         {
-                return strfmt("%s@%s(%s)", table.getName(), session.scope(), conn);
+                return fmt("%s@%s(%s)", table.getName(), session.scope(), conn);
         }
 
         @Override

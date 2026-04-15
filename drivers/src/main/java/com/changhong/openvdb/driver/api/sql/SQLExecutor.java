@@ -4,7 +4,7 @@ import com.changhong.openvdb.driver.api.DataGrid;
 import com.changhong.openvdb.driver.api.Dialect;
 import com.changhong.openvdb.driver.api.Session;
 
-import static com.changhong.utils.string.StaticLibrary.strfmt;
+import static com.changhong.utils.string.StaticLibrary.fmt;
 
 /**
  * SQL 执行器（统一入口）
@@ -106,7 +106,7 @@ public interface SQLExecutor
          * @return 查询结果集（非查询语句返回 null）
          */
         default DataGrid execute(Session session, String fmt, Object... args) {
-                return execute(session, new SQL(strfmt(fmt, args)));
+                return execute(session, new SQL(fmt(fmt, args)));
         }
 
         /**

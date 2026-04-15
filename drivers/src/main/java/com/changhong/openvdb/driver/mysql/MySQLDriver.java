@@ -54,7 +54,7 @@ public class MySQLDriver extends Driver
         public String showCreateTable(Session session, String table)
         {
                 DataGrid dataGrid = execute(session, new SQL(
-                        strfmt("SHOW CREATE TABLE %s;", dialect.quote(table))
+                        fmt("SHOW CREATE TABLE %s;", dialect.quote(table))
                 ));
 
                 return beg(dataGrid.getRows()).get(1);
@@ -66,7 +66,7 @@ public class MySQLDriver extends Driver
                 List<Table> tables = Lists.newArrayList();
 
                 execute(session, (connection, statement) -> {
-                        String sql = strfmt("""
+                        String sql = fmt("""
                             SELECT
                             	`TABLE_NAME` AS `name`,
                             	`CREATE_TIME` AS `createTime`,
@@ -178,7 +178,7 @@ public class MySQLDriver extends Driver
         public void dropTable(Session session, String table)
         {
                 execute(session, (connection, statement) -> statement.execute(
-                        strfmt("DROP TABLE `%s`;", dialect.quote(table))));
+                        fmt("DROP TABLE `%s`;", dialect.quote(table))));
         }
 
         @Override
@@ -186,10 +186,10 @@ public class MySQLDriver extends Driver
         {
                 StringBuilder script = new StringBuilder();
 
-                script.append(strfmt("ALTER TABLE `%s` ", table));
+                script.append(fmt("ALTER TABLE `%s` ", table));
 
                 for (Column col : columns)
-                        script.append(strfmt("DROP COLUMN `%s`, ", col.getName()));
+                        script.append(fmt("DROP COLUMN `%s`, ", col.getName()));
 
                 script.delete(script.length() - 2, script.length());
                 script.append(";");
@@ -209,7 +209,7 @@ public class MySQLDriver extends Driver
                                 : index.getOriginalName();
 
                         scripts.append(
-                                strfmt("ALTER TABLE `%s` DROP INDEX `%s`;\n", table, name)
+                                fmt("ALTER TABLE `%s` DROP INDEX `%s`;\n", table, name)
                         );
                 }
 
@@ -220,7 +220,7 @@ public class MySQLDriver extends Driver
         public Err dropPrimaryKey(Session session, String table)
         {
                 try {
-                        execute(session, new SQL(strfmt("ALTER TABLE %s DROP PRIMARY KEY;", dialect.quote(table))));
+                        execute(session, new SQL(fmt("ALTER TABLE %s DROP PRIMARY KEY;", dialect.quote(table))));
                 } catch (DriverException e) {
                         if (e.getErrorCode() == 1091)
                                 return Err.KEY_NOT_FOUND;
@@ -271,7 +271,7 @@ public class MySQLDriver extends Driver
 
                         if (streq(type, "NORMAL")) {
                                 scripts.append(
-                                        strfmt(
+                                        fmt(
                                                 "CREATE INDEX `%s` ON `%s`(%s);\n",
                                                 name,
                                                 table,
@@ -283,7 +283,7 @@ public class MySQLDriver extends Driver
 
                         if (streq(type, "UNIQUE")) {
                                 scripts.append(
-                                        strfmt(
+                                        fmt(
                                                 "CREATE UNIQUE INDEX `%s` ON `%s`(%s);\n",
                                                 name,
                                                 table,
@@ -295,7 +295,7 @@ public class MySQLDriver extends Driver
 
                         if (streq(type, "FULLTEXT")) {
                                 scripts.append(
-                                        strfmt(
+                                        fmt(
                                                 "CREATE FULLTEXT INDEX `%s` ON `%s`(%s);\n",
                                                 name,
                                                 table,
@@ -307,7 +307,7 @@ public class MySQLDriver extends Driver
 
                         if (streq(type, "SPATIAL")) {
                                 scripts.append(
-                                        strfmt(
+                                        fmt(
                                                 "CREATE SPATIAL INDEX `%s` ON `%s`(%s);\n",
                                                 name,
                                                 table,
@@ -319,7 +319,7 @@ public class MySQLDriver extends Driver
 
                         if (streq(type, "HASH")) {
                                 scripts.append(
-                                        strfmt(
+                                        fmt(
                                                 "CREATE INDEX `%s` ON `%s`(%s) USING HASH;\n",
                                                 name,
                                                 table,
@@ -390,7 +390,7 @@ public class MySQLDriver extends Driver
                 for (Index index : indexes) {
                         String isVisible = index.isVisible() ? "VISIBLE" : "INVISIBLE";
                         scripts.append(
-                                strfmt("ALTER TABLE %s ALTER INDEX %s %s;",
+                                fmt("ALTER TABLE %s ALTER INDEX %s %s;",
                                         dialect.quote(table),
                                         dialect.quote(index.getName()),
                                         isVisible)
