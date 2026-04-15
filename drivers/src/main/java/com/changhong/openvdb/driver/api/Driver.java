@@ -586,10 +586,10 @@ public abstract class Driver implements SQLExecutor
          * @throws IllegalArgumentException 如果 {@code table} 为空白字符串
          * @throws UnsupportedOperationException 如果数据库方言不支持删除主键约束
          */
-        public abstract Err dropPrimaryKey(Session session, String table);
+        public abstract void dropPrimaryKey(Session session, String table);
 
-        public Err dropPrimaryKey(Session session, Table table) {
-                return dropPrimaryKey(session, table.getName());
+        public void dropPrimaryKey(Session session, Table table) {
+                dropPrimaryKey(session, table.getName());
         }
 
         /**
@@ -622,10 +622,10 @@ public abstract class Driver implements SQLExecutor
          * @throws UnsupportedOperationException 如果数据库方言不支持添加主键约束
          * @throws DriverException 如果删除阶段发生非“主键不存在”的异常，或添加主键阶段发生异常
          */
-        public abstract void updatePrimaryKey(Session session, String table, Collection<Column> primaryKeys);
+        public abstract void addPrimaryKey(Session session, String table, Collection<Column> primaryKeys);
 
-        public void updatePrimaryKey(Session session, Table table, Collection<Column> primaryKeys) {
-                updatePrimaryKey(session, table.getName(), primaryKeys);
+        public void addPrimaryKey(Session session, Table table, Collection<Column> primaryKeys) {
+                addPrimaryKey(session, table.getName(), primaryKeys);
         }
 
         /**

@@ -217,35 +217,24 @@ public class MySQLDriver extends Driver
         }
 
         @Override
-        public Err dropPrimaryKey(Session session, String table)
+        public void dropPrimaryKey(Session session, String table)
         {
                 try {
                         execute(session, new SQL(fmt("ALTER TABLE %s DROP PRIMARY KEY;", dialect.quote(table))));
                 } catch (DriverException e) {
                         if (e.getErrorCode() == 1091)
-                                return Err.KEY_NOT_FOUND;
-                        return Err.withCause(e);
+                                return;
+                        throw e;
                 }
-
-                return Err.OK;
         }
 
         @Override
-        public void updatePrimaryKey(Session session, String table, Collection<Column> primaryKeys)
+        public void addPrimaryKey(Session session, String table, Collection<Column> primaryKeys)
         {
                 if (primaryKeys.isEmpty())
                         return;
 
-                try {
-                        dropPrimaryKey(session, table);
-                } catch (DriverException e) {
-                        if (e.getErrorCode() != MySQL.KEY_NOT_FOUND)
-                                throw e;
-                }
-
-                /* 重建主键 */
                 StringBuilder script = new StringBuilder();
-
                 script.append("ALTER TABLE ").append(dialect.quote(table)).append(" ADD PRIMARY KEY (");
 
                 for (Column primaryKey : primaryKeys) {

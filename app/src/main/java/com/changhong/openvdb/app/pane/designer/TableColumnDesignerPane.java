@@ -82,16 +82,14 @@ public class TableColumnDesignerPane extends Designer<Column>
 
                 /* [Step 3]: 设置表主键字段 */
                 if (primaryChange) {
-                        Err err = driver.dropPrimaryKey(session, table);
+                        /* [Step 3.1]: 删除已有的主键列表 */
+                        driver.dropPrimaryKey(session, table);
 
-                        if (err != Err.OK && err != Err.KEY_NOT_FOUND)
-                                throw err.getCause();
+                        /* [Step 3.2]: 重建主键 */
+                        if (!primaryBuffer.isEmpty())
+                                driver.addPrimaryKey(session, table, primaryBuffer);
 
-                        if (primaryBuffer.isEmpty())
-                                return;
-
-                        driver.updatePrimaryKey(session, table, primaryBuffer);
-                        /* [Step 3.1]: 恢复自增列 */
+                        /* [Step 3.3]: 恢复自增列 */
                         if (!autoIncrements.isEmpty()) {
                                 autoIncrements.forEach(e -> e.setAutoIncrement(true));
                                 driver.alterChange(session, table, autoIncrements);

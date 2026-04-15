@@ -182,29 +182,23 @@ public class DMDriver extends Driver
         }
 
         @Override
-        public Err dropPrimaryKey(Session session, String table)
+        public void dropPrimaryKey(Session session, String table)
         {
                 String constraintId = getConstraintId(session, table);
 
                 if (strempty(constraintId))
-                        return Err.KEY_NOT_FOUND;
+                        return;
 
-                try {
-                        String temp = "ALTER TABLE %s DROP CONSTRAINT %s;";
-                        var dropSql = fmt(temp, dialect.quote(table), dialect.quote(constraintId));
-                        execute(session, ((connection, statement) -> statement.execute(dropSql)));
-                        return Err.OK;
-                } catch (DriverException e) {
-                        return Err.withCause(e);
-                }
+                String temp = "ALTER TABLE %s DROP CONSTRAINT %s;";
+                var dropSql = fmt(temp, dialect.quote(table), dialect.quote(constraintId));
+
+                execute(session, ((connection, statement) -> statement.execute(dropSql)));
         }
 
         @Override
-        public void updatePrimaryKey(Session session, String table, Collection<Column> primaryKeys)
+        public void addPrimaryKey(Session session, String table, Collection<Column> primaryKeys)
         {
                 execute(session, ((connection, statement) -> {
-                        dropPrimaryKey(session, table);
-                        // 新增主键
                         StringBuilder builder = new StringBuilder();
                         builder.append(fmt("ALTER TABLE %s ADD CONSTRAINT PRIMARY KEY (", dialect.quote(table)));
 
