@@ -182,23 +182,31 @@ public class DMDriver extends Driver
         }
 
         @Override
-        public void updatePrimaryKey(Session session, String table, Collection<Column> primaryKeys)
+        public Err dropPrimaryKey(Session session, String table)
         {
                 String constraintId = getConstraintId(session, table);
 
+                if (strempty(constraintId))
+                        return Err.KEY_NOT_FOUND;
+
+                try {
+                        String temp = "ALTER TABLE %s DROP CONSTRAINT %s;";
+                        var dropSql = strfmt(temp, dialect.quote(table), dialect.quote(constraintId));
+                        execute(session, ((connection, statement) -> statement.execute(dropSql)));
+                        return Err.OK;
+                } catch (DriverException e) {
+                        return Err.withCause(e);
+                }
+        }
+
+        @Override
+        public void updatePrimaryKey(Session session, String table, Collection<Column> primaryKeys)
+        {
                 execute(session, ((connection, statement) -> {
-                        var quotedTable = dialect.quote(table);
-
-                        if (strnempty(constraintId)) {
-                                var dropSql = strfmt("ALTER TABLE %s DROP CONSTRAINT %s;", quotedTable,
-                                        dialect.quote(constraintId));
-                                // 删除主键
-                                statement.execute(dropSql);
-                        }
-
+                        dropPrimaryKey(session, table);
                         // 新增主键
                         StringBuilder builder = new StringBuilder();
-                        builder.append(strfmt("ALTER TABLE %s ADD CONSTRAINT PRIMARY KEY (", quotedTable));
+                        builder.append(strfmt("ALTER TABLE %s ADD CONSTRAINT PRIMARY KEY (", dialect.quote(table)));
 
                         for (Column pk : primaryKeys)
                                 builder.append(dialect.quote(pk.getName())).append(",");

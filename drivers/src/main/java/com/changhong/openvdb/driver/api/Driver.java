@@ -575,6 +575,24 @@ public abstract class Driver implements SQLExecutor
         }
 
         /**
+         * 删除指定表的主键约束。
+         * <p>
+         * 该方法直接移除表的主键约束，不进行主键列匹配校验。
+         * 若表当前不存在主键约束，实现应静默忽略，不抛出异常。
+         *
+         * @param session 会话上下文（不能为 {@code null}）
+         * @param table 目标表名称（不能为 {@code null} 或空白字符串）
+         * @throws NullPointerException 如果 {@code session} 或 {@code table} 为 {@code null}
+         * @throws IllegalArgumentException 如果 {@code table} 为空白字符串
+         * @throws UnsupportedOperationException 如果数据库方言不支持删除主键约束
+         */
+        public abstract Err dropPrimaryKey(Session session, String table);
+
+        public Err dropPrimaryKey(Session session, Table table) {
+                return dropPrimaryKey(session, table.getName());
+        }
+
+        /**
          * 更新指定表的主键约束。
          * <p>
          * 该方法用于替换表的现有主键为新定义的主键列集合。内部实现为先删除当前主键约束，
@@ -597,7 +615,7 @@ public abstract class Driver implements SQLExecutor
          *
          * @param session 会话上下文（不能为 {@code null}）
          * @param table 目标表名称（不能为 {@code null} 或空白字符串）
-         * @param primaryKeys 新主键列集合（可为空，表示仅删除现有主键）
+         * @param primaryKeys 新主键列集合
          * @throws NullPointerException 如果 {@code session} 或 {@code table} 为 {@code null}
          * @throws IllegalArgumentException 如果 {@code table} 为空白字符串，或任一列不存在于表中，
          *                                  或列数量为 0 但数据库不允许无主键表

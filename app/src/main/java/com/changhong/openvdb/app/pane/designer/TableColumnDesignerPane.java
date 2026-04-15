@@ -1,10 +1,7 @@
 package com.changhong.openvdb.app.pane.designer;
 
 import com.changhong.openvdb.app.pane.Designer;
-import com.changhong.openvdb.driver.api.Column;
-import com.changhong.openvdb.driver.api.Driver;
-import com.changhong.openvdb.driver.api.Session;
-import com.changhong.openvdb.driver.api.Table;
+import com.changhong.openvdb.driver.api.*;
 import com.changhong.utils.collection.Lists;
 
 import java.util.*;
@@ -85,6 +82,14 @@ public class TableColumnDesignerPane extends Designer<Column>
 
                 /* [Step 3]: 设置表主键字段 */
                 if (primaryChange) {
+                        Err err = driver.dropPrimaryKey(session, table);
+
+                        if (err != Err.OK && err != Err.KEY_NOT_FOUND)
+                                throw err.getCause();
+
+                        if (primaryBuffer.isEmpty())
+                                return;
+
                         driver.updatePrimaryKey(session, table, primaryBuffer);
                         /* [Step 3.1]: 恢复自增列 */
                         if (!autoIncrements.isEmpty()) {
