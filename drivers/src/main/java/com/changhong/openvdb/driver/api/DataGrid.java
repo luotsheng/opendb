@@ -24,7 +24,6 @@ import java.util.*;
  */
 @Getter
 @Setter
-@SuppressWarnings("DuplicatedCode")
 public class DataGrid
 {
         @Getter
@@ -175,56 +174,41 @@ public class DataGrid
                 List<Delete> deletes = new ArrayList<>();
 
                 indices.forEach(index -> {
-
                         var delete = new Delete();
+                        List<EqualsTo> equals = new ArrayList<>();
 
                         var table = new Table(driver.getDialect().removeQuote(sql.getSingleTableName()));
                         delete.setTable(table);
 
-                        if (!pks.isEmpty()) {
+                        List<Column> whereColumns = columns;
 
-                                pks.forEach(pk -> {
+                        if (!pks.isEmpty())
+                                whereColumns = pks;
 
-                                        var c = new net.sf.jsqlparser.schema.Column(pk.getName());
-                                        var v = new StringValue(rows.get(index).get(pk.getIndex()));
-                                        var w = new EqualsTo();
+                        whereColumns.forEach(col -> {
 
-                                        w.setLeftExpression(c);
-                                        w.setRightExpression(v);
+                                var c = new net.sf.jsqlparser.schema.Column(col.getName());
+                                var v = new StringValue(rows.get(index).get(col.getIndex()));
+                                var w = new EqualsTo();
 
-                                        delete.setWhere(w);
+                                w.setLeftExpression(c);
+                                w.setRightExpression(v);
 
-                                });
+                                equals.add(w);
 
-                        } else {
+                        });
 
-                                List<EqualsTo> equals = new ArrayList<>();
+                        Expression exp = equals.getFirst();
 
-                                columns.forEach(col -> {
+                        for (int i = 1; i < equals.size(); i++)
+                                exp = new AndExpression(exp, equals.get(i));
 
-                                        var c = new net.sf.jsqlparser.schema.Column(col.getName());
-                                        var v = new StringValue(rows.get(index).get(col.getIndex()));
-                                        var w = new EqualsTo();
+                        delete.setWhere(exp);
 
-                                        w.setLeftExpression(c);
-                                        w.setRightExpression(v);
-
-                                        equals.add(w);
-
-                                });
-
-                                Expression exp = equals.getFirst();
-
-                                for (int i = 1; i < equals.size(); i++)
-                                        exp = new AndExpression(exp, equals.get(i));
-
-                                delete.setWhere(exp);
-
+                        if (pks.isEmpty()) {
                                 Limit limit = new Limit();
                                 limit.setRowCount(new LongValue(1));
-
                                 delete.setLimit(limit);
-
                         }
 
                         deletes.add(delete);
@@ -272,11 +256,16 @@ public class DataGrid
 
                         }
 
-                        for (Column pk : pks) {
+                        List<Column> whereColumns = columns;
+
+                        if (!pks.isEmpty())
+                                whereColumns = pks;
+
+                        for (Column col : whereColumns) {
 
                                 var r = rows.get(entry.getKey());
-                                var c = new net.sf.jsqlparser.schema.Column(pk.getName());
-                                var v = new StringValue(r.get(pk.getIndex()));
+                                var c = new net.sf.jsqlparser.schema.Column(col.getName());
+                                var v = new StringValue(r.get(col.getIndex()));
                                 var w = new EqualsTo();
 
                                 w.setLeftExpression(c);
@@ -284,6 +273,13 @@ public class DataGrid
 
                                 update.setWhere(w);
 
+                        }
+
+                        /* 如果没有主键只修改一条 */
+                        if (pks.isEmpty()) {
+                                Limit limit = new Limit();
+                                limit.setRowCount(new LongValue(1));
+                                update.setLimit(limit);
                         }
 
                         updates.add(update);

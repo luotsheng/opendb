@@ -77,6 +77,7 @@ public class TableDataPane extends BorderPane
                 new Thread(() -> {
                         try {
                                 DataGrid rs = driver.selectByPage(session, table.getName(), start, size);
+                                rs.setAddable(true);
                                 Platform.runLater(() -> dataGridViewPane.render(rs));
                         } catch (Exception e) {
                                 VFXDialogHelper.alert(e);
