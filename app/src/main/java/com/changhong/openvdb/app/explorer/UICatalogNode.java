@@ -95,8 +95,8 @@ public class UICatalogNode extends UIExplorerNode implements EventListener
                 setGraphic(getIcon());
 
                 this.session = switch (connection.getDriverType()) {
-                        case MYSQL -> Session.ofCatalog(name);
-                        case DM -> Session.ofSchema(name);
+                        case mysql -> Session.ofCatalog(name);
+                        case dm -> Session.ofSchema(name);
                 };
 
                 this.driver = driver;

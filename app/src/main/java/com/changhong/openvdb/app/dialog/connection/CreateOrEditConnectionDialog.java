@@ -5,7 +5,7 @@ import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
 import com.changhong.openvdb.core.repository.ConnectionRepository;
 import com.changhong.openvdb.core.utils.JSONUtils;
-import com.changhong.openvdb.driver.api.DriverType;
+import com.changhong.openvdb.driver.api.DbType;
 import com.changhong.openvdb.driver.api.PooledDataSource;
 import com.changhong.utils.exception.Causes;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -39,9 +39,9 @@ public class CreateOrEditConnectionDialog extends Stage
         private static final int WW = 700;
         private static final int WH = 500;
 
-        public CreateOrEditConnectionDialog(DriverType driverType)
+        public CreateOrEditConnectionDialog(DbType dbType)
         {
-                this(driverType, null);
+                this(dbType, null);
         }
 
         public CreateOrEditConnectionDialog(ConnectionPropertyModel propertyModel)
@@ -49,7 +49,7 @@ public class CreateOrEditConnectionDialog extends Stage
                 this(null, propertyModel);
         }
 
-        public CreateOrEditConnectionDialog(DriverType driverType, ConnectionPropertyModel newProperty)
+        public CreateOrEditConnectionDialog(DbType dbType, ConnectionPropertyModel newProperty)
         {
                 this.isUpdate = newProperty != null;
 
@@ -62,7 +62,7 @@ public class CreateOrEditConnectionDialog extends Stage
                         : null;
 
                 if (!isUpdate)
-                        this.newProperty.setType(driverType.name());
+                        this.newProperty.setType(dbType.name());
 
                 setupTabPane();
                 setupButtonBar();

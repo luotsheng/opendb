@@ -41,9 +41,9 @@ public class MySQLDriver extends Driver
         }
 
         @Override
-        public DriverType getType()
+        public DbType getType()
         {
-                return DriverType.MYSQL;
+                return DbType.mysql;
         }
 
         @Override

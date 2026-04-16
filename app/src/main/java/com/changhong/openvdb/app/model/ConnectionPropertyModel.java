@@ -2,7 +2,7 @@ package com.changhong.openvdb.app.model;
 
 import com.changhong.openvdb.core.model.ConnectionProfile;
 import com.changhong.openvdb.driver.api.ConnectionConfig;
-import com.changhong.openvdb.driver.api.DriverType;
+import com.changhong.openvdb.driver.api.DbType;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -215,7 +215,7 @@ public class ConnectionPropertyModel
         {
                 ConnectionConfig config = new ConnectionConfig();
 
-                config.setType(DriverType.toDriverType(getType()));
+                config.setType(DbType.of(getType()));
                 config.setHost(getHost());
                 config.setPort(getPort());
                 config.setUsername(getUsername());

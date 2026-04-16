@@ -6,10 +6,6 @@ package com.changhong.openvdb.driver.api.sql;
  * @author Luo Tiansheng
  * @since 2026/4/02
  */
-@SuppressWarnings({
-        "ConvertToBasicLatin",
-        "JavadocBlankLines",
-})
 public enum SQLCommandType
 {
         EXECUTE,

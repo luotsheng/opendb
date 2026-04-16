@@ -35,9 +35,9 @@ public class DMDriver extends Driver
         }
 
         @Override
-        public DriverType getType()
+        public DbType getType()
         {
-                return DriverType.DM;
+                return DbType.dm;
         }
 
         @Override

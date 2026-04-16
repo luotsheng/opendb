@@ -1,7 +1,7 @@
 package com.changhong.openvdb.app.menu;
 
 import com.changhong.openvdb.app.dialog.connection.CreateOrEditConnectionDialog;
-import com.changhong.openvdb.driver.api.DriverType;
+import com.changhong.openvdb.driver.api.DbType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
@@ -14,11 +14,11 @@ public class ConnectionMenuBuilder
         public static Menu buildNewConnectionMenu() {
                 Menu newConnectionMenu = new Menu("新建连接");
 
-                MenuItem mysqlItem = new MenuItem(DriverType.MYSQL.getAlias());
-                mysqlItem.setOnAction(e -> openConnectionDialog(DriverType.MYSQL));
+                MenuItem mysqlItem = new MenuItem(DbType.mysql.getAlias());
+                mysqlItem.setOnAction(e -> openConnectionDialog(DbType.mysql));
 
-                MenuItem postgreSQLItem = new MenuItem(DriverType.DM.getAlias());
-                postgreSQLItem.setOnAction(e -> openConnectionDialog(DriverType.DM));
+                MenuItem postgreSQLItem = new MenuItem(DbType.dm.getAlias());
+                postgreSQLItem.setOnAction(e -> openConnectionDialog(DbType.dm));
 
                 newConnectionMenu.getItems().addAll(mysqlItem, postgreSQLItem);
 
@@ -26,7 +26,7 @@ public class ConnectionMenuBuilder
         }
 
         @SuppressWarnings("unused")
-        private static void openConnectionDialog(DriverType driverType) {
-                new CreateOrEditConnectionDialog(driverType).showAndWait();
+        private static void openConnectionDialog(DbType dbType) {
+                new CreateOrEditConnectionDialog(dbType).showAndWait();
         }
 }

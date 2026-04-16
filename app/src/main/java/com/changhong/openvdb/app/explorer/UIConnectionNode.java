@@ -8,7 +8,7 @@ import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
 import com.changhong.openvdb.core.repository.ConnectionRepository;
 import com.changhong.openvdb.driver.api.ConnectionConfig;
 import com.changhong.openvdb.driver.api.Driver;
-import com.changhong.openvdb.driver.api.DriverType;
+import com.changhong.openvdb.driver.api.DbType;
 import com.changhong.openvdb.driver.api.PooledDataSource;
 import com.changhong.openvdb.driver.dm.DMDriver;
 import com.changhong.openvdb.driver.mysql.MySQLDriver;
@@ -41,7 +41,7 @@ public class UIConnectionNode extends UIExplorerNode
         private Driver driver;
 
         @Getter
-        private DriverType driverType;
+        private DbType dbType;
 
         // Menu Items
         private MenuItem openOrCloseMenuItem;
@@ -66,8 +66,7 @@ public class UIConnectionNode extends UIExplorerNode
         {
                 super(propertyModel.getName());
 
-                this.driverType = DriverType.toDriverType(propertyModel.getType());
-
+                this.dbType = DbType.of(propertyModel.getType());
 
                 setGraphic(getIcon());
                 this.propertyModel = propertyModel;
@@ -77,9 +76,9 @@ public class UIConnectionNode extends UIExplorerNode
         @Override
         public ImageView getIcon()
         {
-                return switch (this.driverType) {
-                        case MYSQL -> Assets.use("mysql");
-                        case DM -> Assets.use("dm2");
+                return switch (this.dbType) {
+                        case mysql -> Assets.use("mysql");
+                        case dm -> Assets.use("dm2");
                 };
         }
 
@@ -89,8 +88,8 @@ public class UIConnectionNode extends UIExplorerNode
                 dataSource = new PooledDataSource(config);
 
                 driver = switch (config.getType()) {
-                        case MYSQL -> new MySQLDriver(dataSource);
-                        case DM -> new DMDriver(dataSource);
+                        case mysql -> new MySQLDriver(dataSource);
+                        case dm -> new DMDriver(dataSource);
                 };
         }
 

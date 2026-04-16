@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class ConnectionConfig
 {
-        private DriverType type;
+        private DbType type;
         private String host;
         private String port;
         private String username;

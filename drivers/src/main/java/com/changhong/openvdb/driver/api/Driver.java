@@ -108,9 +108,9 @@ public abstract class Driver implements SQLExecutor
          * 以便上层模块根据不同的数据库类型执行特定的逻辑分支或优化策略。
          *
          * @return 当前驱动对应的数据库类型枚举值（永不返回 {@code null}）
-         * @see DriverType
+         * @see DbType
          */
-        public abstract DriverType getType();
+        public abstract DbType getType();
 
         /**
          * 创建并返回当前环境适用的数据库方言实例。
