@@ -86,7 +86,7 @@ public class Application extends javafx.application.Application
         {
                 primaryStage = stage;
 
-                javafx.application.Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+                javafx.application.Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
                 Scene scene = new Scene(new MainLayout(), 1200, 800);
                 initializeVFX(scene);
                 stage.setTitle(TITLE);

@@ -7,6 +7,8 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.Clipboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -97,6 +99,35 @@ public class VFXCodeArea extends CodeArea
                                         menu.setDisable(!Clipboard.getSystemClipboard().hasString());
                                 }
                         });
+                });
+
+                addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                        if (!(event.isControlDown() || event.isShortcutDown()))
+                                return;
+
+                        switch (event.getCode()) {
+                                case KeyCode.D -> {
+                                        int line = getCurrentParagraph();
+                                        var text = getParagraph(line).getText();
+                                        int pos  = getAbsolutePosition(line, getParagraphLength(line));
+
+                                        insertText(pos, "\n" + text);
+                                }
+
+                                case KeyCode.X -> {
+                                        int line = getCurrentParagraph();
+
+                                        int start = getAbsolutePosition(line, 0);
+                                        int end = start + getParagraph(line).length() + 1;
+
+                                        String text = getText(start, end);
+                                        Application.copyToClipboard(text);
+
+                                        deleteText(start, end);
+                                }
+
+                                default -> {}
+                        }
                 });
 
                 contextMenu.setOnShowing(event -> showingMenuListeners.forEach(listener -> listener.apply(event)));
