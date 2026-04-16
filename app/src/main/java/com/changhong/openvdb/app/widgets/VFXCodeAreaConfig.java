@@ -13,4 +13,6 @@ public class VFXCodeAreaConfig
 {
         public boolean enableCopy = true;
         public boolean enablePaste = true;
+        public VFXCodeArea.ShowingMenuListener showingMenuListener;
+        public VFXCodeArea.ConfigureContextMenuHandler contextMenuHandler;
 }

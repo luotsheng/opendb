@@ -27,7 +27,7 @@ public class SqlMessagePane extends VirtualizedScrollPane<VFXCodeArea>
 
         public SqlMessagePane()
         {
-                super(new VFXCodeArea(new VFXCodeAreaConfig(true, false)));
+                super(new VFXCodeArea(new VFXCodeAreaConfig(true, false, null, null)));
 
                 codeArea = getContent();
                 codeArea.setEditable(false);

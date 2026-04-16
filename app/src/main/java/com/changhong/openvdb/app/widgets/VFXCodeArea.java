@@ -6,9 +6,7 @@ import com.changhong.utils.system.OS;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import javafx.stage.WindowEvent;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -40,7 +38,11 @@ public class VFXCodeArea extends CodeArea
         }
 
         public interface ShowingMenuListener {
-                void apply(WindowEvent event);
+                void apply(WindowEvent event, ContextMenu contextMenu);
+        }
+
+        public interface ConfigureContextMenuHandler {
+                void handle(ContextMenu contextMenu);
         }
 
         private final List<HighlightingListener> highlightingListeners = new ArrayList<>();
@@ -79,16 +81,26 @@ public class VFXCodeArea extends CodeArea
                 if (config.enableCopy) {
                         MenuItem copyTextItem = new MenuItem("复制");
                         copyTextItem.setOnAction(event -> copy());
+                        copyTextItem.setAccelerator(
+                                new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN)
+                        );
+
                         contextMenu.getItems().add(copyTextItem);
                 }
 
                 if (config.enablePaste) {
                         MenuItem pasteTextItem = new MenuItem("粘贴");
                         pasteTextItem.setOnAction(event -> paste());
+                        pasteTextItem.setAccelerator(
+                                new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN)
+                        );
                         contextMenu.getItems().add(pasteTextItem);
                 }
 
-                showingMenuListeners.add(event -> {
+                if (config.contextMenuHandler != null)
+                        config.contextMenuHandler.handle(contextMenu);
+
+                showingMenuListeners.add((event, contextMenu) -> {
                         contextMenu.getItems().forEach(menu -> {
                                 if (menu.getText() == null)
                                         return;
@@ -100,6 +112,9 @@ public class VFXCodeArea extends CodeArea
                                 }
                         });
                 });
+
+                if (config.showingMenuListener != null)
+                        showingMenuListeners.add(config.showingMenuListener);
 
                 addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                         if (!(event.isControlDown() || event.isShortcutDown()))
@@ -130,7 +145,8 @@ public class VFXCodeArea extends CodeArea
                         }
                 });
 
-                contextMenu.setOnShowing(event -> showingMenuListeners.forEach(listener -> listener.apply(event)));
+                contextMenu.setOnShowing(event -> showingMenuListeners.forEach(listener ->
+                        listener.apply(event, contextMenu)));
 
                 setContextMenu(contextMenu);
         }

@@ -9,10 +9,7 @@ import com.changhong.openvdb.app.explorer.UIConnectionNode;
 import com.changhong.openvdb.app.model.UINodeGlobalStatus;
 import com.changhong.openvdb.app.pane.DataGridViewPane;
 import com.changhong.openvdb.app.pane.SqlMessagePane;
-import com.changhong.openvdb.app.widgets.VFXCodeArea;
-import com.changhong.openvdb.app.widgets.VFXComboBox;
-import com.changhong.openvdb.app.widgets.VFXIconButton;
-import com.changhong.openvdb.app.widgets.VFXSeparator;
+import com.changhong.openvdb.app.widgets.*;
 import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
 import com.changhong.openvdb.core.model.ScriptFile;
 import com.changhong.openvdb.core.repository.ScriptFileRepository;
@@ -39,8 +36,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileReader;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.changhong.utils.string.StaticLibrary.fmt;
+import static com.changhong.utils.string.StaticLibrary.strempty;
 
 /**
  * SQL 脚本编辑器
@@ -83,6 +83,8 @@ public class ScriptEditor extends SplitPane
         private Button stop;
         private Button beautify;
 
+        private MenuItem beautifySelectedSQLItem;
+
         public ScriptEditor(UIConnectionNode conn, ScriptFile scriptFile, Tab owner)
         {
                 this.scriptFile = scriptFile;
@@ -97,7 +99,7 @@ public class ScriptEditor extends SplitPane
 
                 topBorderPane = new BorderPane();
                 toolBar = new ToolBar();
-                codeArea = new VFXCodeArea();
+                codeArea = createCodeArea();
                 virtualizedScrollPane = new VirtualizedScrollPane<>(codeArea);
                 dataGridViewPane = new DataGridViewPane(false);
                 sqlMessagePane = new SqlMessagePane();
@@ -120,6 +122,35 @@ public class ScriptEditor extends SplitPane
                 setOwnerTabName(name);
 
                 getItems().addAll(topBorderPane);
+        }
+
+        private VFXCodeArea createCodeArea()
+        {
+                VFXCodeAreaConfig config = new VFXCodeAreaConfig();
+
+                config.contextMenuHandler = (contextMenu) -> {
+                        beautifySelectedSQLItem = new MenuItem("美化当前选中 SQL");
+                        beautifySelectedSQLItem.setOnAction(event -> beautifySQL());
+
+                        List<MenuItem> copyPasteItems = new ArrayList<>(contextMenu.getItems());
+
+                        contextMenu.getItems().clear();
+                        contextMenu.getItems().addAll(
+                                beautifySelectedSQLItem,
+                                new SeparatorMenuItem()
+                        );
+
+                        copyPasteItems.forEach(contextMenu.getItems()::add);
+                };
+
+                config.showingMenuListener = ((event, contextMenu) -> {
+                        contextMenu.getItems().forEach(contextMenuItem -> {
+                                if (contextMenuItem == beautifySelectedSQLItem)
+                                        contextMenuItem.setDisable(strempty(codeArea.getSelectedText()));
+                        });
+                });
+
+                return new VFXCodeArea(config);
         }
 
         private void setupPane()
@@ -429,8 +460,19 @@ public class ScriptEditor extends SplitPane
 
         private void beautifySQL()
         {
-                codeArea.replaceText(SqlFormatter.format(codeArea.getText()));
-                codeArea.applyHighlightAll(); /* 强制刷新高亮 */
+                String selected = codeArea.getSelectedText();
+
+                if (selected != null && !selected.isEmpty()) {
+                        int start = codeArea.getSelection().getStart();
+                        int end = codeArea.getSelection().getEnd();
+
+                        String formatted = SqlFormatter.format(selected);
+                        codeArea.replaceText(start, end, formatted);
+                } else {
+                        codeArea.replaceText(SqlFormatter.format(codeArea.getText()));
+                }
+
+                codeArea.applyHighlightAll();
         }
 
         public String getCodeAreaContent()
