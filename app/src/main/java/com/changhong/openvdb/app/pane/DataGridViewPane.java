@@ -39,7 +39,7 @@ public class DataGridViewPane extends BorderPane
         private final TabPane tabPane = new TabPane();
         private final Tab dataGridTab = new Tab();
         private final VFXTableView<GridRow> tableView = new VFXTableView<>();
-        private final HBox toolBar = new HBox();
+        private final ToolBar toolBar = new ToolBar();
         private final VBox vContainer;
 
         private final Button plus = new VFXIconButton("新增", "plus");
@@ -78,8 +78,7 @@ public class DataGridViewPane extends BorderPane
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                toolBar.getStyleClass().add("tool-bar");
-                toolBar.getChildren().addAll(
+                toolBar.getItems().addAll(
                         plus, minus,
                         new VFXSeparator(),
                         submit, cross,
