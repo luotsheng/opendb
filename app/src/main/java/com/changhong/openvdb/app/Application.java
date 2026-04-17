@@ -1,9 +1,6 @@
 package com.changhong.openvdb.app;
 
 import atlantafx.base.theme.CupertinoLight;
-import atlantafx.base.theme.NordDark;
-import atlantafx.base.theme.PrimerDark;
-import atlantafx.base.theme.PrimerLight;
 import com.changhong.openvdb.app.layout.MainLayout;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -12,7 +9,10 @@ import javafx.scene.input.ClipboardContent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,8 @@ import java.util.List;
  */
 public class Application extends javafx.application.Application
 {
+        private static final Logger LOG = LoggerFactory.getLogger(Application.class);
+
         public static final String TITLE = "OpenVDB v1.0.0-arch.1";
 
         private static final Class<Application> aClass = Application.class;
@@ -86,6 +88,8 @@ public class Application extends javafx.application.Application
         @SuppressWarnings("CommentedOutCode")
         public void start(Stage stage)
         {
+                setDockIcon("/assets/icons/main.png");
+
                 primaryStage = stage;
 
                 javafx.application.Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
@@ -112,5 +116,25 @@ public class Application extends javafx.application.Application
         public static void start()
         {
                 launch();
+        }
+
+        public static void setDockIcon(String iconPath)
+        {
+                try {
+                        if (!Taskbar.isTaskbarSupported())
+                                return;
+
+                        Taskbar taskbar = Taskbar.getTaskbar();
+
+                        if (!taskbar.isSupported(Taskbar.Feature.ICON_IMAGE))
+                                return;
+
+                        Image image = Toolkit.getDefaultToolkit().getImage(
+                                Application.class.getResource(iconPath));
+
+                        taskbar.setIconImage(image);
+                } catch (Exception e) {
+                        LOG.error("set dock icon failed", e);
+                }
         }
 }

@@ -130,15 +130,17 @@ public class VFXCodeArea extends CodeArea
                                 }
 
                                 case KeyCode.X -> {
-                                        int line = getCurrentParagraph();
+                                        if (getSelectedText() == null) {
+                                                int line = getCurrentParagraph();
 
-                                        int start = getAbsolutePosition(line, 0);
-                                        int end = start + getParagraph(line).length() + 1;
+                                                int start = getAbsolutePosition(line, 0);
+                                                int end = start + getParagraph(line).length() + 1;
 
-                                        String text = getText(start, end);
-                                        Application.copyToClipboard(text);
+                                                String text = getText(start, end);
+                                                Application.copyToClipboard(text);
 
-                                        deleteText(start, end);
+                                                deleteText(start, end);
+                                        }
                                 }
 
                                 default -> {}
