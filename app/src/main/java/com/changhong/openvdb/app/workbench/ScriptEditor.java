@@ -24,6 +24,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.util.StringConverter;
@@ -83,6 +84,7 @@ public class ScriptEditor extends SplitPane
         private Button stop;
         private Button beautify;
 
+        private MenuItem runSelectedSQLItem;
         private MenuItem beautifySelectedSQLItem;
 
         public ScriptEditor(UIConnectionNode conn, ScriptFile scriptFile, Tab owner)
@@ -130,13 +132,20 @@ public class ScriptEditor extends SplitPane
                 VFXCodeAreaConfig config = new VFXCodeAreaConfig();
 
                 config.contextMenuHandler = (contextMenu) -> {
-                        beautifySelectedSQLItem = new MenuItem("美化当前选中 SQL");
+                        runSelectedSQLItem = new MenuItem("运行当前选择的");
+                        runSelectedSQLItem.setOnAction(event -> runTask());
+                        runSelectedSQLItem.setAccelerator(
+                                new KeyCodeCombination(KeyCode.R, KeyCodeCombination.SHORTCUT_DOWN)
+                        );
+
+                        beautifySelectedSQLItem = new MenuItem("美化当前选择的");
                         beautifySelectedSQLItem.setOnAction(event -> beautifySQL());
 
                         List<MenuItem> copyPasteItems = new ArrayList<>(contextMenu.getItems());
 
                         contextMenu.getItems().clear();
                         contextMenu.getItems().addAll(
+                                runSelectedSQLItem,
                                 beautifySelectedSQLItem,
                                 new SeparatorMenuItem()
                         );
@@ -146,8 +155,18 @@ public class ScriptEditor extends SplitPane
 
                 config.showingMenuListener = ((event, contextMenu) -> {
                         contextMenu.getItems().forEach(contextMenuItem -> {
+                                boolean isEmptySelectedText = strempty(codeArea.getSelectedText());
+
                                 if (contextMenuItem == beautifySelectedSQLItem)
-                                        contextMenuItem.setDisable(strempty(codeArea.getSelectedText()));
+                                        contextMenuItem.setDisable(isEmptySelectedText);
+
+                                if (contextMenuItem == runSelectedSQLItem) {
+                                        if (isEmptySelectedText) {
+                                                runSelectedSQLItem.setDisable(true);
+                                                return;
+                                        }
+                                        contextMenuItem.setDisable(run.isDisable());
+                                }
                         });
                 });
 
