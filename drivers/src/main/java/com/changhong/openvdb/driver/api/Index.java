@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.util.List;
 
 import static com.changhong.utils.string.StaticLibrary.strip;
+import static com.changhong.utils.string.StaticLibrary.strnempty;
 
 /**
  * @author Luo Tiansheng
@@ -67,5 +68,12 @@ public class Index extends Sealable
 
                 builder.deleteCharAt(builder.length() - 2);
                 columnsText = builder.toString();
+        }
+
+        public String getLatestName()
+        {
+                if (strnempty(originalName))
+                        return originalName;
+                return name;
         }
 }

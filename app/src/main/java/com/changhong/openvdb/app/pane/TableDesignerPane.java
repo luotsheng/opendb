@@ -137,7 +137,6 @@ public class TableDesignerPane extends BorderPane
                         applyReload();
                 } catch (Exception e) {
                         VFXDialogHelper.alert(e);
-                        applyReload();
                 }
         }
 

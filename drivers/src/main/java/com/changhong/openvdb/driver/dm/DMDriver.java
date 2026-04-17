@@ -21,7 +21,6 @@ import static com.changhong.utils.TypeConverter.atobool;
 import static com.changhong.utils.TypeConverter.atos;
 import static com.changhong.utils.collection.Lists.beg;
 import static com.changhong.utils.string.StaticLibrary.*;
-import static com.changhong.utils.string.StaticLibrary.fmt;
 
 /**
  * @author Luo Tiansheng
@@ -150,6 +149,7 @@ public class DMDriver extends Driver
                               AND I.TABLE_NAME = IC.TABLE_NAME
                         WHERE
                           I.TABLE_NAME = '%s'
+                          AND INDEX_TYPE != 'VIRTUAL'
                           AND I.INDEX_NAME NOT LIKE 'ROWID%%'
                           AND I.INDEX_NAME NOT IN (
                             SELECT INDEX_NAME FROM USER_CONSTRAINTS
@@ -183,11 +183,9 @@ public class DMDriver extends Driver
         public Set<String> getIndexTypes()
         {
                 return Sets.newLinkedHashSet(
-                        "NORMAL",
-                        "UNIQUE",
-                        "BITMAP",
-                        "CLUSTER",
-                        "VIRTUAL"
+                        DMIndexType.NORMAL.name(),
+                        DMIndexType.UNIQUE.name(),
+                        DMIndexType.BITMAP.name()
                 );
         }
 
@@ -211,7 +209,7 @@ public class DMDriver extends Driver
                 for (Index selectionItem : selectionItems) {
                         var sqlText = fmt("DROP INDEX IF EXISTS %s.%s;",
                                 dialect.quote(session.schema()),
-                                dialect.quote(selectionItem.getName()));
+                                dialect.quote(selectionItem.getLatestName()));
                         batch.append(sqlText);
                 }
 
@@ -270,7 +268,39 @@ public class DMDriver extends Driver
         @Override
         public void alterIndexKeys(Session session, String table, Collection<Index> indexes)
         {
+                StringBuilder createIndexBuilder = new StringBuilder();
 
+                for (Index index : indexes) {
+                        DMIndexType type = DMIndexType.of(index.getType());
+                        switch (type) {
+                                case NORMAL -> {
+                                        createIndexBuilder.append(fmt("CREATE INDEX %s ON %s.%s(%s);",
+                                                dialect.quote(index.getName()),
+                                                dialect.quote(session.schema()),
+                                                dialect.quote(table),
+                                                index.getColumnsText()));
+                                }
+
+                                case UNIQUE -> {
+                                        createIndexBuilder.append(fmt("CREATE UNIQUE INDEX %s ON %s.%s(%s);",
+                                                dialect.quote(index.getName()),
+                                                dialect.quote(session.schema()),
+                                                dialect.quote(table),
+                                                index.getColumnsText()));
+                                }
+
+                                case BITMAP -> {
+                                        createIndexBuilder.append(fmt("CREATE BITMAP INDEX %s ON %s.%s(%s);",
+                                                dialect.quote(index.getName()),
+                                                dialect.quote(session.schema()),
+                                                dialect.quote(table),
+                                                index.getColumnsText()));
+                                }
+                        }
+
+                }
+
+                execute(session, new SQL(createIndexBuilder));
         }
 
         @Override
