@@ -186,7 +186,8 @@ public class DMDriver extends Driver
                         "NORMAL",
                         "UNIQUE",
                         "BITMAP",
-                        "CLUSTER"
+                        "CLUSTER",
+                        "VIRTUAL"
                 );
         }
 
