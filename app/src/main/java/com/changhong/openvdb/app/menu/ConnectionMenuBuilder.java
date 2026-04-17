@@ -1,6 +1,6 @@
 package com.changhong.openvdb.app.menu;
 
-import com.changhong.openvdb.app.dialog.connection.CreateOrEditConnectionDialog;
+import com.changhong.openvdb.app.dialog.connection.JdbcCreateConnectionDialog;
 import com.changhong.openvdb.driver.api.DbType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -27,6 +27,6 @@ public class ConnectionMenuBuilder
 
         @SuppressWarnings("unused")
         private static void openConnectionDialog(DbType dbType) {
-                new CreateOrEditConnectionDialog(dbType).showAndWait();
+                new JdbcCreateConnectionDialog(dbType).showAndWait();
         }
 }

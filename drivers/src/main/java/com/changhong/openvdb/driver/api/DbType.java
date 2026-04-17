@@ -8,13 +8,13 @@ import static com.changhong.utils.string.StaticLibrary.lowercase;
  * @author Luo Tiansheng
  * @since 2026/4/11
  */
+@Getter
 public enum DbType
 {
         mysql("MySQL"),
         dm("达梦数据库"),
         ;
 
-        @Getter
         private final String alias;
 
         DbType(String alias)

@@ -1,7 +1,7 @@
 package com.changhong.openvdb.app.explorer;
 
 import com.changhong.openvdb.app.assets.Assets;
-import com.changhong.openvdb.app.dialog.connection.CreateOrEditConnectionDialog;
+import com.changhong.openvdb.app.dialog.connection.JdbcCreateConnectionDialog;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
 import com.changhong.openvdb.app.model.UINodeGlobalStatus;
 import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
@@ -140,10 +140,10 @@ public class UIConnectionNode extends UIExplorerNode
                 if (openFlag) {
                         if (VFXDialogHelper.ask("编辑需要关闭当前连接，是否关闭？")) {
                                 closeConnection();
-                                new CreateOrEditConnectionDialog(propertyModel).showAndWait();
+                                new JdbcCreateConnectionDialog(propertyModel).showAndWait();
                         }
                 } else {
-                        new CreateOrEditConnectionDialog(propertyModel).showAndWait();
+                        new JdbcCreateConnectionDialog(propertyModel).showAndWait();
                 }
         }
 

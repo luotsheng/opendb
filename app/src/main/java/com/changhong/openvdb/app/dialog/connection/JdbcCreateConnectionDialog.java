@@ -27,7 +27,7 @@ import java.sql.Connection;
  * @author Luo Tiansheng
  * @since 2026/3/26
  */
-public class CreateOrEditConnectionDialog extends Stage
+public class JdbcCreateConnectionDialog extends Stage
 {
         private TabPane tabPane;
         private HBox buttonBar;
@@ -39,17 +39,17 @@ public class CreateOrEditConnectionDialog extends Stage
         private static final int WW = 700;
         private static final int WH = 500;
 
-        public CreateOrEditConnectionDialog(DbType dbType)
+        public JdbcCreateConnectionDialog(DbType dbType)
         {
                 this(dbType, null);
         }
 
-        public CreateOrEditConnectionDialog(ConnectionPropertyModel propertyModel)
+        public JdbcCreateConnectionDialog(ConnectionPropertyModel propertyModel)
         {
                 this(null, propertyModel);
         }
 
-        public CreateOrEditConnectionDialog(DbType dbType, ConnectionPropertyModel newProperty)
+        public JdbcCreateConnectionDialog(DbType dbType, ConnectionPropertyModel newProperty)
         {
                 this.isUpdate = newProperty != null;
 
