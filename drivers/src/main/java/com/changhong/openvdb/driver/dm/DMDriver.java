@@ -321,12 +321,14 @@ public class DMDriver extends Driver
                 // 列的信息和列名称。但 DM 不行，所以需要便利两次字段信息来分别不
                 // 同执行列名的修改和列结构的修改
                 for (Column column : columns) {
-                        if (strne(column.getOriginalName(), column.getName())) {
-                                sqls.add(fmt("ALTER TABLE %s RENAME COLUMN %s TO %s;",
-                                        dialect.quote(table),
-                                        dialect.quote(column.getOriginalName()),
-                                        dialect.quote(column.getName())
-                                ));
+                        if (column.getOriginalName() != null) {
+                                if (strne(column.getOriginalName(), column.getName())) {
+                                        sqls.add(fmt("ALTER TABLE %s RENAME COLUMN %s TO %s;",
+                                                dialect.quote(table),
+                                                dialect.quote(column.getOriginalName()),
+                                                dialect.quote(column.getName())
+                                        ));
+                                }
                         }
                 }
 
@@ -350,23 +352,24 @@ public class DMDriver extends Driver
                                 continue;
 
                         // MODIFY
-                        StringBuilder modifyBuilder = new StringBuilder();
+                        StringBuilder modifyOrAddBuilder = new StringBuilder();
 
-                        modifyBuilder.append(fmt("ALTER TABLE %s MODIFY %s ",
+                        modifyOrAddBuilder.append(fmt("ALTER TABLE %s %s %s ",
                                 dialect.quote(table),
+                                column.getOriginalName() != null ? "MODIFY" : "ADD",
                                 dialect.quote(column.getName())
                         ));
 
-                        modifyBuilder.append(column.getType());
+                        modifyOrAddBuilder.append(column.getType());
 
-                        modifyBuilder.append(column.isNotNull() ? " NOT NULL" : " NULL");
+                        modifyOrAddBuilder.append(column.isNotNull() ? " NOT NULL" : " NULL");
 
                         if (strnempty(column.getDefaultValue()))
-                                modifyBuilder.append(" DEFAULT ").append(column.getDefaultValue());
+                                modifyOrAddBuilder.append(" DEFAULT ").append(column.getDefaultValue());
 
-                        modifyBuilder.append(";");
+                        modifyOrAddBuilder.append(";");
 
-                        sqls.add(atos(modifyBuilder));
+                        sqls.add(atos(modifyOrAddBuilder));
 
                         // COMMENT
                         var comment = column.getComment();
