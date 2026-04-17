@@ -47,7 +47,7 @@ public class DataGridViewPane extends BorderPane
         private final Button submit = new VFXIconButton("提交", "check");
         private final Button cross = new VFXIconButton("取消", "cross");
         private final Button reload = new VFXIconButton("刷新", "reload");
-        private final Button export = new VFXIconButton("导出", "export");
+        private final Button export = new VFXIconButton("", "导出", "export");
 
         private final Node progressIndicator = Assets.newProgressIndicator();
 

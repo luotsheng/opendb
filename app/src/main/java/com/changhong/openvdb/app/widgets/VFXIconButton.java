@@ -14,7 +14,13 @@ public class VFXIconButton extends Button
 {
         public VFXIconButton(String tip, String icon)
         {
+                this(tip, null, icon);
+        }
+
+        public VFXIconButton(String tip, String text, String icon)
+        {
                 getStyleClass().add("vfx-icon-button");
+                setText(text);
                 setTooltip(new Tooltip(tip));
                 setGraphic(Assets.use(icon));
         }
