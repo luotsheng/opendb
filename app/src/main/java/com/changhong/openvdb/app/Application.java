@@ -11,6 +11,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lombok.Getter;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class Application extends javafx.application.Application
         private static final Class<Application> aClass = Application.class;
         private static final List<LauncherTask> tasks = new ArrayList<>();
 
+        @Getter
         private static Stage primaryStage = null;
 
         public interface LauncherTask

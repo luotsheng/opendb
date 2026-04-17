@@ -103,7 +103,7 @@ public class ScriptEditor extends SplitPane
                 toolBar = new ToolBar();
                 codeArea = createCodeArea();
                 virtualizedScrollPane = new VirtualizedScrollPane<>(codeArea);
-                dataGridViewPane = new DataGridViewPane(false);
+                dataGridViewPane = new DataGridViewPane(owner, false);
                 sqlMessagePane = new SqlMessagePane();
                 virtualizedScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 

@@ -24,22 +24,22 @@ public class TableDataPane extends BorderPane
         private int size = 1024;
         private Node oldGraphic;
 
-        private final Tab ownerTab;
+        private final Tab owner;
         private final Driver driver;
         private final Session session;
         private final Table table;
         private final DataGridViewPane dataGridViewPane;
 
-        public TableDataPane(Tab ownerTab,
+        public TableDataPane(Tab owner,
                              Session session,
                              Driver driver,
                              Table table)
         {
-                this.ownerTab = ownerTab;
+                this.owner = owner;
                 this.session = session;
                 this.driver = driver;
                 this.table = table;
-                this.dataGridViewPane = new DataGridViewPane(true);
+                this.dataGridViewPane = new DataGridViewPane(owner, true);
 
                 dataGridViewPane.setReloadProgressListener(new DataGridViewPane.ReloadProgressListener()
                 {
@@ -61,13 +61,13 @@ public class TableDataPane extends BorderPane
 
         private void setLoadingIndicator()
         {
-                oldGraphic = ownerTab.getGraphic();
-                ownerTab.setGraphic(Assets.newProgressIndicator());
+                oldGraphic = owner.getGraphic();
+                owner.setGraphic(Assets.newProgressIndicator());
         }
 
         private void removeLoadingIndicator()
         {
-                ownerTab.setGraphic(oldGraphic);
+                owner.setGraphic(oldGraphic);
         }
 
         public void asyncUpdate()

@@ -11,6 +11,10 @@ import com.changhong.openvdb.app.workbench.ModifyCell;
 import com.changhong.openvdb.driver.api.Column;
 import com.changhong.openvdb.driver.api.DataGrid;
 import com.changhong.openvdb.driver.api.GridRow;
+import com.changhong.utils.collection.Lists;
+import com.changhong.utils.io.UFile;
+import com.changhong.utils.poi.WorkBook;
+import com.changhong.utils.time.DateFormatter;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -22,12 +26,14 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import lombok.Setter;
 
+import java.io.File;
 import java.util.List;
 
-import static com.changhong.utils.string.StaticLibrary.fmt;
-import static com.changhong.utils.string.StaticLibrary.strnempty;
+import static com.changhong.utils.string.StaticLibrary.*;
 
 /**
  * @author Luo Tiansheng
@@ -41,6 +47,7 @@ public class DataGridViewPane extends BorderPane
         private final VFXTableView<GridRow> tableView = new VFXTableView<>();
         private final ToolBar toolBar = new ToolBar();
         private final VBox vContainer;
+        private final Tab attachedToTab;
 
         private final Button plus = new VFXIconButton("新增", "plus");
         private final Button minus = new VFXIconButton("删除", "minus");
@@ -68,8 +75,10 @@ public class DataGridViewPane extends BorderPane
         @Setter
         private ReloadProgressListener reloadProgressListener;
 
-        public DataGridViewPane(boolean isPreview)
+        public DataGridViewPane(Tab attachedToTab, boolean isPreview)
         {
+                this.attachedToTab = attachedToTab;
+
                 dataGridTab.setClosable(false);
 
                 setupTableView();
@@ -144,13 +153,11 @@ public class DataGridViewPane extends BorderPane
         private void setupToolButtonAction()
         {
                 plus.setOnAction(event -> onPlus());
-
                 minus.setOnAction(event -> onMinus());
-
                 submit.setOnAction(event -> applySubmit());
                 cross.setOnAction(event -> applyCross());
-
                 reload.setOnAction(event -> reloadAndBlinkTable(true));
+                export.setOnAction(event -> applyExport());
         }
 
         private void onPlus()
@@ -235,6 +242,28 @@ public class DataGridViewPane extends BorderPane
                                 reload.setDisable(false);
                         }
                 }).start();
+        }
+
+        private void applyExport()
+        {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("选择保存文件");
+
+                String initName = attachedToTab.getText();
+                initName = strcut(initName, 0, initName.indexOf("."));
+                initName = initName + DateFormatter.format("yyyyMMddHHmmss") + ".xlsx";
+
+                fileChooser.setInitialFileName(initName);
+
+                // 打开对话框
+                File saveDirectory = fileChooser.showSaveDialog(Application.getPrimaryStage());
+
+                if (saveDirectory != null) {
+                        WorkBook wb = WorkBook.create();
+                        wb.addRow(Lists.map(grid.getColumns(), Column::getLabel).toArray());
+                        grid.getRows().forEach(row -> wb.addRow(row.toArray()));
+                        wb.transferTo(UFile.wrap(saveDirectory));
+                }
         }
 
         private void setupTableView()
