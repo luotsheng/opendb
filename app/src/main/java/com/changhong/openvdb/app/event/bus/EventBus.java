@@ -43,6 +43,9 @@ public class EventBus
 
                         CopyOnWriteArrayList<EventListener> copyOnWriteEventListeners = eventListeners.get(eventClass);
 
+                        if (copyOnWriteEventListeners == null)
+                                return;
+
                         copyOnWriteEventListeners.forEach(listener -> {
                                 try {
                                         if (event.isConsume())
