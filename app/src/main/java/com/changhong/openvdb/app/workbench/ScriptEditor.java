@@ -6,7 +6,7 @@ import com.changhong.openvdb.app.event.RefreshQueryNodeEvent;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.explorer.UICatalogNode;
 import com.changhong.openvdb.app.explorer.UIConnectionNode;
-import com.changhong.openvdb.app.model.UINodeGlobalStatus;
+import com.changhong.openvdb.app.model.UIExplorerStatus;
 import com.changhong.openvdb.app.pane.DataGridViewPane;
 import com.changhong.openvdb.app.pane.SqlMessagePane;
 import com.changhong.openvdb.app.widgets.*;
@@ -185,7 +185,7 @@ public class ScriptEditor extends SplitPane
 
         private void setupToolbar(UIConnectionNode initConnection)
         {
-                UINodeGlobalStatus instance = UINodeGlobalStatus.getInstance();
+                UIExplorerStatus instance = UIExplorerStatus.getInstance();
                 UIConnectionNode selectedConnection = initConnection != null
                         ? initConnection
                         : instance.getSelectedConnection();
@@ -284,6 +284,12 @@ public class ScriptEditor extends SplitPane
 
         private void configureConnectionComboBox(VFXComboBox<UIConnectionNode> comboBox)
         {
+                comboBox.setOnAction(event -> {
+                        UIConnectionNode item = comboBox.getSelectionModel().getSelectedItem();
+                        if (item != null)
+                                catalogComboBox.getItems().setAll(item.getCatalogs());
+                });
+
                 comboBox.setButtonCell(new ListCell<>()
                 {
                         @Override

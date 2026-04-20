@@ -13,18 +13,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @since 2026/3/30
  */
 @Getter
-public class UINodeGlobalStatus
+public class UIExplorerStatus
 {
-        private static UINodeGlobalStatus status = null;
+        private static UIExplorerStatus status = null;
 
         private final List<UIConnectionNode> connections = new CopyOnWriteArrayList<>();
 
         private UIConnectionNode selectedConnection;
 
-        public static synchronized UINodeGlobalStatus getInstance()
+        public static synchronized UIExplorerStatus getInstance()
         {
                 if (status == null)
-                        status = new UINodeGlobalStatus();
+                        status = new UIExplorerStatus();
 
                 return status;
         }
@@ -34,12 +34,16 @@ public class UINodeGlobalStatus
                 connections.add(connection);
         }
 
-        public void removeConnection(UIConnectionNode connection)
+        public void unselectConnection(UIConnectionNode connection)
         {
-                connections.remove(connection);
-
                 if (connection == selectedConnection)
                         selectedConnection = null;
+        }
+
+        public void removeConnection(UIConnectionNode connection)
+        {
+                unselectConnection(connection);
+                connections.remove(connection);
         }
 
         public void selectedConnection(UIConnectionNode connection)

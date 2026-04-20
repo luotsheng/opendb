@@ -3,7 +3,7 @@ package com.changhong.openvdb.app.explorer;
 import com.changhong.openvdb.app.assets.Assets;
 import com.changhong.openvdb.app.dialog.connection.JdbcCreateConnectionDialog;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
-import com.changhong.openvdb.app.model.UINodeGlobalStatus;
+import com.changhong.openvdb.app.model.UIExplorerStatus;
 import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
 import com.changhong.openvdb.core.repository.ConnectionRepository;
 import com.changhong.openvdb.driver.api.ConnectionConfig;
@@ -23,6 +23,8 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.changhong.utils.io.IOUtils.printf;
 
 /**
  * @author Luo Tiansheng
@@ -110,6 +112,7 @@ public class UIConnectionNode extends UIExplorerNode
                                 setupDatabases(driver.getCatalogs());
                                 setExpanded(true);
                                 openFlag = true;
+                                UIExplorerStatus.getInstance().selectedConnection(this);
                         } catch (Throwable e) {
                                 if (!cancelFlag)
                                         Platform.runLater(() -> VFXDialogHelper.alert(e));
@@ -147,7 +150,7 @@ public class UIConnectionNode extends UIExplorerNode
                 catalogs.clear();
                 getChildren().clear();
                 VFXDialogHelper.runWith(dataSource::close);
-                UINodeGlobalStatus.getInstance().removeConnection(this);
+                UIExplorerStatus.getInstance().unselectConnection(this);
                 selectedDatabase = null;
 
                 openFlag = false;
@@ -170,6 +173,7 @@ public class UIConnectionNode extends UIExplorerNode
                 if (VFXDialogHelper.askDangerous("确定要删除“%s”吗？", getName())) {
                         deleteRequestListener.onDeleteRequest(this);
                         ConnectionRepository.deleteConnection(getName());
+                        UIExplorerStatus.getInstance().removeConnection(this);
                 }
         }
 
@@ -214,7 +218,8 @@ public class UIConnectionNode extends UIExplorerNode
         @Override
         public void onSelectedEvent(UIExplorerNode node)
         {
-                UINodeGlobalStatus.getInstance().selectedConnection(this);
+                if (openFlag)
+                        UIExplorerStatus.getInstance().selectedConnection(this);
         }
 
         private void setupListenerEvent()

@@ -9,7 +9,7 @@ import com.changhong.openvdb.app.explorer.UIConnectionNode;
 import com.changhong.openvdb.app.explorer.UIExplorerNode;
 import com.changhong.openvdb.app.menu.ConnectionMenuBuilder;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
-import com.changhong.openvdb.app.model.UINodeGlobalStatus;
+import com.changhong.openvdb.app.model.UIExplorerStatus;
 import com.changhong.openvdb.app.widgets.VFXTextField;
 import com.changhong.openvdb.core.model.ConnectionProfile;
 import com.changhong.openvdb.core.repository.ConnectionRepository;
@@ -290,7 +290,7 @@ public class ObjectExplorerPane extends VBox implements EventListener
                         ConnectionPropertyModel propertyModel = new ConnectionPropertyModel(profile);
 
                         UIConnectionNode connection = new UIConnectionNode(propertyModel);
-                        UINodeGlobalStatus.getInstance().addConnection(connection);
+                        UIExplorerStatus.getInstance().addConnection(connection);
                         connections.put(profile.getName(), connection);
                         children.add(connection);
 
