@@ -2,6 +2,7 @@ package com.changhong.openvdb.driver.api;
 
 import com.changhong.openvdb.driver.api.sql.SQL;
 import com.changhong.utils.Optional;
+import com.changhong.utils.collection.Lists;
 import com.changhong.utils.collection.Maps;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +36,7 @@ public class DataGrid
 
         @Setter
         @Getter
-        private List<GridRow> rows;
+        private List<GridRow> rows = Lists.newArrayList();
 
         @Setter
         @Getter
@@ -68,6 +69,42 @@ public class DataGrid
                 this.session = session;
                 this.driver = driver;
                 this.sql = sql;
+        }
+        
+        public static DataGrid ofValue(Session session, String value)
+        {
+                DataGrid dataGrid = new DataGrid(session, null, null);
+                
+                Column col = new Column();
+                col.setLabel("Value");
+                col.setName("Value");
+                col.setType("Object");
+
+                dataGrid.setColumns(Lists.fromVarargs(col));
+                dataGrid.addEmptyRow();
+                dataGrid.getRows().getFirst().set(0, value);
+
+                return dataGrid;
+        }
+
+        public static DataGrid ofList(Session session, List<String> list)
+        {
+                DataGrid dataGrid = new DataGrid(session, null, null);
+
+                Column col = new Column();
+                col.setLabel("Value");
+                col.setName("Value");
+                col.setType("Object");
+
+                dataGrid.setColumns(Lists.fromVarargs(col));
+
+                list.forEach(e -> {
+                        GridRow row = new GridRow();
+                        row.add(e);
+                        dataGrid.rows.add(row);
+                });
+
+                return dataGrid;
         }
 
         public int size()

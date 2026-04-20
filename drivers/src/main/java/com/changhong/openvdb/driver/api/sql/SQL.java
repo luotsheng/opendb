@@ -64,7 +64,6 @@ public class SQL implements Iterable<SQLParsedStatement>
                                 this.statements.add(sqlParsedStatement);
                         }
                 } catch (Exception e) {
-                        LOG.error("create SQL object error", e);
                         this.statements.clear();
                         this.statements.add(new SQLParsedStatement(raw, type != null ? type : SQLCommandType.EXECUTE));
                 }

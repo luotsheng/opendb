@@ -1,19 +1,20 @@
 package com.changhong.openvdb.driver.redis;
 
-import com.changhong.openvdb.driver.api.Column;
-import com.changhong.openvdb.driver.api.DbType;
-import com.changhong.openvdb.driver.api.Dialect;
-import com.changhong.openvdb.driver.api.Driver;
-import com.changhong.openvdb.driver.api.Index;
-import com.changhong.openvdb.driver.api.Session;
-import com.changhong.openvdb.driver.api.Table;
+import com.changhong.openvdb.driver.api.*;
+import com.changhong.openvdb.driver.api.sql.SQL;
 import com.changhong.utils.collection.Lists;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.commands.ProtocolCommand;
 
 import javax.sql.DataSource;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
+import static com.changhong.utils.TypeConverter.atos;
+import static com.changhong.utils.string.StaticLibrary.strip;
 
 /**
  * Redis 驱动层实现
@@ -48,9 +49,38 @@ public class RedisDriver extends Driver {
         }
 
         @Override
+        public DataGrid execute(long jobId, Session session, SQL sql)
+        {
+                jedis.select(Integer.parseInt(session.catalog()));
+
+                String[] parts = strip(sql.getRaw()).split("\\s+");
+                ProtocolCommand cmd = () -> parts[0].getBytes(StandardCharsets.UTF_8);
+                byte[][] args = new byte[parts.length - 1][];
+
+                for (int i = 1; i < parts.length; i++)
+                        args[i - 1] = parts[i].getBytes(StandardCharsets.UTF_8);
+
+                // GET serviceCalendar|2026-04
+                Object result = jedis.sendCommand(cmd, args);
+
+                return switch (result) {
+                        case byte[] b -> DataGrid.ofValue(session, atos(b));
+                        case Long l -> DataGrid.ofValue(session, atos(l));
+                        case ArrayList<?> list -> {
+                                List<String> values = Lists.newArrayList();
+                                ((ArrayList<?>) list.get(1)).forEach(bytes -> {
+                                        values.add(atos((byte[]) bytes));
+                                });
+                                yield DataGrid.ofList(session, values);
+                        }
+                        default -> null;
+                };
+        }
+
+        @Override
         public DbType getType()
         {
-                return null;
+                return DbType.redis;
         }
 
         @Override
@@ -62,72 +92,73 @@ public class RedisDriver extends Driver {
         @Override
         public String showCreateTable(Session session, String table)
         {
-                return "";
+                throw new UnsupportedOperationException();
         }
 
         @Override
         public List<Table> getTables(Session session)
         {
-                return List.of();
+                return Lists.newArrayList();
         }
 
         @Override
         public List<Index> getIndexes(Session session, String table)
         {
-                return List.of();
+                throw new UnsupportedOperationException();
         }
 
         @Override
         public Set<String> getIndexTypes()
         {
-                return Set.of();
+                throw new UnsupportedOperationException();
         }
 
         @Override
         public void dropTable(Session session, String table)
         {
-
+                throw new UnsupportedOperationException();
         }
 
         @Override
         public void dropColumns(Session session, String table, Collection<Column> columns)
         {
-
+                throw new UnsupportedOperationException();
         }
 
         @Override
         public void dropIndexKeys(Session session, String table, Collection<Index> selectionItems)
         {
-
+                throw new UnsupportedOperationException();
         }
 
         @Override
         public void dropPrimaryKey(Session session, String table)
         {
-
+                throw new UnsupportedOperationException();
         }
 
         @Override
         public void addPrimaryKey(Session session, String table, Collection<Column> primaryKeys)
         {
-
+                throw new UnsupportedOperationException();
         }
 
         @Override
         public void alterIndexKeys(Session session, String table, Collection<Index> indexes)
         {
-
+                throw new UnsupportedOperationException();
         }
 
         @Override
         public void alterChange(Session session, String table, Collection<Column> columns)
         {
-
+                throw new UnsupportedOperationException();
         }
 
         @Override
         public void alterVisible(Session session, String table, Collection<Index> indexes)
         {
-
+                throw new UnsupportedOperationException();
         }
+
 }
