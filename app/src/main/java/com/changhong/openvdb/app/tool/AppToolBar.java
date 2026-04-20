@@ -22,9 +22,7 @@ public class AppToolBar extends ToolBar
 {
         public AppToolBar()
         {
-                Button newConnectionButton = new VFXIconButton("连接", "chain");
-                newConnectionButton.setText("新建连接");
-
+                Button newConnectionButton = new VFXIconButton(null, "新建连接", "chain");
                 ContextMenu contextMenu = ConnectionMenuBuilder.buildContextMenu();
                 newConnectionButton.setOnMouseClicked(event -> {
                         if (event.getButton() == MouseButton.PRIMARY) {

@@ -1,12 +1,11 @@
 package com.changhong.openvdb.app.menu;
 
-import com.changhong.openvdb.app.dialog.connection.JdbcCreateConnectionDialog;
+import com.changhong.openvdb.app.assets.Assets;
+import com.changhong.openvdb.app.dialog.connection.CreateOrEditConnectionDialog;
 import com.changhong.openvdb.driver.api.DbType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-
-import javax.naming.Context;
 
 /**
  * @author Luo Tiansheng
@@ -18,12 +17,18 @@ public class ConnectionMenuBuilder
                 Menu newConnectionMenu = new Menu("新建连接");
 
                 MenuItem mysqlItem = new MenuItem(DbType.mysql.getAlias());
+                mysqlItem.setGraphic(Assets.use("mysql"));
                 mysqlItem.setOnAction(e -> openConnectionDialog(DbType.mysql));
 
-                MenuItem postgreSQLItem = new MenuItem(DbType.dm.getAlias());
-                postgreSQLItem.setOnAction(e -> openConnectionDialog(DbType.dm));
+                MenuItem dmItem = new MenuItem(DbType.dm.getAlias());
+                dmItem.setGraphic(Assets.use("dm2"));
+                dmItem.setOnAction(e -> openConnectionDialog(DbType.dm));
 
-                newConnectionMenu.getItems().addAll(mysqlItem, postgreSQLItem);
+                MenuItem redisItem = new MenuItem(DbType.redis.getAlias());
+                redisItem.setGraphic(Assets.use("redis"));
+                redisItem.setOnAction(e -> openConnectionDialog(DbType.redis));
+
+                newConnectionMenu.getItems().addAll(mysqlItem, dmItem, redisItem);
 
                 return newConnectionMenu;
         }
@@ -36,6 +41,6 @@ public class ConnectionMenuBuilder
 
         @SuppressWarnings("unused")
         private static void openConnectionDialog(DbType dbType) {
-                new JdbcCreateConnectionDialog(dbType).showAndWait();
+                new CreateOrEditConnectionDialog(dbType).showAndWait();
         }
 }

@@ -74,3 +74,4 @@ OpenVDB 将查询、结构设计、数据管理与运行分析整合到单一工
 - [amazona-adorada](https://www.flaticon.com/authors/amazona-adorada)
 - [fathema-khanom](https://www.flaticon.com/authors/fathema-khanom)
 - [customicondesign-1](https://www.flaticon.com/authors/customicondesign-1)
+- [Lee.m.yin](https://www.iconfont.cn/user/detail?spm=a313x.search_index.0.d214f71f6.590f3a81Iyg8Pg&uid=6074964&nid=qsTMfc2rGezP)

@@ -1,19 +1,17 @@
 package com.changhong.openvdb.app.explorer;
 
 import com.changhong.openvdb.app.assets.Assets;
-import com.changhong.openvdb.app.dialog.connection.JdbcCreateConnectionDialog;
+import com.changhong.openvdb.app.dialog.connection.CreateOrEditConnectionDialog;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.workbench.ConnectionOpenedNotifyEvent;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
 import com.changhong.openvdb.app.model.UIExplorerStatus;
 import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
 import com.changhong.openvdb.core.repository.ConnectionRepository;
-import com.changhong.openvdb.driver.api.ConnectionConfig;
-import com.changhong.openvdb.driver.api.Driver;
-import com.changhong.openvdb.driver.api.DbType;
-import com.changhong.openvdb.driver.api.PooledDataSource;
+import com.changhong.openvdb.driver.api.*;
 import com.changhong.openvdb.driver.dm.DMDriver;
 import com.changhong.openvdb.driver.mysql.MySQLDriver;
+import com.changhong.openvdb.driver.redis.RedisDriver;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -25,8 +23,6 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.changhong.utils.io.IOUtils.printf;
 
 /**
  * @author Luo Tiansheng
@@ -41,7 +37,7 @@ public class UIConnectionNode extends UIExplorerNode
         private boolean openFlag = false;
         private boolean cancelFlag = false;
         private Thread connecetThread = null;
-        private PooledDataSource dataSource;
+        private CloseableDataSource dataSource;
 
         @Getter
         private Driver driver;
@@ -85,17 +81,19 @@ public class UIConnectionNode extends UIExplorerNode
                 return switch (this.dbType) {
                         case mysql -> Assets.use("mysql");
                         case dm -> Assets.use("dm2");
+                        case redis -> Assets.use("redis");
                 };
         }
 
         private void createDriver()
         {
                 ConnectionConfig config = propertyModel.toConnectionConfig();
-                dataSource = new PooledDataSource(config);
+                dataSource = DataSourceFactory.getDataSource(config);
 
                 driver = switch (config.getType()) {
                         case mysql -> new MySQLDriver(dataSource);
                         case dm -> new DMDriver(dataSource);
+                        case redis -> new RedisDriver(dataSource);
                 };
         }
 
@@ -164,10 +162,10 @@ public class UIConnectionNode extends UIExplorerNode
                 if (openFlag) {
                         if (VFXDialogHelper.ask("编辑需要关闭当前连接，是否关闭？")) {
                                 closeConnection();
-                                new JdbcCreateConnectionDialog(propertyModel).showAndWait();
+                                new CreateOrEditConnectionDialog(propertyModel).showAndWait();
                         }
                 } else {
-                        new JdbcCreateConnectionDialog(propertyModel).showAndWait();
+                        new CreateOrEditConnectionDialog(propertyModel).showAndWait();
                 }
         }
 

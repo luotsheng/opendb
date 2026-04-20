@@ -11,15 +11,18 @@ import static com.changhong.utils.string.StaticLibrary.lowercase;
 @Getter
 public enum DbType
 {
-        mysql("MySQL"),
-        dm("达梦数据库"),
+        mysql("MySQL", true),
+        dm("达梦数据库", true),
+        redis("Redis", false),
         ;
 
         private final String alias;
+        private final boolean supportedProductMetaData;
 
-        DbType(String alias)
+        DbType(String alias, boolean supportedProductMetaData)
         {
                 this.alias = alias;
+                this.supportedProductMetaData = supportedProductMetaData;
         }
 
         public static DbType of(String type)

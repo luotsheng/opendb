@@ -5,8 +5,7 @@ import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.model.ConnectionPropertyModel;
 import com.changhong.openvdb.core.repository.ConnectionRepository;
 import com.changhong.openvdb.core.utils.JSONUtils;
-import com.changhong.openvdb.driver.api.DbType;
-import com.changhong.openvdb.driver.api.PooledDataSource;
+import com.changhong.openvdb.driver.api.*;
 import com.changhong.utils.exception.Causes;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.geometry.Insets;
@@ -20,6 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import redis.clients.jedis.ConnectionFactory;
 
 import java.sql.Connection;
 
@@ -27,11 +27,12 @@ import java.sql.Connection;
  * @author Luo Tiansheng
  * @since 2026/3/26
  */
-public class JdbcCreateConnectionDialog extends Stage
+public class CreateOrEditConnectionDialog extends Stage
 {
         private TabPane tabPane;
         private HBox buttonBar;
         private final boolean isUpdate;
+        private final DbType dbType;
         private final ConnectionPropertyModel oldProperty;
         private final ConnectionPropertyModel newProperty;
         private final Label status = new Label();
@@ -39,19 +40,20 @@ public class JdbcCreateConnectionDialog extends Stage
         private static final int WW = 700;
         private static final int WH = 500;
 
-        public JdbcCreateConnectionDialog(DbType dbType)
+        public CreateOrEditConnectionDialog(DbType dbType)
         {
                 this(dbType, null);
         }
 
-        public JdbcCreateConnectionDialog(ConnectionPropertyModel propertyModel)
+        public CreateOrEditConnectionDialog(ConnectionPropertyModel propertyModel)
         {
-                this(null, propertyModel);
+                this(propertyModel.getDbType(), propertyModel);
         }
 
-        public JdbcCreateConnectionDialog(DbType dbType, ConnectionPropertyModel newProperty)
+        public CreateOrEditConnectionDialog(DbType dbType, ConnectionPropertyModel newProperty)
         {
                 this.isUpdate = newProperty != null;
+                this.dbType = dbType;
 
                 this.newProperty = isUpdate
                         ? newProperty
@@ -76,17 +78,22 @@ public class JdbcCreateConnectionDialog extends Stage
                 Tab generalTab = new Tab("常规属性");
                 generalTab.setClosable(false);
                 generalTab.setContent(new ConnectionGeneralPane(newProperty));
+                tabPane.getTabs().add(generalTab);
 
-                Tab advanceTab = new Tab("高级属性");
-                advanceTab.setClosable(false);
-                advanceTab.setContent(new ConnectionAdvancedPane(newProperty));
-
-                tabPane.getTabs().addAll(generalTab, advanceTab);
+                switch (dbType) {
+                        case mysql, dm -> {
+                                Tab advanceTab = new Tab("高级属性");
+                                advanceTab.setClosable(false);
+                                advanceTab.setContent(new ConnectionAdvancedPane(newProperty));
+                                tabPane.getTabs().add(advanceTab);
+                        }
+                        default -> {}
+                }
         }
 
         private void setupButtonBar()
         {
-                Button test = new Button("测试链接");
+                Button test = new Button("测试连接");
                 test.setOnAction(event -> testConnection());
 
                 Button save = new Button("保存");
@@ -120,8 +127,8 @@ public class JdbcCreateConnectionDialog extends Stage
         })
         public void testConnection()
         {
-                try (PooledDataSource dataSource = new PooledDataSource(newProperty.toConnectionConfig());
-                     Connection connection = dataSource.getConnection()) {
+                var config = newProperty.toConnectionConfig();
+                try (CloseableDataSource ds = DataSourceFactory.getDataSource(config)) {
                         status.setText("Connected successfully...");
                         status.setStyle("-fx-text-fill: #28a745;");
                 } catch (Exception e) {

@@ -69,7 +69,7 @@ public abstract class Driver implements SQLExecutor
          * 数据库产品元数据
          */
         @Getter
-        protected final ProductMetaData productMetaData;
+        protected ProductMetaData productMetaData;
 
         /**
          * 数据库方言转换器
@@ -87,15 +87,17 @@ public abstract class Driver implements SQLExecutor
         {
                 this.dataSource = Objects.requireNonNull(dataSource, "DataSource must not be null");
 
-                try (var conn = dataSource.getConnection()) {
-                        DatabaseMetaData db = conn.getMetaData();
-                        productMetaData = new ProductMetaData();
-                        productMetaData.setProductName(Optional.ifError(db::getDatabaseProductName, "ERROR"));
-                        productMetaData.setVersion(Optional.ifError(db::getDatabaseProductVersion, "ERROR"));
-                        productMetaData.setMajorVersion(Optional.ifError(db::getDatabaseMajorVersion, -1));
-                        productMetaData.setMinorVersion(Optional.ifError(db::getDatabaseMinorVersion, -1));
-                } catch (Exception e) {
-                        throw new DriverException(e);
+                if (dataSource instanceof PooledDataSource) {
+                        try (var conn = dataSource.getConnection()) {
+                                DatabaseMetaData db = conn.getMetaData();
+                                productMetaData = new ProductMetaData();
+                                productMetaData.setProductName(Optional.ifError(db::getDatabaseProductName, "ERROR"));
+                                productMetaData.setVersion(Optional.ifError(db::getDatabaseProductVersion, "ERROR"));
+                                productMetaData.setMajorVersion(Optional.ifError(db::getDatabaseMajorVersion, -1));
+                                productMetaData.setMinorVersion(Optional.ifError(db::getDatabaseMinorVersion, -1));
+                        } catch (Exception e) {
+                                throw new DriverException(e);
+                        }
                 }
 
                 this.dialect = createDialect();

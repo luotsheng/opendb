@@ -3,7 +3,6 @@ package com.changhong.openvdb.driver.api;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,7 +16,7 @@ import java.util.logging.Logger;
  * @since 2026/3/27
  */
 public class PooledDataSource
-        implements DataSource, AutoCloseable
+        implements CloseableDataSource
 {
         private final HikariDataSource ds;
 

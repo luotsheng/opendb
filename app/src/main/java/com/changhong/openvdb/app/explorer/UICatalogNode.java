@@ -95,7 +95,7 @@ public class UICatalogNode extends UIExplorerNode implements EventListener
                 setGraphic(getIcon());
 
                 this.session = switch (connection.getDbType()) {
-                        case mysql -> Session.ofCatalog(name);
+                        case mysql, redis -> Session.ofCatalog(name);
                         case dm -> Session.ofSchema(name);
                 };
 

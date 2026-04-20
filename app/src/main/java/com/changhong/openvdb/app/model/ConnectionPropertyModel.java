@@ -224,4 +224,9 @@ public class ConnectionPropertyModel
 
                 return config;
         }
+
+        public DbType getDbType()
+        {
+                return DbType.of(getType());
+        }
 }

@@ -1,5 +1,6 @@
 package com.changhong.openvdb.core.utils;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -37,11 +38,7 @@ public class JSONUtils
 
         public static <T> T toJavaObject(String json, Class<T> aClass)
         {
-                try {
-                        return objectMapper.readValue(json, aClass);
-                } catch (JsonProcessingException e) {
-                        return null;
-                }
+                return JSONObject.parseObject(json, aClass);
         }
 
         public static <T> List<T> toJavaList(String jsonArray, Class<T> aClass)
