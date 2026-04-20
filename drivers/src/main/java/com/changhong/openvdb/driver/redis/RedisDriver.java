@@ -42,8 +42,11 @@ public class RedisDriver extends Driver {
                 List<String> catalogs = Lists.newArrayList();
                 int count = Integer.parseInt(jedis.configGet("databases").get("databases"));
 
-                for (int i = 0; i < count; i++)
-                        catalogs.add(String.valueOf(i));
+                for (int i = 0; i < count; i++) {
+                        jedis.select(i);
+                        if (jedis.dbSize() > 0)
+                                catalogs.add(String.valueOf(i));
+                }
 
                 return catalogs;
         }
