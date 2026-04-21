@@ -47,11 +47,11 @@ public class DMDriver extends Driver
         }
 
         @Override
-        public List<String> getCatalogs()
+        public List<Catalog> getCatalogs()
         {
                 /* 达梦没有 CATALOG 概念，只有 SCHEMA 模式的概念，所以将 CATALOG
                    映射为 SCHEMA 方便接口统一 */
-                return getSchemas();
+                return Lists.map(getSchemas(), Catalog::of);
         }
 
         @Override

@@ -51,7 +51,7 @@ public class UIConnectionNode extends UIExplorerNode
         private MenuItem deleteMenuItem;
 
         @Getter
-        private final List<UICatalogNode> catalogs = new ArrayList<>();
+        private final List<UICatalogNode> catalogNodes = new ArrayList<>();
 
         @Setter
         @Getter
@@ -148,7 +148,7 @@ public class UIConnectionNode extends UIExplorerNode
                                 dbNode.closeDatabase();
                 });
 
-                catalogs.clear();
+                catalogNodes.clear();
                 getChildren().clear();
                 VFXDialogHelper.runWith(dataSource::close);
                 UIExplorerStatus.getInstance().unselectConnection(this);
@@ -228,11 +228,11 @@ public class UIConnectionNode extends UIExplorerNode
                 setMouseDoubleClickEvent(event -> openConnection());
         }
 
-        private void setupDatabases(List<String> databaseNames)
+        private void setupDatabases(List<Catalog> cats)
         {
-                for (String name : databaseNames)
-                        catalogs.add(new UICatalogNode(this, driver, name));
-                getChildren().addAll(catalogs);
+                for (Catalog cat : cats)
+                        catalogNodes.add(new UICatalogNode(this, driver, cat));
+                getChildren().addAll(catalogNodes);
         }
 
         @SuppressWarnings("BooleanMethodIsAlwaysInverted")

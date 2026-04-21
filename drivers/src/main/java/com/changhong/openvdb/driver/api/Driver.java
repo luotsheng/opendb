@@ -214,15 +214,15 @@ public abstract class Driver implements SQLExecutor
          * @throws DriverException 如果数据库元数据访问失败
          * @see DatabaseMetaData#getCatalogs()
          */
-        public List<String> getCatalogs() {
-                List<String> catalogs = Lists.newArrayList();
+        public List<Catalog> getCatalogs() {
+                List<Catalog> catalogs = Lists.newArrayList();
 
                 try (Connection connection = getConnection()) {
                         DatabaseMetaData metadata = connection.getMetaData();
                         ResultSet rs = metadata.getCatalogs();
 
                         while (rs.next())
-                                catalogs.add(rs.getString("TABLE_CAT"));
+                                catalogs.add(Catalog.of(rs.getString("TABLE_CAT")));
 
                         return catalogs;
                 } catch (SQLException e) {

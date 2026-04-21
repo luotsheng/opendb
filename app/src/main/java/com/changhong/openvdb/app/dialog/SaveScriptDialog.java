@@ -70,7 +70,7 @@ public class SaveScriptDialog extends BorderPane
                         if (!newVal.isOpen())
                                 return;
                         catalogComboBox.getItems().clear();
-                        catalogComboBox.getItems().addAll(newVal.getCatalogs());
+                        catalogComboBox.getItems().addAll(newVal.getCatalogNodes());
                 });
         }
 

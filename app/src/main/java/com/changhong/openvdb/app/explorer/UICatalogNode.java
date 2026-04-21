@@ -12,10 +12,7 @@ import com.changhong.openvdb.app.pane.TableOverviewPane;
 import com.changhong.openvdb.app.widgets.dialog.VFXDialogHelper;
 import com.changhong.openvdb.core.model.ScriptFile;
 import com.changhong.openvdb.core.repository.ScriptFileRepository;
-import com.changhong.openvdb.driver.api.DbType;
-import com.changhong.openvdb.driver.api.Driver;
-import com.changhong.openvdb.driver.api.Session;
-import com.changhong.openvdb.driver.api.Table;
+import com.changhong.openvdb.driver.api.*;
 import com.changhong.utils.collection.Maps;
 import javafx.application.Platform;
 import javafx.scene.Node;
@@ -89,15 +86,15 @@ public class UICatalogNode extends UIExplorerNode implements EventListener
                 }
         }
 
-        public UICatalogNode(UIConnectionNode connection, Driver driver, String name)
+        public UICatalogNode(UIConnectionNode connection, Driver driver, Catalog catalog)
         {
-                super(name);
+                super(catalog.getLabel());
                 this.connection = connection;
                 setGraphic(getIcon());
 
                 this.session = switch (connection.getDbType()) {
-                        case mysql, redis -> Session.ofCatalog(name);
-                        case dm -> Session.ofSchema(name);
+                        case mysql, redis -> Session.ofCatalog(catalog.getName());
+                        case dm -> Session.ofSchema(catalog.getName());
                 };
 
                 this.driver = driver;
@@ -140,7 +137,6 @@ public class UICatalogNode extends UIExplorerNode implements EventListener
                 driver.dropTable(session, table.getName());
         }
 
-        @SuppressWarnings("unchecked")
         public void openDatabase()
         {
                 if (openFlag)

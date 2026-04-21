@@ -8,6 +8,7 @@ import redis.clients.jedis.commands.ProtocolCommand;
 
 import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 import static com.changhong.utils.TypeConverter.atos;
 import static com.changhong.utils.collection.Lists.beg;
+import static com.changhong.utils.string.StaticLibrary.fmt;
 import static com.changhong.utils.string.StaticLibrary.strip;
 
 /**
@@ -39,14 +41,19 @@ public class RedisDriver extends Driver {
         }
 
         @Override
-        public List<String> getCatalogs() {
-                List<String> catalogs = Lists.newArrayList();
+        public List<Catalog> getCatalogs() {
+                List<Catalog> catalogs = Lists.newArrayList();
                 int count = Integer.parseInt(jedis.configGet("databases").get("databases"));
+                NumberFormat numberFormat = NumberFormat.getInstance();
 
                 for (int i = 0; i < count; i++) {
                         jedis.select(i);
-                        if (jedis.dbSize() > 0)
-                                catalogs.add(String.valueOf(i));
+                        long dbSize = jedis.dbSize();
+                        if (dbSize > 0) {
+                                String index = String.valueOf(i);
+                                String lab = fmt("DB%s (%s keys)", index, numberFormat.format(dbSize));
+                                catalogs.add(Catalog.of(lab, index));
+                        }
                 }
 
                 return catalogs;

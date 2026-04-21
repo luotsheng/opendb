@@ -138,7 +138,7 @@ public class ScriptEditor extends SplitPane implements EventListener
                 if (event instanceof ConnectionOpenedNotifyEvent e) {
                         UIConnectionNode selectedItem = connectionComboBox.getSelectionModel().getSelectedItem();
                         if (selectedItem == e.connection)
-                                catalogComboBox.getItems().setAll(selectedItem.getCatalogs());
+                                catalogComboBox.getItems().setAll(selectedItem.getCatalogNodes());
                 }
         }
 
@@ -226,7 +226,7 @@ public class ScriptEditor extends SplitPane implements EventListener
 
                 if (selectedConnection != null) {
                         connectionComboBox.getSelectionModel().select(selectedConnection);
-                        catalogComboBox.getItems().addAll(selectedConnection.getCatalogs());
+                        catalogComboBox.getItems().addAll(selectedConnection.getCatalogNodes());
                         catalogComboBox.getSelectionModel().select(selectedConnection.getSelectedDatabase());
                 }
 
@@ -302,7 +302,7 @@ public class ScriptEditor extends SplitPane implements EventListener
                 comboBox.setOnAction(event -> {
                         UIConnectionNode item = comboBox.getSelectionModel().getSelectedItem();
                         if (item != null)
-                                catalogComboBox.getItems().setAll(item.getCatalogs());
+                                catalogComboBox.getItems().setAll(item.getCatalogNodes());
                 });
 
                 comboBox.setButtonCell(new ListCell<>()
