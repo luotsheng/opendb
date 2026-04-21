@@ -25,7 +25,7 @@ public class Application extends javafx.application.Application
 {
         private static final Logger LOG = LoggerFactory.getLogger(Application.class);
 
-        public static final String TITLE = "OpenVDB v1.0.0-arch.1";
+        public static final String TITLE = "OpenDB v1.0.0-arch.1";
 
         private static final Class<Application> aClass = Application.class;
         private static final List<LauncherTask> tasks = new ArrayList<>();
