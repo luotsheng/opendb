@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.changhong.utils.TypeConverter.atos;
+import static com.changhong.utils.collection.Lists.beg;
 import static com.changhong.utils.string.StaticLibrary.strip;
 
 /**
@@ -67,17 +68,31 @@ public class RedisDriver extends Driver {
                 Object result = jedis.sendCommand(cmd, args);
 
                 return switch (result) {
+                        case null -> DataGrid.ofValue(session, null);
+
                         case byte[] b -> DataGrid.ofValue(session, atos(b));
+
                         case Long l -> DataGrid.ofValue(session, atos(l));
-                        case ArrayList<?> list -> {
-                                List<String> values = Lists.newArrayList();
-                                ((ArrayList<?>) list.get(1)).forEach(bytes -> {
-                                        values.add(atos((byte[]) bytes));
-                                });
-                                yield DataGrid.ofList(session, values);
+
+                        case List<?> list -> {
+                                if (list.isEmpty())
+                                        yield DataGrid.ofList(session, List.of());
+
+                                Object second = list.get(1);
+
+                                if (second instanceof List<?> byteList) {
+                                        List<String> values = new ArrayList<>(list.size());
+                                        for (Object v : byteList)
+                                                values.add(atos((byte[]) v));
+                                        yield DataGrid.ofList(session, values);
+                                }
+
+                                yield DataGrid.ofList(session, List.of());
                         }
-                        default -> null;
+
+                        default -> DataGrid.ofValue(session, result.toString());
                 };
+
         }
 
         @Override
