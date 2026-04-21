@@ -97,6 +97,7 @@ public class UITableNode extends UIExplorerNode
         public void openTableDesignerPane()
         {
                 EventBus.publish(new OpenTableDesignerPaneEvent(
+                        this,
                         catalog.getConnection().getName(),
                         catalog.getSession(),
                         driver,

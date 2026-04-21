@@ -47,6 +47,6 @@ public class AppToolBar extends ToolBar
         {
                 UIExplorerStatus instance = UIExplorerStatus.getInstance();
                 UIConnectionNode selectedConnection = instance.getSelectedConnection();
-                EventBus.publish(new OpenScriptEditorPaneEvent(selectedConnection));
+                EventBus.publish(new OpenScriptEditorPaneEvent(null, selectedConnection));
         }
 }

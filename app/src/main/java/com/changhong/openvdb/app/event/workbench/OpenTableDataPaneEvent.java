@@ -27,14 +27,15 @@ public class OpenTableDataPaneEvent extends OpenTabEvent
 
         public OpenTableDataPaneEvent(UICatalogNode catalog, Table table)
         {
-                this(catalog.getSession(), catalog.getDriver(), table,
+                this(catalog, catalog.getSession(), catalog.getDriver(), table,
                         catalog.getConnection().getName(),
                         catalog.getName());
         }
 
-        public OpenTableDataPaneEvent(Session session, Driver driver, Table table,
+        public OpenTableDataPaneEvent(Object owner, Session session, Driver driver, Table table,
                                       String conn, String db)
         {
+                super(owner);
                 this.session = session;
                 this.driver = driver;
                 this.table = table;

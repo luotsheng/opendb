@@ -5,10 +5,14 @@ import com.changhong.openvdb.app.assets.Assets;
 import com.changhong.openvdb.app.event.bus.Event;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.bus.EventListener;
+import com.changhong.openvdb.app.event.workbench.CloseNavigationPaneEvent;
+import com.changhong.openvdb.app.event.workbench.CloseWorkbenchTabEvent;
 import com.changhong.openvdb.app.event.workbench.OpenNavigationPaneEvent;
 import com.changhong.openvdb.app.event.workbench.OpenTabEvent;
 import com.changhong.openvdb.app.exception.ApplicationException;
 import com.changhong.openvdb.app.widgets.VFXTabPane;
+import com.changhong.utils.collection.Lists;
+import com.changhong.utils.collection.Maps;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -19,6 +23,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Luo Tiansheng
  * @since 2026/3/25
@@ -28,13 +37,21 @@ public class Workbench extends VBox implements EventListener
 {
         private final VFXTabPane tabPane = new VFXTabPane();
         private final Tab navigationTab = new Tab("首页");
+        private final Map<Object, List<Tab>> tabPaneManager = Maps.newHashMap();
 
         private final ContextMenu tabPaneContextMenu = new ContextMenu();
-        private final MenuItem closeCurrent = new MenuItem("关闭当前");;
-        private final MenuItem closeAll = new MenuItem("关闭所有");;
-        private final MenuItem closeLeft = new MenuItem("关闭左侧");;
-        private final MenuItem closeRight = new MenuItem("关闭右侧");;
-        private final MenuItem closeOther = new MenuItem("关闭其他");;
+        private final MenuItem closeCurrent = new MenuItem("关闭当前");
+        ;
+        private final MenuItem closeAll = new MenuItem("关闭所有");
+        ;
+        private final MenuItem closeLeft = new MenuItem("关闭左侧");
+        ;
+        private final MenuItem closeRight = new MenuItem("关闭右侧");
+        ;
+        private final MenuItem closeOther = new MenuItem("关闭其他");
+        ;
+
+        private Object navigationTabOwner = null;
 
         public Workbench()
         {
@@ -46,11 +63,13 @@ public class Workbench extends VBox implements EventListener
 
                 setupTabPane();
                 setupContextMenu();
-                setuphomeTab();
+                setupHomeTab();
 
                 // 订阅事件
                 EventBus.subscribe(OpenTabEvent.class, this);
+                EventBus.subscribe(CloseWorkbenchTabEvent.class, this);
                 EventBus.subscribe(OpenNavigationPaneEvent.class, this);
+                EventBus.subscribe(CloseNavigationPaneEvent.class, this);
         }
 
         private void setupTabPane()
@@ -91,7 +110,7 @@ public class Workbench extends VBox implements EventListener
                 });
         }
 
-        private void setuphomeTab()
+        private void setupHomeTab()
         {
                 navigationTab.setClosable(false);
                 tabPane.add(navigationTab);
@@ -133,7 +152,9 @@ public class Workbench extends VBox implements EventListener
         {
                 switch (event) {
                         case OpenTabEvent e -> handleOpenTabEvent(e);
-                        case OpenNavigationPaneEvent e -> handleOpenWorkbenchPaneEvent(e);
+                        case CloseWorkbenchTabEvent e -> handleCloseTabEvent(e);
+                        case OpenNavigationPaneEvent e -> handleSetNavigationPaneEvent(e);
+                        case CloseNavigationPaneEvent e -> handleUnsetNavigationPaneEvent(e);
                         default -> throw new ApplicationException("unsupported event type");
                 }
         }
@@ -142,12 +163,32 @@ public class Workbench extends VBox implements EventListener
         {
                 Tab tab = new Tab(e.tabId());
                 tab.setContent(e.createPane(tab));
+                tabPaneManager.computeIfAbsent(e.owner(), tabPane -> Lists.newArrayList())
+                        .add(tab);
                 tabPane.addAndSelect(tab);
         }
 
-        private void handleOpenWorkbenchPaneEvent(OpenNavigationPaneEvent event)
+        private void handleCloseTabEvent(CloseWorkbenchTabEvent e)
         {
-                navigationTab.setContent(event.getPane());
+                if (!tabPaneManager.containsKey(e.owner()))
+                        return;
+
+                var tabs = tabPaneManager.remove(e.owner());
+                tabs.forEach(tabPane.getTabs()::remove);
+        }
+
+        private void handleSetNavigationPaneEvent(OpenNavigationPaneEvent e)
+        {
+                navigationTab.setContent(e.getPane());
+                navigationTabOwner = e.getOwner();
                 tabPane.select(navigationTab);
+        }
+
+        private void handleUnsetNavigationPaneEvent(CloseNavigationPaneEvent e)
+        {
+                if (navigationTabOwner != null && navigationTabOwner == e.getOwner()) {
+                        navigationTab.setContent(null);
+                        navigationTabOwner = null;
+                }
         }
 }

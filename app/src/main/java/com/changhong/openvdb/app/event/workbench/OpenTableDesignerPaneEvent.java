@@ -23,8 +23,9 @@ public class OpenTableDesignerPaneEvent extends OpenTabEvent
         private final Driver driver;
         private final Table table;
 
-        public OpenTableDesignerPaneEvent(String conn, Session session, Driver driver, Table table)
+        public OpenTableDesignerPaneEvent(Object owner, String conn, Session session, Driver driver, Table table)
         {
+                super(owner);
                 this.conn = conn;
                 this.session = session;
                 this.driver = driver;

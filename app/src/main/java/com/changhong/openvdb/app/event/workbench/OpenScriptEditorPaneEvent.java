@@ -18,13 +18,14 @@ public class OpenScriptEditorPaneEvent extends OpenTabEvent
         private final UIConnectionNode connection;
         private final ScriptFile scriptFile;
 
-        public OpenScriptEditorPaneEvent(UIConnectionNode connection)
+        public OpenScriptEditorPaneEvent(Object owner, UIConnectionNode connection)
         {
-                this(connection, null);
+                this(owner, connection, null);
         }
 
-        public OpenScriptEditorPaneEvent(UIConnectionNode connection, ScriptFile scriptFile)
+        public OpenScriptEditorPaneEvent(Object owner, UIConnectionNode connection, ScriptFile scriptFile)
         {
+                super(owner);
                 this.connection = connection;
                 this.scriptFile = scriptFile;
         }

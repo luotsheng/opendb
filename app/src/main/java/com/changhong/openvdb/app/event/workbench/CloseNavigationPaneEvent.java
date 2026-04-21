@@ -5,20 +5,18 @@ import javafx.scene.Node;
 import lombok.Getter;
 
 /**
- * 在工作区导航页 Tab 设置面板事件
+ * 在工作区导航页 Tab 关闭面板事件
  *
  * @author Luo Tiansheng
  * @since 2026/3/26
  */
 @Getter
-public class OpenNavigationPaneEvent extends Event
+public class CloseNavigationPaneEvent extends Event
 {
         private final Object owner;
-        private final Node pane;
 
-        public OpenNavigationPaneEvent(Object owner, Node pane)
+        public CloseNavigationPaneEvent(Object owner)
         {
                 this.owner = owner;
-                this.pane = pane;
         }
 }

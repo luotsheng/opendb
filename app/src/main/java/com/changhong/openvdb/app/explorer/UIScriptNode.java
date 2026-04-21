@@ -75,7 +75,7 @@ public class UIScriptNode extends UIExplorerNode
 
         private void openScriptEditor()
         {
-                EventBus.publish(new OpenScriptEditorPaneEvent(catalog.getConnection(), scriptFile));
+                EventBus.publish(new OpenScriptEditorPaneEvent(catalog, catalog.getConnection(), scriptFile));
         }
 
         private void renameQuery()

@@ -6,6 +6,8 @@ import com.changhong.openvdb.app.event.RefreshTableNodeEvent;
 import com.changhong.openvdb.app.event.bus.Event;
 import com.changhong.openvdb.app.event.bus.EventBus;
 import com.changhong.openvdb.app.event.bus.EventListener;
+import com.changhong.openvdb.app.event.workbench.CloseNavigationPaneEvent;
+import com.changhong.openvdb.app.event.workbench.CloseWorkbenchTabEvent;
 import com.changhong.openvdb.app.event.workbench.OpenNavigationPaneEvent;
 import com.changhong.openvdb.app.event.workbench.OpenScriptEditorPaneEvent;
 import com.changhong.openvdb.app.pane.TableOverviewPane;
@@ -57,7 +59,8 @@ public class UICatalogNode extends UIExplorerNode implements EventListener
         private MenuItem newQueryMenuItem;
 
         private final TableOverviewPane overviewPane = new TableOverviewPane(this);
-        private final OpenNavigationPaneEvent openWorkbenchPaneEvent = new OpenNavigationPaneEvent(overviewPane);
+        private final OpenNavigationPaneEvent openNavigationPaneEvent = new OpenNavigationPaneEvent(this, overviewPane);
+        private final CloseNavigationPaneEvent closeNavigationPaneEvent = new CloseNavigationPaneEvent(this);
 
         /**
          * 内部通用节点
@@ -177,8 +180,9 @@ public class UICatalogNode extends UIExplorerNode implements EventListener
                         return;
 
                 setExpanded(false);
-
                 getChildren().clear();
+                EventBus.publish(new CloseWorkbenchTabEvent(this));
+                EventBus.publish(closeNavigationPaneEvent);
 
                 openFlag = false;
         }
@@ -210,13 +214,13 @@ public class UICatalogNode extends UIExplorerNode implements EventListener
         public void onSelected(UIExplorerNode node)
         {
                 if (openFlag && node == tableItem)
-                        EventBus.publish(openWorkbenchPaneEvent);
+                        EventBus.publish(openNavigationPaneEvent);
                 connection.setSelectedDatabase(this);
         }
 
         private void newQueryScript()
         {
-                EventBus.publish(new OpenScriptEditorPaneEvent(connection));
+                EventBus.publish(new OpenScriptEditorPaneEvent(this, connection));
         }
 
         public void setupListenerEvent()
