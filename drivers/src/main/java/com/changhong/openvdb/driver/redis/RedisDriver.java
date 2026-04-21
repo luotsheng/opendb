@@ -82,19 +82,21 @@ public class RedisDriver extends Driver {
                         case Long l -> DataGrid.ofValue(session, atos(l));
 
                         case List<?> list -> {
-                                if (list.isEmpty())
+                                List<?> mut = list;
+
+                                if (mut.isEmpty())
                                         yield DataGrid.ofList(session, List.of());
 
-                                Object second = list.get(1);
+                                List<String> values = new ArrayList<>();
+                                Object second = mut.get(1);
 
-                                if (second instanceof List<?> byteList) {
-                                        List<String> values = new ArrayList<>(list.size());
-                                        for (Object v : byteList)
-                                                values.add(atos((byte[]) v));
-                                        yield DataGrid.ofList(session, values);
-                                }
+                                if (second instanceof List<?> byteList)
+                                        mut = byteList;
 
-                                yield DataGrid.ofList(session, List.of());
+                                for (Object v : mut)
+                                        values.add(atos((byte[]) v));
+
+                                yield DataGrid.ofList(session, values);
                         }
 
                         default -> DataGrid.ofValue(session, result.toString());
