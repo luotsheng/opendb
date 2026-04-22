@@ -1,0 +1,61 @@
+package valkyrie.core.utils;
+
+import valkyrie.core.exception.CoreException;
+import valkyrie.utils.Captor;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.stream.Stream;
+
+/**
+ * @author Luo Tiansheng
+ * @since 2026/3/25
+ */
+public class FileUtils
+{
+        public static boolean isDeepEmptyDirectory(File file)
+        {
+                return isDeepEmptyDirectory(file.toPath());
+        }
+
+        public static boolean isDeepEmptyDirectory(Path path)
+        {
+                try (Stream<Path> stream = Files.walk(path)) {
+                        return stream
+                                .filter(p -> !Files.isDirectory(p))
+                                .findFirst()
+                                .isEmpty();
+                } catch (IOException e) {
+                        throw new CoreException(e);
+                }
+        }
+
+        public static void forceDelete(File file)
+        {
+                forceDelete(file.getPath());
+        }
+
+        /**
+         * 强制删除文件
+         */
+        @SuppressWarnings({"resource", "CodeBlock2Expr"})
+        public static void forceDelete(String pathname)
+        {
+                Path path = Paths.get(pathname);
+
+                if (Files.isRegularFile(path)) {
+                        Captor.call(() -> Files.deleteIfExists(path));
+                        return;
+                }
+
+                Captor.call(() -> {
+                        Files.walk(path)
+                                .sorted(Comparator.reverseOrder())
+                                .forEach(pathVal -> Captor.call(() -> Files.delete(pathVal)));
+                });
+        }
+}

@@ -1,0 +1,395 @@
+package valkyrie.driver.mysql;
+
+import valkyrie.driver.api.*;
+import valkyrie.driver.api.exception.DriverException;
+import valkyrie.driver.api.sql.SQL;
+import valkyrie.driver.api.sql.SQLCommandType;
+import valkyrie.utils.collection.Lists;
+import valkyrie.utils.collection.Maps;
+import valkyrie.utils.collection.Sets;
+import net.sf.jsqlparser.statement.alter.Alter;
+import net.sf.jsqlparser.statement.alter.AlterExpression;
+import net.sf.jsqlparser.statement.alter.AlterOperation;
+import net.sf.jsqlparser.statement.create.table.ColDataType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
+
+import static valkyrie.utils.TypeConverter.atobool;
+import static valkyrie.utils.TypeConverter.atos;
+import static valkyrie.utils.collection.Lists.beg;
+import static valkyrie.utils.string.StaticLibrary.*;
+
+/**
+ * MySQL 驱动层实现
+ *
+ * @author Luo Tiansheng
+ * @since 2026/4/11
+ */
+@SuppressWarnings("SqlSourceToSinkFlow")
+public class MySQLDriver extends Driver
+{
+        private static final Logger LOG = LoggerFactory.getLogger(MySQLDriver.class);
+
+        public MySQLDriver(DataSource dataSource)
+        {
+                super(dataSource);
+        }
+
+        @Override
+        public DbType getType()
+        {
+                return DbType.mysql;
+        }
+
+        @Override
+        protected Dialect createDialect()
+        {
+                return new MySQLDialect();
+        }
+
+        @Override
+        public String showCreateTable(Session session, String table)
+        {
+                DataGrid dataGrid = execute(session, new SQL(
+                        fmt("SHOW CREATE TABLE %s;", dialect.quote(table))
+                ));
+
+                return beg(dataGrid.getRows()).get(1);
+        }
+
+        @Override
+        public List<Table> getTables(Session session)
+        {
+                List<Table> tables = Lists.newArrayList();
+
+                try (Connection connection = getConnection(session);
+                     Statement statement = connection.createStatement()) {
+                        String sql = fmt("""
+                            SELECT
+                            	`TABLE_NAME` AS `name`,
+                            	`CREATE_TIME` AS `createTime`,
+                            	`UPDATE_TIME` AS `updateTime`,
+                            	`ENGINE` AS `engine`,
+                            	 ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024, 2) AS `size`,
+                            	`TABLE_ROWS` AS `rows`,
+                            	`TABLE_COMMENT` AS `comment`
+                            FROM
+                            	information_schema.TABLES
+                            WHERE
+                            	TABLE_SCHEMA = '%s';
+                        """, session.catalog());
+
+                        try (var rs = statement.executeQuery(sql)) {
+                                while (rs.next()) {
+                                        tables.add(new Table(
+                                                rs.getString("name"),
+                                                rs.getDate("createTime"),
+                                                rs.getDate("updateTime"),
+                                                rs.getString("engine"),
+                                                rs.getFloat("size"),
+                                                rs.getInt("rows"),
+                                                rs.getString("comment")
+                                        ));
+                                }
+                        }
+                } catch (SQLException e) {
+                        throw new DriverException(e);
+                }
+
+                return tables;
+        }
+
+        @Override
+        public List<Index> getIndexes(Session session, String table)
+        {
+                SQL sql = new SQL("SHOW INDEX FROM " + dialect.quote(table) + ";");
+
+                DataGrid dataGrid = execute(session, sql);
+
+                Map<String, List<String>> indexColumns = Maps.newHashMap();
+                Map<String, Index> indexes = new LinkedHashMap<>();
+
+                for (int i = 0; i < dataGrid.size(); i++) {
+                        String keyName = dataGrid.getRowValue(i, "Key_name");
+                        List<String> columns = indexColumns.computeIfAbsent(keyName, k -> new ArrayList<>());
+
+                        /* 主键忽略 */
+                        if (streq(keyName, "PRIMARY"))
+                                continue;
+
+                        columns.add(dataGrid.getRowValue(i, "Column_name"));
+
+                        Index index = new Index();
+
+                        index.setName(keyName);
+                        index.setOriginalName(keyName);
+
+                        String Non_unique = dataGrid.getRowValue(i, "Non_unique");
+                        String Index_type = dataGrid.getRowValue(i, "Index_type");
+
+                        if (streq(Non_unique, "1") && streq(Index_type, "BTREE")) {
+                                index.setType("NORMAL");
+                        } else if (streq(Non_unique, "0") && streq(Index_type, "BTREE")) {
+                                index.setType("UNIQUE");
+                        } else if (streq(Index_type, "FULLTEXT")) {
+                                index.setType("FULLTEXT");
+                        } else if (streq(Index_type, "SPATIAL")) {
+                                index.setType("SPATIAL");
+                        } else if (streq(Index_type, "HASH")) {
+                                index.setType("HASH");
+                        } else {
+                                index.setType(Index_type);
+                        }
+
+                        if (productMetaData.getMajorVersion() >= MySQL.VERSION_8x) {
+                                index.setVisible(atobool(dataGrid.getRowValue(i, "Visible")));
+                                index.setOriginalVisible(index.isVisible());
+                        }
+
+                        indexes.put(index.getName(), index);
+                }
+
+                List<Index> ret = Lists.newArrayList(indexes.values());
+
+                ret.forEach(idx -> {
+                        /* 生成索引列 */
+                        idx.generateColumnText(indexColumns.get(idx.getName()));
+                        /* 生成完整性校验码 */
+                        idx.finalIntegrityCode();
+                });
+
+                return ret;
+        }
+
+        @Override
+        public Set<String> getIndexTypes()
+        {
+                return Sets.newLinkedHashSet(
+                        "NORMAL",
+                        "UNIQUE",
+                        "FULLTEXT",
+                        "SPATIAL",
+                        "HASH"
+                );
+        }
+
+        @Override
+        public void dropTable(Session session, String table)
+        {
+                execute(session, "DROP TABLE `%s`;", dialect.quote(table));
+        }
+
+        @Override
+        public void dropColumns(Session session, String table, Collection<Column> columns)
+        {
+                StringBuilder script = new StringBuilder();
+
+                script.append(fmt("ALTER TABLE `%s` ", table));
+
+                for (Column col : columns)
+                        script.append(fmt("DROP COLUMN `%s`, ", col.getName()));
+
+                script.delete(script.length() - 2, script.length());
+                script.append(";");
+
+                execute(session, new SQL(atos(script)));
+        }
+
+        @Override
+        public void dropIndexKeys(Session session, String table, Collection<Index> selectionItems)
+        {
+                StringBuilder scripts = new StringBuilder();
+
+                for (Index index : selectionItems) {
+
+                        String name = streq(index.getName(), index.getOriginalName())
+                                ? index.getName()
+                                : index.getOriginalName();
+
+                        scripts.append(
+                                fmt("ALTER TABLE `%s` DROP INDEX `%s`;\n", table, name)
+                        );
+                }
+
+                execute(session, new SQL(atos(scripts)));
+        }
+
+        @Override
+        public void dropPrimaryKey(Session session, String table)
+        {
+                try {
+                        execute(session, new SQL(fmt("ALTER TABLE %s DROP PRIMARY KEY;", dialect.quote(table))));
+                } catch (DriverException e) {
+                        if (e.getErrorCode() == 1091)
+                                return;
+                        throw e;
+                }
+        }
+
+        @Override
+        public void addPrimaryKey(Session session, String table, Collection<Column> primaryKeys)
+        {
+                if (primaryKeys.isEmpty())
+                        return;
+
+                StringBuilder script = new StringBuilder();
+                script.append("ALTER TABLE ").append(dialect.quote(table)).append(" ADD PRIMARY KEY (");
+
+                for (Column primaryKey : primaryKeys) {
+                        script.append(dialect.quote(primaryKey.getName())).append(",");
+                }
+
+                script.delete(script.length() - 1, script.length());
+                script.append(");");
+
+                execute(session, new SQL(atos(script)));
+        }
+
+        @Override
+        public void alterIndexKeys(Session session, String table, Collection<Index> indexes)
+        {
+                StringBuilder scripts = new StringBuilder();
+
+                for (Index index : indexes) {
+
+                        String type = index.getType();
+                        String name = index.getName();
+                        String columns = index.getColumnsText();
+
+                        if (streq(type, "NORMAL")) {
+                                scripts.append(
+                                        fmt(
+                                                "CREATE INDEX `%s` ON `%s`(%s);\n",
+                                                name,
+                                                table,
+                                                columns
+                                        )
+                                );
+                                continue;
+                        }
+
+                        if (streq(type, "UNIQUE")) {
+                                scripts.append(
+                                        fmt(
+                                                "CREATE UNIQUE INDEX `%s` ON `%s`(%s);\n",
+                                                name,
+                                                table,
+                                                columns
+                                        )
+                                );
+                                continue;
+                        }
+
+                        if (streq(type, "FULLTEXT")) {
+                                scripts.append(
+                                        fmt(
+                                                "CREATE FULLTEXT INDEX `%s` ON `%s`(%s);\n",
+                                                name,
+                                                table,
+                                                columns
+                                        )
+                                );
+                                continue;
+                        }
+
+                        if (streq(type, "SPATIAL")) {
+                                scripts.append(
+                                        fmt(
+                                                "CREATE SPATIAL INDEX `%s` ON `%s`(%s);\n",
+                                                name,
+                                                table,
+                                                columns
+                                        )
+                                );
+                                continue;
+                        }
+
+                        if (streq(type, "HASH")) {
+                                scripts.append(
+                                        fmt(
+                                                "CREATE INDEX `%s` ON `%s`(%s) USING HASH;\n",
+                                                name,
+                                                table,
+                                                columns
+                                        )
+                                );
+                        }
+                }
+
+                execute(session, new SQL(SQLCommandType.EXECUTE, atos(scripts)));
+        }
+
+        @Override
+        public void alterChange(Session session, String table, Collection<Column> columns)
+        {
+                if (Lists.isEmpty(columns))
+                        return;
+
+                StringBuilder builder = new StringBuilder();
+
+                for (Column col : columns) {
+                        AlterExpression alterExpr = new AlterExpression();
+
+                        if (col.getOriginalName() != null) {
+                                alterExpr.setOperation(AlterOperation.CHANGE);
+                                alterExpr.setColumnOldName("`" + col.getOriginalName() + "`");
+                        } else {
+                                alterExpr.setOperation(AlterOperation.ADD);
+                        }
+
+                        ColDataType colDataType = new ColDataType(col.getType());
+
+                        var alterColDataType = new AlterExpression.ColumnDataType(false);
+
+                        alterColDataType.setColumnName(dialect.quote(col.getName()));
+                        alterColDataType.setColDataType(colDataType);
+
+                        alterColDataType.addColumnSpecs(
+                                col.isNotNull() ? "NOT NULL" : "NULL"
+                        );
+
+                        if (col.isAutoIncrement())
+                                alterColDataType.addColumnSpecs("AUTO_INCREMENT");
+
+                        if (strnempty(col.getDefaultValue()))
+                                alterColDataType.addColumnSpecs("DEFAULT", col.getDefaultValue());
+
+                        if (col.getComment() != null)
+                                alterColDataType.addColumnSpecs("COMMENT", "'" + col.getComment() + "'");
+
+                        alterExpr.addColDataType(alterColDataType);
+
+                        Alter alter = new Alter();
+                        alter.setTable(new net.sf.jsqlparser.schema.Table(dialect.quote(table)));
+                        alter.setAlterExpressions(List.of(alterExpr));
+
+                        builder.append(alter).append(";");
+                }
+
+                execute(session, new SQL(atos(builder)));
+        }
+
+        @Override
+        public void alterVisible(Session session, String table, Collection<Index> indexes)
+        {
+                StringBuilder scripts = new StringBuilder();
+
+                for (Index index : indexes) {
+                        String isVisible = index.isVisible() ? "VISIBLE" : "INVISIBLE";
+                        scripts.append(
+                                fmt("ALTER TABLE %s ALTER INDEX %s %s;",
+                                        dialect.quote(table),
+                                        dialect.quote(index.getName()),
+                                        isVisible)
+                        );
+                }
+
+                execute(session, new SQL(atos(scripts)));
+        }
+}

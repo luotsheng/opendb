@@ -1,0 +1,38 @@
+.vk-code-area {
+    -fx-font-family: "Monaco", "Menlo", "Consolas", "Courier New";
+    -fx-font-size: 24px;
+}
+
+.vk-code-area .selection {
+    -fx-fill: #5eacff;
+    -fx-fill: rgba(125, 190, 255, 0.5);
+}
+
+.vk-code-area .keyword {
+    -fx-fill: #0066cc;
+}
+
+.vk-code-area .string {
+    -fx-fill: #09902c;
+}
+
+.vk-code-area .number {
+    -fx-fill: #17a9a9;
+}
+
+.vk-code-area .comment {
+    -fx-fill: #909090;
+    -fx-font-style: italic;
+}
+
+.vk-code-area .info {
+    -fx-fill: #17af12;
+}
+
+.vk-code-area .fail {
+    -fx-fill: #ff0b0b;
+}
+
+.vk-code-area .skip {
+    -fx-fill: #bd9f28;
+}

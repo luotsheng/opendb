@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.changhong.openvdb</groupId>
-        <artifactId>openvdb</artifactId>
+        <groupId>com.changhong.valkyrie</groupId>
+        <artifactId>valkyrie</artifactId>
         <version>v1.0.0-arch.1</version>
     </parent>
 
@@ -49,7 +49,7 @@
             <version>${hikari.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.changhong.openvdb</groupId>
+            <groupId>com.changhong.valkyrie</groupId>
             <artifactId>utils</artifactId>
         </dependency>
         <dependency>
