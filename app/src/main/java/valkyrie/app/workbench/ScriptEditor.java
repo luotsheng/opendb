@@ -90,6 +90,8 @@ public class ScriptEditor extends SplitPane implements EventListener
         private MenuItem runSelectedSQLItem;
         private MenuItem beautifySelectedSQLItem;
 
+        private final VkCodeCompletionPopup codeCompletionPopup = new VkCodeCompletionPopup();
+
         public ScriptEditor(UIConnectionNode conn, ScriptFile scriptFile, Tab owner)
         {
                 this.scriptFile = scriptFile;
@@ -144,9 +146,9 @@ public class ScriptEditor extends SplitPane implements EventListener
 
         private VkCodeArea createCodeArea()
         {
-                VkCodeAreaConfig config = new VkCodeAreaConfig();
+                VkCodeAreaCreateInfo codeAreaCreateInfo = new VkCodeAreaCreateInfo();
 
-                config.contextMenuHandler = (contextMenu) -> {
+                codeAreaCreateInfo.contextMenuHandler = (contextMenu) -> {
                         runSelectedSQLItem = new MenuItem("运行当前选择的");
                         runSelectedSQLItem.setOnAction(event -> runTask());
                         runSelectedSQLItem.setAccelerator(
@@ -168,7 +170,7 @@ public class ScriptEditor extends SplitPane implements EventListener
                         copyPasteItems.forEach(contextMenu.getItems()::add);
                 };
 
-                config.showingMenuListener = ((event, contextMenu) -> {
+                codeAreaCreateInfo.showingMenuListener = ((event, contextMenu) -> {
                         contextMenu.getItems().forEach(contextMenuItem -> {
                                 boolean isEmptySelectedText = strempty(codeArea.getSelectedText());
 
@@ -185,7 +187,20 @@ public class ScriptEditor extends SplitPane implements EventListener
                         });
                 });
 
-                return new VkCodeArea(config);
+                var codeArea = new VkCodeArea(codeAreaCreateInfo);
+
+                codeArea.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+                        String word = codeArea.getCurrentWord();
+
+                        if (strempty(word)) {
+                                codeCompletionPopup.hide();
+                                return;
+                        }
+
+                        codeCompletionPopup.show(codeArea, word);
+                });
+
+                return codeArea;
         }
 
         private void setupPane()
@@ -244,7 +259,7 @@ public class ScriptEditor extends SplitPane implements EventListener
         public void setupCodeArea()
         {
                 codeArea.multiPlainChanges().successionEnds(Duration.ofMillis(500))
-                                .subscribe(ignored -> autoSave());
+                        .subscribe(ignored -> autoSave());
 
                 codeArea.setOnKeyPressed(event -> {
                         if ((event.isShortcutDown())
@@ -399,7 +414,9 @@ public class ScriptEditor extends SplitPane implements EventListener
                 });
         }
 
-        /** 开始执行 true，结束执行 false */
+        /**
+         * 开始执行 true，结束执行 false
+         */
         private void updateButtonForExecuting(boolean value)
         {
                 run.setDisable(value);
@@ -460,7 +477,7 @@ public class ScriptEditor extends SplitPane implements EventListener
                                 currentTaskId = System.currentTimeMillis();
 
                                 Session session = catalog.getSession();
-                                SQL sql = new  SQL(scriptText);
+                                SQL sql = new SQL(scriptText);
 
                                 DataGrid grid = driver.execute(currentTaskId, session, sql);
 

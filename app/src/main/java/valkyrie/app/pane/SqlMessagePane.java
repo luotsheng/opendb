@@ -1,7 +1,7 @@
 package valkyrie.app.pane;
 
 import valkyrie.app.widgets.VkCodeArea;
-import valkyrie.app.widgets.VkCodeAreaConfig;
+import valkyrie.app.widgets.VkCodeAreaCreateInfo;
 import javafx.scene.control.MenuItem;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 
@@ -27,7 +27,7 @@ public class SqlMessagePane extends VirtualizedScrollPane<VkCodeArea>
 
         public SqlMessagePane()
         {
-                super(new VkCodeArea(new VkCodeAreaConfig(true, false, null, null)));
+                super(new VkCodeArea(new VkCodeAreaCreateInfo(true, false, null, null)));
 
                 codeArea = getContent();
                 codeArea.setEditable(false);

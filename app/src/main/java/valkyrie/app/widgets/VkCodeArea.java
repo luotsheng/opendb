@@ -52,10 +52,10 @@ public class VkCodeArea extends CodeArea
 
         public VkCodeArea()
         {
-                this(new VkCodeAreaConfig());
+                this(new VkCodeAreaCreateInfo());
         }
 
-        public VkCodeArea(VkCodeAreaConfig config)
+        public VkCodeArea(VkCodeAreaCreateInfo config)
         {
                 setStyle("-fx-font-weight: normal;");
 
@@ -255,6 +255,21 @@ public class VkCodeArea extends CodeArea
                 }
 
                 return styleClass;
+        }
+
+        public String getCurrentWord()
+        {
+                int caret = getCaretPosition();
+                String text = getText();
+
+                int start = caret - 1;
+
+                while (start >= 0 && Character.isLetterOrDigit(text.charAt(start)))
+                        start--;
+
+                start++;
+
+                return text.substring(start, caret);
         }
 
 }
