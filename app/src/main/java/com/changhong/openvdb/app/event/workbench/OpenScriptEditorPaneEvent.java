@@ -1,11 +1,15 @@
 package com.changhong.openvdb.app.event.workbench;
 
 import com.changhong.openvdb.app.assets.Assets;
+import com.changhong.openvdb.app.explorer.UICatalogNode;
 import com.changhong.openvdb.app.explorer.UIConnectionNode;
 import com.changhong.openvdb.app.workbench.ScriptEditor;
 import com.changhong.openvdb.core.model.ScriptFile;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
+
+import static com.changhong.utils.string.StaticLibrary.fmt;
+import static com.changhong.utils.string.StaticLibrary.strnempty;
 
 /**
  * 打开脚本编辑器
@@ -15,17 +19,19 @@ import javafx.scene.control.Tab;
  */
 public class OpenScriptEditorPaneEvent extends OpenTabEvent
 {
+        private final UICatalogNode catalog;
         private final UIConnectionNode connection;
         private final ScriptFile scriptFile;
 
-        public OpenScriptEditorPaneEvent(Object owner, UIConnectionNode connection)
+        public OpenScriptEditorPaneEvent(UICatalogNode owner, UIConnectionNode connection)
         {
                 this(owner, connection, null);
         }
 
-        public OpenScriptEditorPaneEvent(Object owner, UIConnectionNode connection, ScriptFile scriptFile)
+        public OpenScriptEditorPaneEvent(UICatalogNode owner, UIConnectionNode connection, ScriptFile scriptFile)
         {
                 super(owner);
+                this.catalog = owner;
                 this.connection = connection;
                 this.scriptFile = scriptFile;
         }
@@ -33,9 +39,9 @@ public class OpenScriptEditorPaneEvent extends OpenTabEvent
         @Override
         public String tabId()
         {
-                // 由于脚本编辑器需要控制 Tab 标题，以及标记未保存状态，
-                // 所以打开事件不指定 Tab id，由脚本编辑器内部自己管理。
-                return "";
+                if (scriptFile != null)
+                        return fmt("%s@%s(%s)", scriptFile.getName(), catalog.getName(), connection.getName());
+                return null;
         }
 
         @Override
@@ -48,6 +54,12 @@ public class OpenScriptEditorPaneEvent extends OpenTabEvent
                                 editor.close();
                 });
 
-                return new ScriptEditor(connection, scriptFile, tab);
+                ScriptEditor scriptEditor = new ScriptEditor(connection, scriptFile, tab);
+
+                /* tabId 不为空时，重新设置 Tab 标题 */
+                if (strnempty(tabId()))
+                        tab.setText(tabId());
+
+                return scriptEditor;
         }
 }
