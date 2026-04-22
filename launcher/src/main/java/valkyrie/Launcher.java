@@ -1,4 +1,4 @@
-package valkyrie.launcher;
+package valkyrie;
 
 import valkyrie.app.Application;
 

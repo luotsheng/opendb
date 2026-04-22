@@ -41,7 +41,7 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>valkyrie.launcher.Launcher</mainClass>
+                                    <mainClass>valkyrie.Launcher</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
