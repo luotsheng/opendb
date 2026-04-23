@@ -5,10 +5,8 @@ import javafx.scene.control.ListView;
 import javafx.stage.Popup;
 import org.fxmisc.richtext.CodeArea;
 import valkyrie.app.workbench.SqlKeyWordDefine;
-import valkyrie.utils.collection.Lists;
 
 import java.util.List;
-import java.util.Optional;
 
 import static valkyrie.utils.string.StaticLibrary.lowercase;
 
