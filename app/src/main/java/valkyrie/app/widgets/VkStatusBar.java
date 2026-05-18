@@ -1,5 +1,6 @@
 package valkyrie.app.widgets;
 
+import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 
@@ -26,11 +27,11 @@ public class VkStatusBar extends BorderPane
 
         public void updateMessage(String message)
         {
-                message = message.replaceAll("\n", "");
+                String frameMessage = message.replaceAll("\n", "");
 
-                if (message.length() > 128)
-                        message = message.substring(0, 128) + "...";
+                if (frameMessage.length() > 128)
+                        frameMessage = frameMessage.substring(0, 128) + "...";
 
-                setCenter(new Label(message));
+                setCenter(new Label(frameMessage));
         }
 }
