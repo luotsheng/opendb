@@ -78,9 +78,9 @@ public class UIConnectionNode extends UIExplorerNode
                 }
 
                 @Override
-                public void afterExecute(String sql, boolean isSkip, long cost)
+                public void afterExecute(String sql, long cost)
                 {
-                        Platform.runLater(() -> VSBInstance.updateMessage(isSkip ? "SKIP: " + sql : sql));
+                        Platform.runLater(() -> VSBInstance.updateMessage(sql));
                 }
         }
 

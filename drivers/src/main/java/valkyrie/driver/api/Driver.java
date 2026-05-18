@@ -182,7 +182,7 @@ public abstract class Driver implements SQLExecutor
          * @see Connection#setSchema(String)
          */
         public Connection getConnection(Session session) throws SQLException {
-                Connection connection = dataSource.getConnection();
+                Connection connection = new ConnectionProxy(dataSource.getConnection(), hooks);
 
                 if (session != null) {
                         if (session.catalog() != null)
@@ -731,22 +731,6 @@ public abstract class Driver implements SQLExecutor
         /*                                SQL EXECUTOR IMPLEMENTS                              */
         /* *********************************************************************************** */
 
-        protected void beforeExecute(String sql)
-        {
-                hooks.forEach(hk -> hk.beforeExecute(sql));
-        }
-
-        protected void afterExecute(String sql, boolean isSkip, long cost)
-        {
-                hooks.forEach(hk -> hk.afterExecute(sql, isSkip, cost));
-        }
-
-        protected void onError(String sql, Throwable e)
-        {
-                hooks.forEach(hk -> hk.onError(sql, e));
-        }
-
-
         @Override
         public DataGrid selectByPage(Session session, String table, int off, int size)
         {
@@ -760,17 +744,13 @@ public abstract class Driver implements SQLExecutor
                 String currentExecuteSQLRef = null;
 
                 try (Connection connection = getConnection(session)) {
-                        try (Statement statement = new StatementProxy(connection.createStatement())) {
+                        try (Statement statement = connection.createStatement()) {
                                 DataGrid dataGrid = null;
                                 taskQueue.put(jobId, statement);
                                 SQLParsedStatement lastPS = sql.getLast();
 
                                 for (SQLParsedStatement ps : sql) {
-                                        boolean isSkip = false;
                                         currentExecuteSQLRef = ps.toString();
-                                        beforeExecute(currentExecuteSQLRef);
-
-                                        long startTime = System.currentTimeMillis();
 
                                         switch (ps.getCommand()) {
                                                 case EXECUTE -> statement.execute(currentExecuteSQLRef);
@@ -780,14 +760,9 @@ public abstract class Driver implements SQLExecutor
                                                                 ResultSet rs = statement.executeQuery(currentExecuteSQLRef);
                                                                 dataGrid = new DataGrid(session, this, sql);
                                                                 ResultSets.toDataGrid(connection, ps, rs, dialect, dataGrid);
-                                                        } else {
-                                                                isSkip = true;
                                                         }
                                                 }
                                         }
-
-                                        long endTime = System.currentTimeMillis();
-                                        afterExecute(currentExecuteSQLRef, isSkip, endTime - startTime);
 
                                         if (ps == lastPS && dataGrid != null)
                                                 return dataGrid;
@@ -796,7 +771,6 @@ public abstract class Driver implements SQLExecutor
                                 return null;
                         }
                 } catch (SQLException e) {
-                        onError(currentExecuteSQLRef, e);
                         throw new DriverException(e);
                 }
         }

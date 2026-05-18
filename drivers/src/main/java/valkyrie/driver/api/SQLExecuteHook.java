@@ -36,10 +36,9 @@ public interface SQLExecuteHook {
          * SQL 语句执行成功后的回调。
          *
          * @param sql    已执行的 SQL 语句
-         * @param isSkip 是否跳过 SQL
          * @param cost   执行耗时（单位：毫秒），始终为非负数
          */
-        default void afterExecute(String sql, boolean isSkip, long cost) { /* DO NOTHING... */ };
+        default void afterExecute(String sql, long cost) { /* DO NOTHING... */ };
 
         /**
          * SQL 语句执行异常时的回调。

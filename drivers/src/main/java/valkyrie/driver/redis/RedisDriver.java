@@ -79,8 +79,6 @@ public class RedisDriver extends Driver
                         // GET serviceCalendar|2026-04
                         Object result = jedis.sendCommand(cmd, args);
 
-                        beforeExecute(currentCommandRef);
-
                         long startTime = System.currentTimeMillis();
 
                         var ret = switch (result) {
@@ -108,11 +106,9 @@ public class RedisDriver extends Driver
                         };
 
                         long endTime = System.currentTimeMillis();
-                        afterExecute(currentCommandRef, false, endTime - startTime);
 
                         return ret;
                 } catch (Exception e) {
-                        onError(currentCommandRef, e);
                         throw new DriverException(e);
                 }
         }
