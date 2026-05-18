@@ -11,6 +11,7 @@ import valkyrie.driver.utils.SQLUtils;
 import valkyrie.utils.Captor;
 import valkyrie.utils.Optional;
 import valkyrie.utils.collection.Lists;
+import valkyrie.utils.exception.Causes;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -731,6 +732,8 @@ public abstract class Driver implements SQLExecutor
         /*                                SQL EXECUTOR IMPLEMENTS                              */
         /* *********************************************************************************** */
 
+        private static final SQLExecuteCallback DEFAULT_SQL_EXECUTE_CALLBACK = new SQLExecuteCallback() {};
+
         @Override
         public QueryResult selectByPage(Session session, String table, int off, int size)
         {
@@ -741,8 +744,11 @@ public abstract class Driver implements SQLExecutor
         @Override
         public QueryResult execute(long jobId, Session session, SQL sql)
         {
-                String currentExecuteSQLRef = null;
+                return execute(jobId, session, sql, DEFAULT_SQL_EXECUTE_CALLBACK);
+        }
 
+        public QueryResult execute(long jobId, Session session, SQL sql, SQLExecuteCallback callback)
+        {
                 try (Connection connection = getConnection(session)) {
                         try (Statement statement = connection.createStatement()) {
                                 QueryResult queryResult = null;
@@ -750,16 +756,37 @@ public abstract class Driver implements SQLExecutor
                                 SQLParsedStatement lastPS = sql.getLast();
 
                                 for (SQLParsedStatement ps : sql) {
-                                        currentExecuteSQLRef = ps.toString();
+                                        String currentExecuteSQL = ps.toString();
 
                                         switch (ps.getCommand()) {
-                                                case EXECUTE -> statement.execute(currentExecuteSQLRef);
-                                                case EXECUTE_UPDATE -> statement.executeUpdate(currentExecuteSQLRef);
+                                                case EXECUTE -> {
+                                                        callback.execute(currentExecuteSQL);
+                                                        long startTime = System.currentTimeMillis();
+                                                        statement.execute(currentExecuteSQL);
+                                                        long endTime = System.currentTimeMillis();
+                                                        callback.cost(endTime - startTime);
+                                                }
+
+                                                case EXECUTE_UPDATE -> {
+                                                        callback.executeUpdate(currentExecuteSQL);
+                                                        long startTime = System.currentTimeMillis();
+                                                        int row = statement.executeUpdate(currentExecuteSQL);
+                                                        long endTime = System.currentTimeMillis();
+                                                        callback.row(row);
+                                                        callback.cost(endTime - startTime);
+                                                }
+
                                                 case EXECUTE_QUERY -> {
                                                         if (ps == lastPS) {
-                                                                ResultSet rs = statement.executeQuery(currentExecuteSQLRef);
+                                                                callback.executeQuery(currentExecuteSQL, false);
+                                                                long startTime = System.currentTimeMillis();
+                                                                ResultSet rs = statement.executeQuery(currentExecuteSQL);
                                                                 queryResult = new QueryResult(session, this, sql);
                                                                 ResultSets.toDataGrid(connection, ps, rs, dialect, queryResult);
+                                                                long endTime = System.currentTimeMillis();
+                                                                callback.cost(endTime - startTime);
+                                                        } else {
+                                                                callback.executeQuery(currentExecuteSQL, true);
                                                         }
                                                 }
                                         }

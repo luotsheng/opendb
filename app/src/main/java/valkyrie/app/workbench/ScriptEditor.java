@@ -34,6 +34,7 @@ import valkyrie.core.model.ScriptFile;
 import valkyrie.core.repository.ScriptFileRepository;
 import valkyrie.driver.api.QueryResult;
 import valkyrie.driver.api.Driver;
+import valkyrie.driver.api.SQLExecuteCallback;
 import valkyrie.driver.api.Session;
 import valkyrie.driver.api.sql.SQL;
 import valkyrie.monacofx.MonacoEditor;
@@ -441,9 +442,15 @@ public class ScriptEditor extends SplitPane implements EventListener
                 owner.setGraphic(oldGraphic);
         }
 
+        private void showLog()
+        {
+                showResultSetTableViewPane(QUERY_MESSAGE_LOG_FIRST);
+        }
+
         private void showResultSetTableViewPane(int flag)
         {
-                dataGridViewPane.addTab(sqlMessageTab);
+                if (!dataGridViewPane.getTabs().contains(sqlMessageTab))
+                        dataGridViewPane.getTabs().add(sqlMessageTab);
 
                 switch (flag) {
                         case QUERY_RESULT_SET_FIRST -> dataGridViewPane.selectResultSetFirst();
@@ -487,7 +494,49 @@ public class ScriptEditor extends SplitPane implements EventListener
                                         Session session = catalog.getSession();
                                         SQL sql = new SQL(finalScriptText);
 
-                                        QueryResult queryResult = driver.execute(currentTaskId, session, sql);
+                                        QueryResult queryResult = driver.execute(currentTaskId, session, sql, new SQLExecuteCallback()
+                                        {
+                                                @Override
+                                                public void execute(String sql)
+                                                {
+                                                        Platform.runLater(() -> sqlMessagePane.appendExecute(sql));
+                                                        showLog();
+                                                }
+
+                                                @Override
+                                                public void executeQuery(String sql, boolean skip)
+                                                {
+                                                        Platform.runLater(() -> sqlMessagePane.appendExecuteQuery(sql));
+                                                        showLog();
+                                                }
+
+                                                @Override
+                                                public void executeUpdate(String sql)
+                                                {
+                                                        Platform.runLater(() -> {
+                                                                sqlMessagePane.appendExecuteUpdate(sql);
+                                                                showLog();
+                                                        });
+                                                }
+
+                                                @Override
+                                                public void row(int value)
+                                                {
+                                                        Platform.runLater(() -> {
+                                                                sqlMessagePane.appendRow(value);
+                                                                showLog();
+                                                        });
+                                                }
+
+                                                @Override
+                                                public void cost(long time)
+                                                {
+                                                        Platform.runLater(() -> {
+                                                                sqlMessagePane.appendCost(time);
+                                                                showLog();
+                                                        });
+                                                }
+                                        });
 
                                         if (queryResult != null) {
                                                 Platform.runLater(() -> {

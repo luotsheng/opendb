@@ -428,6 +428,12 @@ public class DataGridViewPane extends BorderPane
                 Application.copyToClipboard(sql.toString());
         }
 
+        public boolean selectedInstanceOf(Object object)
+        {
+                Tab selectedItem = tabPane.getSelectionModel().getSelectedItem();
+                return selectedItem != null && selectedItem.getContent() == object;
+        }
+
         public void selectResultSetFirst()
         {
                 select(dataGridTab);
@@ -439,10 +445,9 @@ public class DataGridViewPane extends BorderPane
                         tabPane.getSelectionModel().select(tab);
         }
 
-        public void addTab(Tab tab)
+        public ObservableList<Tab> getTabs()
         {
-                if (!tabPane.getTabs().contains(tab))
-                        tabPane.getTabs().addLast(tab);
+                return tabPane.getTabs();
         }
 
         /**

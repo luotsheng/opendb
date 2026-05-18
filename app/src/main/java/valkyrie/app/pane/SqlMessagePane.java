@@ -33,24 +33,42 @@ public class SqlMessagePane extends VirtualizedScrollPane<CodeArea>
                 codeArea.replaceText("");
         }
 
-        public void appendInfo(String text)
+        public void appendExecute(String text)
         {
-                appendText(fmt("[  OK  ] %s\n", text));
+                appendText("> Execute");
+                appendText(text);
         }
 
-        public void appendSkip(String text)
+        public void appendExecuteQuery(String text)
         {
-                appendText(fmt("[ SKIP ] %s\n", text));
+                appendText("> Query");
+                appendText(text);
         }
 
-        public void appendError(String text)
+        public void appendExecuteUpdate(String text)
         {
-                appendText("> Error");
-                appendText(fmt("%s", text));
+                appendText("> Update");
+                appendText(text);
+        }
+
+        public void appendRow(int value)
+        {
+                appendText("Row: " + value);
+        }
+
+        public void appendCost(long cost)
+        {
+                appendText("Time: " + cost + "ms");
+        }
+
+        public void appendError(String message)
+        {
+                appendText("Error: " + message.replaceAll("\n", ""));
         }
 
         private void appendText(String text)
         {
+                text = text.strip();
                 codeArea.appendText(text + "\n");
                 codeArea.moveTo(codeArea.getLength());
                 codeArea.requestFollowCaret();
