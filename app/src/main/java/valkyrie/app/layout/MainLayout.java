@@ -5,6 +5,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import valkyrie.app.menu.AppMenuBar;
 import valkyrie.app.tool.AppToolBar;
+import valkyrie.app.widgets.VkStatusBar;
 
 /**
  * @author Luo Tiansheng
@@ -23,5 +24,6 @@ public class MainLayout extends BorderPane
 
                 setTop(vBox);
                 setCenter(new ContainerLayout());
+                setBottom(VkStatusBar.getInstance());
         }
 }
