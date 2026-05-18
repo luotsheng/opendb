@@ -732,20 +732,20 @@ public abstract class Driver implements SQLExecutor
         /* *********************************************************************************** */
 
         @Override
-        public DataGrid selectByPage(Session session, String table, int off, int size)
+        public QueryResult selectByPage(Session session, String table, int off, int size)
         {
                 String sql = fmt("SELECT * FROM %s", dialect.quote(table));
                 return execute(session, new SQL(dialect.limit(sql, off, size)));
         }
 
         @Override
-        public DataGrid execute(long jobId, Session session, SQL sql)
+        public QueryResult execute(long jobId, Session session, SQL sql)
         {
                 String currentExecuteSQLRef = null;
 
                 try (Connection connection = getConnection(session)) {
                         try (Statement statement = connection.createStatement()) {
-                                DataGrid dataGrid = null;
+                                QueryResult queryResult = null;
                                 taskQueue.put(jobId, statement);
                                 SQLParsedStatement lastPS = sql.getLast();
 
@@ -758,14 +758,14 @@ public abstract class Driver implements SQLExecutor
                                                 case EXECUTE_QUERY -> {
                                                         if (ps == lastPS) {
                                                                 ResultSet rs = statement.executeQuery(currentExecuteSQLRef);
-                                                                dataGrid = new DataGrid(session, this, sql);
-                                                                ResultSets.toDataGrid(connection, ps, rs, dialect, dataGrid);
+                                                                queryResult = new QueryResult(session, this, sql);
+                                                                ResultSets.toDataGrid(connection, ps, rs, dialect, queryResult);
                                                         }
                                                 }
                                         }
 
-                                        if (ps == lastPS && dataGrid != null)
-                                                return dataGrid;
+                                        if (ps == lastPS && queryResult != null)
+                                                return queryResult;
                                 }
 
                                 return null;

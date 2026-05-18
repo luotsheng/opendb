@@ -6,7 +6,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 import valkyrie.app.assets.Assets;
 import valkyrie.app.widgets.dialog.VkDialogHelper;
-import valkyrie.driver.api.DataGrid;
+import valkyrie.driver.api.QueryResult;
 import valkyrie.driver.api.Driver;
 import valkyrie.driver.api.Session;
 import valkyrie.driver.api.Table;
@@ -76,7 +76,7 @@ public class TableDataPane extends BorderPane
 
                 new Thread(() -> {
                         try {
-                                DataGrid rs = driver.selectByPage(session, table.getName(), start, size);
+                                QueryResult rs = driver.selectByPage(session, table.getName(), start, size);
                                 rs.setAddable(true);
                                 Platform.runLater(() -> dataGridViewPane.reload(table.getName(), rs));
                         } catch (Exception e) {

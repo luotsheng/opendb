@@ -1,6 +1,6 @@
 package valkyrie.driver.api.sql;
 
-import valkyrie.driver.api.DataGrid;
+import valkyrie.driver.api.QueryResult;
 import valkyrie.driver.api.Dialect;
 import valkyrie.driver.api.Session;
 
@@ -32,7 +32,7 @@ public interface SQLExecutor
          * 执行分页查询，返回指定范围内的数据网格。
          * <p>
          * 该方法接收完整的 SQL 查询语句，根据当前数据库方言自动添加分页子句（如 {@code LIMIT ... OFFSET ...} 或
-         * {@code ROWNUM} 等），并执行查询。返回的 {@link DataGrid} 包含结果集数据、列元信息以及分页上下文。
+         * {@code ROWNUM} 等），并执行查询。返回的 {@link QueryResult} 包含结果集数据、列元信息以及分页上下文。
          * <p>
          * <b>实现要求：</b>
          * <ul>
@@ -44,9 +44,9 @@ public interface SQLExecutor
          * <pre>{@code
          * Session session = new Session("my_catalog", "my_schema");
          * String sql = "SELECT * FROM user ORDER BY id";
-         * DataGrid grid = dialect.selectByPage(session, sql, 0, 20);
-         * List<Map<String, Object>> rows = grid.getRows();
-         * long total = grid.getTotal();  // 总记录数（如有）
+         * QueryResult queryResult = dialect.selectByPage(session, sql, 0, 20);
+         * List<Map<String, Object>> rows = queryResult.getRows();
+         * long total = queryResult.getTotal();  // 总记录数（如有）
          * }</pre>
          *
          * @param session 会话上下文，用于设置连接的 catalog 和 schema（不能为 {@code null}）
@@ -57,9 +57,9 @@ public interface SQLExecutor
          * @throws NullPointerException     如果 {@code session} 或 {@code sql} 为 {@code null}
          * @throws IllegalArgumentException 如果 {@code off < 0} 或 {@code size <= 0}，或 {@code sql} 为空白字符串
          * @see Dialect#limit(String, int, int)
-         * @see DataGrid
+         * @see QueryResult
          */
-        DataGrid selectByPage(Session session, String table, int off, int size);
+        QueryResult selectByPage(Session session, String table, int off, int size);
 
         /**
          * 执行 SQL 任务
@@ -79,7 +79,7 @@ public interface SQLExecutor
          * @param sql 待执行 SQL 任务
          * @return 查询结果集（非查询语句返回 null）
          */
-        default DataGrid execute(Session session, SQL sql)
+        default QueryResult execute(Session session, SQL sql)
         {
                 return execute(-1, session, sql);
         }
@@ -103,7 +103,7 @@ public interface SQLExecutor
          * @param args 格式化参数
          * @return 查询结果集（非查询语句返回 null）
          */
-        default DataGrid execute(Session session, Object sqlfmt, Object... args) {
+        default QueryResult execute(Session session, Object sqlfmt, Object... args) {
                 return execute(session, new SQL(sqlfmt, args));
         }
 
@@ -129,7 +129,7 @@ public interface SQLExecutor
          * @param sql   待执行 SQL 任务
          * @return 查询结果集（非查询语句返回 null）
          */
-        DataGrid execute(long jobId, Session session, SQL sql);
+        QueryResult execute(long jobId, Session session, SQL sql);
 
         /**
          * 取消 SQL 执行任务

@@ -25,7 +25,7 @@ import java.util.*;
  */
 @Getter
 @Setter
-public class DataGrid
+public class QueryResult
 {
         @Getter
         private List<Column> columns;
@@ -64,47 +64,47 @@ public class DataGrid
         /**
          * 构造器
          */
-        public DataGrid(Session session, Driver driver, SQL sql)
+        public QueryResult(Session session, Driver driver, SQL sql)
         {
                 this.session = session;
                 this.driver = driver;
                 this.sql = sql;
         }
         
-        public static DataGrid ofValue(Session session, String value)
+        public static QueryResult ofValue(Session session, String value)
         {
-                DataGrid dataGrid = new DataGrid(session, null, null);
+                QueryResult queryResult = new QueryResult(session, null, null);
                 
                 Column col = new Column();
                 col.setLabel("Value");
                 col.setName("Value");
                 col.setType("Object");
 
-                dataGrid.setColumns(Lists.of(col));
-                dataGrid.addEmptyRow();
-                dataGrid.getRows().getFirst().set(0, value);
+                queryResult.setColumns(Lists.of(col));
+                queryResult.addEmptyRow();
+                queryResult.getRows().getFirst().set(0, value);
 
-                return dataGrid;
+                return queryResult;
         }
 
-        public static DataGrid ofList(Session session, List<String> list)
+        public static QueryResult ofList(Session session, List<String> list)
         {
-                DataGrid dataGrid = new DataGrid(session, null, null);
+                QueryResult queryResult = new QueryResult(session, null, null);
 
                 Column col = new Column();
                 col.setLabel("Value");
                 col.setName("Value");
                 col.setType("ANY");
 
-                dataGrid.setColumns(Lists.of(col));
+                queryResult.setColumns(Lists.of(col));
 
                 list.forEach(e -> {
                         GridRow row = new GridRow();
                         row.add(e);
-                        dataGrid.rows.add(row);
+                        queryResult.rows.add(row);
                 });
 
-                return dataGrid;
+                return queryResult;
         }
 
         public int size()
@@ -129,10 +129,10 @@ public class DataGrid
         {
                 if (driver != null && session != null && sql != null) {
 
-                        DataGrid dataGrid = driver.execute(session, sql);
+                        QueryResult queryResult = driver.execute(session, sql);
 
-                        columns = dataGrid.columns;
-                        rows = dataGrid.rows;
+                        columns = queryResult.columns;
+                        rows = queryResult.rows;
 
                         clearUpdateBuffer();
 

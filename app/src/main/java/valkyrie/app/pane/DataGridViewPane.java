@@ -23,9 +23,8 @@ import valkyrie.app.widgets.table.VkTableView;
 import valkyrie.app.widgets.table.cell.VkTextFieldTableCell;
 import valkyrie.app.workbench.ModifyCell;
 import valkyrie.driver.api.Column;
-import valkyrie.driver.api.DataGrid;
+import valkyrie.driver.api.QueryResult;
 import valkyrie.driver.api.GridRow;
-import valkyrie.driver.api.Table;
 import valkyrie.utils.Optional;
 import valkyrie.utils.collection.Lists;
 import valkyrie.utils.io.UFile;
@@ -62,7 +61,7 @@ public class DataGridViewPane extends BorderPane
 
         private final Node progressIndicator = Assets.newProgressIndicator();
 
-        private DataGrid grid;
+        private QueryResult queryResult;
 
         public interface ReloadProgressListener {
                 void start();
@@ -154,7 +153,7 @@ public class DataGridViewPane extends BorderPane
 
         private void updateCheckCross()
         {
-                boolean disable = (grid == null || !grid.isUpdatable());
+                boolean disable = (queryResult == null || !queryResult.isUpdatable());
 
                 submit.setDisable(disable);
                 cross.setDisable(disable);
@@ -172,8 +171,8 @@ public class DataGridViewPane extends BorderPane
 
         private void onPlus()
         {
-                grid.addEmptyRow();
-                tableView.getItems().setAll(grid.getRows());
+                queryResult.addEmptyRow();
+                tableView.getItems().setAll(queryResult.getRows());
                 tableView.refresh();
                 tableView.playFlash();
         }
@@ -192,7 +191,7 @@ public class DataGridViewPane extends BorderPane
 
                 new Thread(() -> {
                         try {
-                                grid.remove(List.copyOf(indices));
+                                queryResult.remove(List.copyOf(indices));
                                 reloadAndBlinkTable(false);
                         } finally {
                                 removeProgressIndicator();
@@ -202,16 +201,16 @@ public class DataGridViewPane extends BorderPane
 
         private void applySubmit()
         {
-                grid.update();
+                queryResult.update();
                 updateCheckCross();
-                reload(tableName, grid);
+                reload(tableName, queryResult);
         }
 
         private void applyCross()
         {
-                grid.clearUpdateBuffer();
+                queryResult.clearUpdateBuffer();
                 updateCheckCross();
-                reload(tableName, grid);
+                reload(tableName, queryResult);
         }
 
         public void setProgressIndicator()
@@ -241,8 +240,8 @@ public class DataGridViewPane extends BorderPane
 
                 new Thread(() -> {
                         try {
-                                grid.reload();
-                                Platform.runLater(() -> reload(tableName, grid));
+                                queryResult.reload();
+                                Platform.runLater(() -> reload(tableName, queryResult));
                         } finally {
                                 tableView.playFlash();
 
@@ -270,8 +269,8 @@ public class DataGridViewPane extends BorderPane
 
                 if (saveDirectory != null) {
                         WorkBook wb = WorkBook.create();
-                        wb.addRow(Lists.map(grid.getColumns(), Column::getLabel).toArray());
-                        grid.getRows().forEach(row -> wb.addRow(row.toArray()));
+                        wb.addRow(Lists.map(queryResult.getColumns(), Column::getLabel).toArray());
+                        queryResult.getRows().forEach(row -> wb.addRow(row.toArray()));
                         wb.transferTo(UFile.wrap(saveDirectory));
                 }
         }
@@ -320,7 +319,7 @@ public class DataGridViewPane extends BorderPane
                 tableView.setOnKeyPressed(event -> {
                         if ((event.isShortcutDown())
                                 && event.getCode() == KeyCode.S) {
-                                if (grid.isUpdatable())
+                                if (queryResult.isUpdatable())
                                         applySubmit();
                                 event.consume();
                         }
@@ -388,8 +387,8 @@ public class DataGridViewPane extends BorderPane
 
                 String tableName = Optional.ifBlank(this.tableName, "?");
 
-                List<Column> columns = grid.getColumns();
-                List<GridRow> rows = grid.getRows();
+                List<Column> columns = queryResult.getColumns();
+                List<GridRow> rows = queryResult.getRows();
 
                 StringBuilder sql = new StringBuilder();
                 if ("INSERT".equals(type)) {
@@ -454,16 +453,16 @@ public class DataGridViewPane extends BorderPane
                 if (cell.isUnmodified())
                         return;
 
-                grid.addUpdateRow(cell.getColumnIndex(), cell.getRowIndex(), cell.getNewValue());
+                queryResult.addUpdateRow(cell.getColumnIndex(), cell.getRowIndex(), cell.getNewValue());
         }
 
-        public void reload(String tableName, DataGrid grid)
+        public void reload(String tableName, QueryResult queryResult)
         {
                 this.tableName = tableName;
                 
-                if (this.grid != grid) {
-                        this.grid = grid;
-                        this.grid.setUpdateListener(r -> updateCheckCross());
+                if (this.queryResult != queryResult) {
+                        this.queryResult = queryResult;
+                        this.queryResult.setUpdateListener(r -> updateCheckCross());
                 }
 
                 tableView.getColumns().clear();
@@ -472,14 +471,14 @@ public class DataGridViewPane extends BorderPane
                 if (!tabPane.getTabs().contains(dataGridTab))
                         tabPane.getTabs().addFirst(dataGridTab);
 
-                setToolButtonStatus(grid.isAddable(), grid.isEditable());
+                setToolButtonStatus(queryResult.isAddable(), queryResult.isEditable());
 
-                dataGridTab.setText(fmt("查询结果集 (%d条)", grid.getRows().size()));
+                dataGridTab.setText(fmt("查询结果集 (%d条)", queryResult.getRows().size()));
 
-                for (int i = 0; i < grid.getColumns().size(); i++) {
+                for (int i = 0; i < queryResult.getColumns().size(); i++) {
                         int index = i;
 
-                        Column columnMetaData = grid.getColumns().get(i);
+                        Column columnMetaData = queryResult.getColumns().get(i);
                         StringBuilder labelBuilder = new StringBuilder(columnMetaData.getLabel());
 
                         labelBuilder.append("\n# ")
@@ -494,7 +493,7 @@ public class DataGridViewPane extends BorderPane
                                 new TableColumn<>(label);
 
                         col.setEditable(true);
-                        col.setPrefWidth(calcColWidth(label, grid.getRows(), i));
+                        col.setPrefWidth(calcColWidth(label, queryResult.getRows(), i));
                         col.setMaxWidth(1000);
                         col.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().get(index)));
 
@@ -504,7 +503,7 @@ public class DataGridViewPane extends BorderPane
                 }
 
                 tableView.setItems(
-                        FXCollections.observableArrayList(grid.getRows())
+                        FXCollections.observableArrayList(queryResult.getRows())
                 );
 
                 tableView.playFlash();

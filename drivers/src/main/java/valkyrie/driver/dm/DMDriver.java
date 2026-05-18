@@ -59,13 +59,13 @@ public class DMDriver extends Driver
         @Override
         public String showCreateTable(Session session, String table)
         {
-                DataGrid dataGrid = execute(session, new SQL(
+                QueryResult queryResult = execute(session, new SQL(
                         fmt("""
                                 SELECT DMDBA.GET_DDL_FIX('TABLE', '%s', '%s') AS "DDL" FROM DUAL
                                 """, table, session.schema())
                 ));
 
-                return first(first(dataGrid.getRows()));
+                return first(first(queryResult.getRows()));
         }
 
         @Override
@@ -75,7 +75,7 @@ public class DMDriver extends Driver
 
                 ret.addAll(DMSuggestions.VALUES);
 
-                DataGrid grid = execute(session, """
+                QueryResult queryResult = execute(session, """
                         SELECT
                           c.COLUMN_NAME,
                           MAX(cc.COMMENTS) as "COMMENT"
@@ -89,7 +89,7 @@ public class DMDriver extends Driver
                         GROUP BY
                           c.COLUMN_NAME;
                         """, session.schema());
-                ret.addAll(grid.getRows().stream().map(t -> Suggestion.ofField(first(t), second(t))).toList());
+                ret.addAll(queryResult.getRows().stream().map(t -> Suggestion.ofField(first(t), second(t))).toList());
 
                 return Lists.newArrayList(ret);
         }
@@ -189,15 +189,15 @@ public class DMDriver extends Driver
                         ;
                         """;
 
-                DataGrid dataGrid = execute(session, sql, table, table);
+                QueryResult queryResult = execute(session, sql, table, table);
 
                 List<Index> indexes = Lists.newArrayList();
-                for (int i = 0; i < dataGrid.size(); i++) {
+                for (int i = 0; i < queryResult.size(); i++) {
                         Index index = new Index();
-                        index.setName(dataGrid.getRowValue(i, 0));
-                        index.setColumnsText(dataGrid.getRowValue(i, 1));
-                        index.setType(dataGrid.getRowValue(i, 2));
-                        index.setVisible(atobool(dataGrid.getRowValue(0, 3)));
+                        index.setName(queryResult.getRowValue(i, 0));
+                        index.setColumnsText(queryResult.getRowValue(i, 1));
+                        index.setType(queryResult.getRowValue(i, 2));
+                        index.setVisible(atobool(queryResult.getRowValue(0, 3)));
                         index.setOriginalName(index.getName());
                         index.setOriginalVisible(index.isVisible());
                         index.finalIntegrityCode();
@@ -268,8 +268,8 @@ public class DMDriver extends Driver
                         ;
                         """, table, session.schema());
 
-                DataGrid dataGrid = execute(session, sql);
-                return dataGrid.getRowValue(0, 0);
+                QueryResult queryResult = execute(session, sql);
+                return queryResult.getRowValue(0, 0);
         }
 
         @Override

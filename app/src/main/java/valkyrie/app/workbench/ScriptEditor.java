@@ -32,7 +32,7 @@ import valkyrie.app.widgets.VkSeparator;
 import valkyrie.app.widgets.dialog.VkDialogHelper;
 import valkyrie.core.model.ScriptFile;
 import valkyrie.core.repository.ScriptFileRepository;
-import valkyrie.driver.api.DataGrid;
+import valkyrie.driver.api.QueryResult;
 import valkyrie.driver.api.Driver;
 import valkyrie.driver.api.Session;
 import valkyrie.driver.api.sql.SQL;
@@ -487,11 +487,11 @@ public class ScriptEditor extends SplitPane implements EventListener
                                         Session session = catalog.getSession();
                                         SQL sql = new SQL(finalScriptText);
 
-                                        DataGrid grid = driver.execute(currentTaskId, session, sql);
+                                        QueryResult queryResult = driver.execute(currentTaskId, session, sql);
 
-                                        if (grid != null) {
+                                        if (queryResult != null) {
                                                 Platform.runLater(() -> {
-                                                        dataGridViewPane.reload(sql.getSingleTableName(), grid);
+                                                        dataGridViewPane.reload(sql.getSingleTableName(), queryResult);
                                                         showResultSetTableViewPane(QUERY_RESULT_SET_FIRST);
                                                 });
                                         } else {

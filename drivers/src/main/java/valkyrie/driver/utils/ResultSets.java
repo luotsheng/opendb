@@ -1,7 +1,7 @@
 package valkyrie.driver.utils;
 
 import valkyrie.driver.api.Column;
-import valkyrie.driver.api.DataGrid;
+import valkyrie.driver.api.QueryResult;
 import valkyrie.driver.api.Dialect;
 import valkyrie.driver.api.GridRow;
 import valkyrie.driver.api.exception.DriverException;
@@ -31,17 +31,17 @@ public class ResultSets
         /**
          * 结果集转 QueryResultSet 对象
          */
-        public static DataGrid toDataGrid(Connection connection,
-                                          SQLParsedStatement ps,
-                                          ResultSet rs,
-                                          Dialect dialect,
-                                          DataGrid dataGrid)
+        public static QueryResult toDataGrid(Connection connection,
+                                             SQLParsedStatement ps,
+                                             ResultSet rs,
+                                             Dialect dialect,
+                                             QueryResult queryResult)
                 throws SQLException
         {
                 SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT_PATTERN);
 
                 /* COL */
-                setColumns(connection, ps, rs, dialect, dataGrid);
+                setColumns(connection, ps, rs, dialect, queryResult);
 
                 /* ROW */
                 List<GridRow> rows = new ArrayList<>();
@@ -50,22 +50,22 @@ public class ResultSets
 
                         GridRow row = new GridRow();
 
-                        for (int i = 1; i <= dataGrid.getColumns().size(); i++)
+                        for (int i = 1; i <= queryResult.getColumns().size(); i++)
                                 row.add(stringify(rs.getObject(i), sdf));
 
                         rows.add(row);
                 }
 
-                dataGrid.setRows(rows);
+                queryResult.setRows(rows);
 
-                return dataGrid;
+                return queryResult;
         }
 
         private static void setColumns(Connection connection,
                                        SQLParsedStatement ps,
                                        ResultSet rs,
                                        Dialect dialect,
-                                       DataGrid dataGrid)
+                                       QueryResult queryResult)
                 throws SQLException
         {
                 Map<String, Column> colMetas = new LinkedHashMap<>();
@@ -154,8 +154,8 @@ public class ResultSets
                                 .anyMatch(Column::isPrimary);
                 }
 
-                dataGrid.setEditable(editable);
-                dataGrid.setColumns(Lists.newArrayList(colMetas.values()));
+                queryResult.setEditable(editable);
+                queryResult.setColumns(Lists.newArrayList(colMetas.values()));
         }
 
         private static String stringify(Object val, SimpleDateFormat sdf)

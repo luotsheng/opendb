@@ -58,11 +58,11 @@ public class MySQLDriver extends Driver
         @Override
         public String showCreateTable(Session session, String table)
         {
-                DataGrid dataGrid = execute(session, new SQL(
+                QueryResult queryResult = execute(session, new SQL(
                         fmt("SHOW CREATE TABLE %s;", dialect.quote(table))
                 ));
 
-                return first(dataGrid.getRows()).get(1);
+                return first(queryResult.getRows()).get(1);
         }
 
         @Override
@@ -72,7 +72,7 @@ public class MySQLDriver extends Driver
 
                 ret.addAll(MySQLSuggestions.VALUES);
 
-                DataGrid grid = execute(session, """
+                QueryResult queryResult = execute(session, """
                         SELECT
                           COLUMN_NAME,
                           MAX(COLUMN_COMMENT) AS COLUMN_COMMENT
@@ -85,7 +85,7 @@ public class MySQLDriver extends Driver
                         ORDER BY
                           COLUMN_NAME;
                         """);
-                ret.addAll(grid.getRows().stream().map(t -> Suggestion.ofField(first(t), second(t))).toList());
+                ret.addAll(queryResult.getRows().stream().map(t -> Suggestion.ofField(first(t), second(t))).toList());
 
                 return Lists.newArrayList(ret);
         }
@@ -137,28 +137,28 @@ public class MySQLDriver extends Driver
         {
                 SQL sql = new SQL("SHOW INDEX FROM " + dialect.quote(table) + ";");
 
-                DataGrid dataGrid = execute(session, sql);
+                QueryResult queryResult = execute(session, sql);
 
                 Map<String, List<String>> indexColumns = Maps.newHashMap();
                 Map<String, Index> indexes = new LinkedHashMap<>();
 
-                for (int i = 0; i < dataGrid.size(); i++) {
-                        String keyName = dataGrid.getRowValue(i, "Key_name");
+                for (int i = 0; i < queryResult.size(); i++) {
+                        String keyName = queryResult.getRowValue(i, "Key_name");
                         List<String> columns = indexColumns.computeIfAbsent(keyName, k -> new ArrayList<>());
 
                         /* 主键忽略 */
                         if (streq(keyName, "PRIMARY"))
                                 continue;
 
-                        columns.add(dataGrid.getRowValue(i, "Column_name"));
+                        columns.add(queryResult.getRowValue(i, "Column_name"));
 
                         Index index = new Index();
 
                         index.setName(keyName);
                         index.setOriginalName(keyName);
 
-                        String Non_unique = dataGrid.getRowValue(i, "Non_unique");
-                        String Index_type = dataGrid.getRowValue(i, "Index_type");
+                        String Non_unique = queryResult.getRowValue(i, "Non_unique");
+                        String Index_type = queryResult.getRowValue(i, "Index_type");
 
                         if (streq(Non_unique, "1") && streq(Index_type, "BTREE")) {
                                 index.setType("NORMAL");
@@ -175,7 +175,7 @@ public class MySQLDriver extends Driver
                         }
 
                         if (productMetaData.getMajorVersion() >= MySQL.VERSION_8x) {
-                                index.setVisible(atobool(dataGrid.getRowValue(i, "Visible")));
+                                index.setVisible(atobool(queryResult.getRowValue(i, "Visible")));
                                 index.setOriginalVisible(index.isVisible());
                         }
 

@@ -62,7 +62,7 @@ public class RedisDriver extends Driver
         }
 
         @Override
-        public DataGrid execute(long jobId, Session session, SQL sql)
+        public QueryResult execute(long jobId, Session session, SQL sql)
         {
                 String currentCommandRef = null;
 
@@ -82,14 +82,14 @@ public class RedisDriver extends Driver
                         long startTime = System.currentTimeMillis();
 
                         var ret = switch (result) {
-                                case null -> DataGrid.ofValue(session, null);
-                                case byte[] b -> DataGrid.ofValue(session, atos(b));
-                                case Long l -> DataGrid.ofValue(session, atos(l));
+                                case null -> QueryResult.ofValue(session, null);
+                                case byte[] b -> QueryResult.ofValue(session, atos(b));
+                                case Long l -> QueryResult.ofValue(session, atos(l));
                                 case List<?> list -> {
                                         List<?> mut = list;
 
                                         if (mut.isEmpty())
-                                                yield DataGrid.ofList(session, List.of());
+                                                yield QueryResult.ofList(session, List.of());
 
                                         List<String> values = new ArrayList<>();
                                         Object second = mut.get(1);
@@ -100,9 +100,9 @@ public class RedisDriver extends Driver
                                         for (Object v : mut)
                                                 values.add(atos((byte[]) v));
 
-                                        yield DataGrid.ofList(session, values);
+                                        yield QueryResult.ofList(session, values);
                                 }
-                                default -> DataGrid.ofValue(session, result.toString());
+                                default -> QueryResult.ofValue(session, result.toString());
                         };
 
                         long endTime = System.currentTimeMillis();
