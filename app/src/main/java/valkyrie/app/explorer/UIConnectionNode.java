@@ -14,6 +14,7 @@ import valkyrie.app.event.bus.EventBus;
 import valkyrie.app.event.workbench.ConnectionOpenedNotifyEvent;
 import valkyrie.app.model.ConnectionPropertyModel;
 import valkyrie.app.model.UIExplorerStatus;
+import valkyrie.app.widgets.VkStatusBar;
 import valkyrie.app.widgets.dialog.VkDialogHelper;
 import valkyrie.core.repository.ConnectionRepository;
 import valkyrie.driver.api.*;
@@ -61,8 +62,26 @@ public class UIConnectionNode extends UIExplorerNode
         @Setter
         private DeleteRequestListener deleteRequestListener;
 
+        private static final DriverExecuteHook DRIVER_EXECUTE_HOOK = new DriverExecuteHook();
+
         public interface DeleteRequestListener {
                 void onDeleteRequest(UIConnectionNode node);
+        }
+
+        public static class DriverExecuteHook implements SQLExecuteHook {
+                VkStatusBar VSBInstance = VkStatusBar.getInstance();
+
+                @Override
+                public void beforeExecute(String sql)
+                {
+                        Platform.runLater(() -> VSBInstance.updateMessage(sql));
+                }
+
+                @Override
+                public void afterExecute(String sql, boolean isSkip, long cost)
+                {
+                        Platform.runLater(() -> VSBInstance.updateMessage(isSkip ? "SKIP: " + sql : sql));
+                }
         }
 
         public UIConnectionNode(ConnectionPropertyModel propertyModel)
@@ -96,6 +115,8 @@ public class UIConnectionNode extends UIExplorerNode
                         case dm -> new DMDriver(dataSource);
                         case redis -> new RedisDriver(dataSource);
                 };
+
+                driver.registerExecuteHook(DRIVER_EXECUTE_HOOK);
         }
 
         public void openConnection()

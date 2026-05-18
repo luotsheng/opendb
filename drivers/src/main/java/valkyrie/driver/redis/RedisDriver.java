@@ -3,6 +3,7 @@ package valkyrie.driver.redis;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.commands.ProtocolCommand;
 import valkyrie.driver.api.*;
+import valkyrie.driver.api.exception.DriverException;
 import valkyrie.driver.api.sql.SQL;
 import valkyrie.driver.suggestion.Suggestion;
 import valkyrie.utils.collection.Lists;
@@ -63,46 +64,57 @@ public class RedisDriver extends Driver
         @Override
         public DataGrid execute(long jobId, Session session, SQL sql)
         {
-                jedis.select(Integer.parseInt(session.catalog()));
+                String currentCommandRef = null;
 
-                String[] parts = strip(sql.getRaw()).split("\\s+");
-                ProtocolCommand cmd = () -> parts[0].getBytes(StandardCharsets.UTF_8);
-                byte[][] args = new byte[parts.length - 1][];
+                try {
+                        jedis.select(Integer.parseInt(session.catalog()));
+                        currentCommandRef = sql.getRaw();
+                        String[] parts = strip(currentCommandRef).split("\\s+");
+                        ProtocolCommand cmd = () -> parts[0].getBytes(StandardCharsets.UTF_8);
+                        byte[][] args = new byte[parts.length - 1][];
 
-                for (int i = 1; i < parts.length; i++)
-                        args[i - 1] = parts[i].getBytes(StandardCharsets.UTF_8);
+                        for (int i = 1; i < parts.length; i++)
+                                args[i - 1] = parts[i].getBytes(StandardCharsets.UTF_8);
 
-                // GET serviceCalendar|2026-04
-                Object result = jedis.sendCommand(cmd, args);
+                        // GET serviceCalendar|2026-04
+                        Object result = jedis.sendCommand(cmd, args);
 
-                return switch (result) {
-                        case null -> DataGrid.ofValue(session, null);
+                        beforeExecute(currentCommandRef);
 
-                        case byte[] b -> DataGrid.ofValue(session, atos(b));
+                        long startTime = System.currentTimeMillis();
 
-                        case Long l -> DataGrid.ofValue(session, atos(l));
+                        var ret = switch (result) {
+                                case null -> DataGrid.ofValue(session, null);
+                                case byte[] b -> DataGrid.ofValue(session, atos(b));
+                                case Long l -> DataGrid.ofValue(session, atos(l));
+                                case List<?> list -> {
+                                        List<?> mut = list;
 
-                        case List<?> list -> {
-                                List<?> mut = list;
+                                        if (mut.isEmpty())
+                                                yield DataGrid.ofList(session, List.of());
 
-                                if (mut.isEmpty())
-                                        yield DataGrid.ofList(session, List.of());
+                                        List<String> values = new ArrayList<>();
+                                        Object second = mut.get(1);
 
-                                List<String> values = new ArrayList<>();
-                                Object second = mut.get(1);
+                                        if (second instanceof List<?> byteList)
+                                                mut = byteList;
 
-                                if (second instanceof List<?> byteList)
-                                        mut = byteList;
+                                        for (Object v : mut)
+                                                values.add(atos((byte[]) v));
 
-                                for (Object v : mut)
-                                        values.add(atos((byte[]) v));
+                                        yield DataGrid.ofList(session, values);
+                                }
+                                default -> DataGrid.ofValue(session, result.toString());
+                        };
 
-                                yield DataGrid.ofList(session, values);
-                        }
+                        long endTime = System.currentTimeMillis();
+                        afterExecute(currentCommandRef, false, endTime - startTime);
 
-                        default -> DataGrid.ofValue(session, result.toString());
-                };
-
+                        return ret;
+                } catch (Exception e) {
+                        onError(currentCommandRef, e);
+                        throw new DriverException(e);
+                }
         }
 
         @Override

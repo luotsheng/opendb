@@ -16,7 +16,7 @@ public class VkStatusBar extends BorderPane
         private VkStatusBar()
         {
                 getStyleClass().add("vk-status-bar");
-                updateMessage("SELECT 1");
+                updateMessage("(STARTING)");
         }
 
         public static VkStatusBar getInstance()
@@ -26,6 +26,11 @@ public class VkStatusBar extends BorderPane
 
         public void updateMessage(String message)
         {
+                message = message.replaceAll("\n", "");
+
+                if (message.length() > 128)
+                        message = message.substring(0, 128) + "...";
+
                 setCenter(new Label(message));
         }
 }

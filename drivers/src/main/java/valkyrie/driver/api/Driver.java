@@ -67,6 +67,11 @@ public abstract class Driver implements SQLExecutor
         protected final Map<Long, Statement> taskQueue = new ConcurrentHashMap<>();
 
         /**
+         * Hook 接口
+         */
+        protected final List<SQLExecuteHook> hooks = new ArrayList<>();
+
+        /**
          * 数据库产品元数据
          */
         @Getter
@@ -102,6 +107,14 @@ public abstract class Driver implements SQLExecutor
                 }
 
                 this.dialect = createDialect();
+        }
+
+        /**
+         * 注册 Hook 接口
+         */
+        public void registerExecuteHook(SQLExecuteHook hook)
+        {
+                hooks.add(hook);
         }
 
         /**
@@ -718,6 +731,22 @@ public abstract class Driver implements SQLExecutor
         /*                                SQL EXECUTOR IMPLEMENTS                              */
         /* *********************************************************************************** */
 
+        protected void beforeExecute(String sql)
+        {
+                hooks.forEach(hk -> hk.beforeExecute(sql));
+        }
+
+        protected void afterExecute(String sql, boolean isSkip, long cost)
+        {
+                hooks.forEach(hk -> hk.afterExecute(sql, isSkip, cost));
+        }
+
+        protected void onError(String sql, Throwable e)
+        {
+                hooks.forEach(hk -> hk.onError(sql, e));
+        }
+
+
         @Override
         public DataGrid selectByPage(Session session, String table, int off, int size)
         {
@@ -728,46 +757,55 @@ public abstract class Driver implements SQLExecutor
         @Override
         public DataGrid execute(long jobId, Session session, SQL sql)
         {
+                String currentExecuteSQLRef = null;
+
                 try (Connection connection = getConnection(session)) {
                         try (Statement statement = new StatementProxy(connection.createStatement())) {
-                                DataGrid dataGrid = new DataGrid(session, this, sql);
-
+                                DataGrid dataGrid = null;
                                 taskQueue.put(jobId, statement);
-
-                                SQLParsedStatement eps = sql.popupEnd();
+                                SQLParsedStatement lastPS = sql.getLast();
 
                                 for (SQLParsedStatement ps : sql) {
+                                        boolean isSkip = false;
+                                        currentExecuteSQLRef = ps.toString();
+                                        beforeExecute(currentExecuteSQLRef);
+
+                                        long startTime = System.currentTimeMillis();
+
                                         switch (ps.getCommand()) {
-                                                case EXECUTE -> statement.execute(ps.toString());
-                                                case EXECUTE_UPDATE -> statement.executeUpdate(ps.toString());
-                                                case EXECUTE_QUERY -> {}
+                                                case EXECUTE -> statement.execute(currentExecuteSQLRef);
+                                                case EXECUTE_UPDATE -> statement.executeUpdate(currentExecuteSQLRef);
+                                                case EXECUTE_QUERY -> {
+                                                        if (ps == lastPS) {
+                                                                ResultSet rs = statement.executeQuery(currentExecuteSQLRef);
+                                                                dataGrid = new DataGrid(session, this, sql);
+                                                                ResultSets.toDataGrid(connection, ps, rs, dialect, dataGrid);
+                                                        } else {
+                                                                isSkip = true;
+                                                        }
+                                                }
                                         }
-                                }
 
-                                sql.pushback(eps);
+                                        long endTime = System.currentTimeMillis();
+                                        afterExecute(currentExecuteSQLRef, isSkip, endTime - startTime);
 
-                                switch (eps.getCommand()) {
-                                        case EXECUTE -> statement.execute(eps.toString());
-                                        case EXECUTE_UPDATE -> statement.executeUpdate(eps.toString());
-                                        case EXECUTE_QUERY -> {
-                                                ResultSet rs = statement.executeQuery(eps.toString());
-                                                ResultSets.toDataGrid(connection, eps, rs, dialect, dataGrid);
+                                        if (ps == lastPS && dataGrid != null)
                                                 return dataGrid;
-                                        }
                                 }
 
                                 return null;
                         }
                 } catch (SQLException e) {
+                        onError(currentExecuteSQLRef, e);
                         throw new DriverException(e);
                 }
         }
 
         @Override
+        @SuppressWarnings("ALL")
         public void cancel(long jobId)
         {
                 if (taskQueue.containsKey(jobId))
                         Captor.call(() -> taskQueue.remove(jobId).cancel());
         }
-
 }

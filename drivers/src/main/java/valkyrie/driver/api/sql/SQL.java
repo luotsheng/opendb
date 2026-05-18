@@ -69,14 +69,9 @@ public class SQL implements Iterable<SQLParsedStatement>
                 }
         }
 
-        public SQLParsedStatement popupEnd()
+        public SQLParsedStatement getLast()
         {
-                return statements.removeLast();
-        }
-
-        public void pushback(SQLParsedStatement statement)
-        {
-                statements.add(statement);
+                return last(statements);
         }
 
         @Override
