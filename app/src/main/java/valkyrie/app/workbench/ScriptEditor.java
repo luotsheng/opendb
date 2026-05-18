@@ -499,15 +499,19 @@ public class ScriptEditor extends SplitPane implements EventListener
                                                 @Override
                                                 public void execute(String sql)
                                                 {
-                                                        Platform.runLater(() -> sqlMessagePane.appendExecute(sql));
-                                                        showLog();
+                                                        Platform.runLater(() -> {
+                                                                sqlMessagePane.appendExecute(sql);
+                                                                showLog();
+                                                        });
                                                 }
 
                                                 @Override
                                                 public void executeQuery(String sql, boolean skip)
                                                 {
-                                                        Platform.runLater(() -> sqlMessagePane.appendExecuteQuery(sql));
-                                                        showLog();
+                                                        Platform.runLater(() -> {
+                                                                sqlMessagePane.appendExecuteQuery(sql);
+                                                                showLog();
+                                                        });
                                                 }
 
                                                 @Override

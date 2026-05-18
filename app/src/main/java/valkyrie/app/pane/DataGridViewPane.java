@@ -428,12 +428,6 @@ public class DataGridViewPane extends BorderPane
                 Application.copyToClipboard(sql.toString());
         }
 
-        public boolean selectedInstanceOf(Object object)
-        {
-                Tab selectedItem = tabPane.getSelectionModel().getSelectedItem();
-                return selectedItem != null && selectedItem.getContent() == object;
-        }
-
         public void selectResultSetFirst()
         {
                 select(dataGridTab);
