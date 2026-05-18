@@ -1,9 +1,7 @@
 package valkyrie.app.pane;
 
-import javafx.event.EventType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.ContextMenuEvent;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import valkyrie.app.Application;
@@ -93,5 +91,4 @@ public class ExecuteLoggerPane extends VirtualizedScrollPane<CodeArea>
                 codeArea.moveTo(codeArea.getLength());
                 codeArea.requestFollowCaret();
         }
-
 }
