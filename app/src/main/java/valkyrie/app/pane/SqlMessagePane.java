@@ -45,12 +45,13 @@ public class SqlMessagePane extends VirtualizedScrollPane<CodeArea>
 
         public void appendError(String text)
         {
-                appendText(fmt("[ FAIL ] %s\n", text));
+                appendText("> Error");
+                appendText(fmt("%s", text));
         }
 
         private void appendText(String text)
         {
-                codeArea.appendText(text);
+                codeArea.appendText(text + "\n");
                 codeArea.moveTo(codeArea.getLength());
                 codeArea.requestFollowCaret();
         }
