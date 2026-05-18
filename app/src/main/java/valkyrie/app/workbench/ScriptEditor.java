@@ -25,7 +25,7 @@ import valkyrie.app.explorer.UICatalogNode;
 import valkyrie.app.explorer.UIConnectionNode;
 import valkyrie.app.model.UIExplorerStatus;
 import valkyrie.app.pane.ResultViewPane;
-import valkyrie.app.pane.SqlMessagePane;
+import valkyrie.app.pane.ExecuteLoggerPane;
 import valkyrie.app.widgets.VkComboBox;
 import valkyrie.app.widgets.VkIconButton;
 import valkyrie.app.widgets.VkSeparator;
@@ -67,7 +67,7 @@ public class ScriptEditor extends SplitPane implements EventListener
         private final BorderPane topBorderPane;
         private final ResultViewPane resultViewPane;
         private final Tab sqlMessageTab;
-        private final SqlMessagePane sqlMessagePane;
+        private final ExecuteLoggerPane sqlMessagePane;
 
         @Getter
         private String name;
@@ -107,7 +107,7 @@ public class ScriptEditor extends SplitPane implements EventListener
                 toolBar = new ToolBar();
                 editor = createEditor();
                 resultViewPane = new ResultViewPane(owner, false);
-                sqlMessagePane = new SqlMessagePane();
+                sqlMessagePane = new ExecuteLoggerPane();
 
                 // 绑定日志标签
                 sqlMessageTab = new Tab("日志");
