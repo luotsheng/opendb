@@ -163,12 +163,14 @@ public class ScriptEditor extends SplitPane implements EventListener
                 });
 
                 runSelectedSQLItem = new MenuItem("运行当前选择的");
+                runSelectedSQLItem.setGraphic(Assets.use("run"));
                 runSelectedSQLItem.setOnAction(event -> runTask());
                 runSelectedSQLItem.setAccelerator(
                         new KeyCodeCombination(KeyCode.R, KeyCodeCombination.SHORTCUT_DOWN)
                 );
 
                 beautifySelectedSQLItem = new MenuItem("美化当前选择的");
+                beautifySelectedSQLItem.setGraphic(Assets.use("beautify"));
                 beautifySelectedSQLItem.setOnAction(event -> beautifySQL());
 
                 copyItem = new MenuItem("复制");
@@ -222,7 +224,7 @@ public class ScriptEditor extends SplitPane implements EventListener
                         ? initConnection
                         : instance.getSelectedConnection();
 
-                run = new VkIconButton("运行已选择", "run0");
+                run = new VkIconButton("运行已选择", "run");
                 run.setText("运行");
                 run.setOnAction(event -> runTask());
 

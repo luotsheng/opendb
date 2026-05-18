@@ -62,7 +62,7 @@ public class Assets
                 IMAGES.put("database0", load("/assets/icons/database0.png"));
                 IMAGES.put("database1", load("/assets/icons/database1.png"));
                 IMAGES.put("query", load("/assets/icons/query.png"));
-                IMAGES.put("run0", load("/assets/icons/run0.png"));
+                IMAGES.put("run", load("/assets/icons/run.png"));
                 IMAGES.put("sql", load("/assets/icons/sql.png"));
                 IMAGES.put("table", load("/assets/icons/table.png"));
                 IMAGES.put("modify", load("/assets/icons/modify.png"));
