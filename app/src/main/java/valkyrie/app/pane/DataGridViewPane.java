@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
@@ -24,6 +25,8 @@ import valkyrie.app.workbench.ModifyCell;
 import valkyrie.driver.api.Column;
 import valkyrie.driver.api.DataGrid;
 import valkyrie.driver.api.GridRow;
+import valkyrie.driver.api.Table;
+import valkyrie.utils.Optional;
 import valkyrie.utils.collection.Lists;
 import valkyrie.utils.io.UFile;
 import valkyrie.utils.poi.WorkBook;
@@ -41,6 +44,8 @@ import static valkyrie.utils.string.StaticLibrary.*;
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class DataGridViewPane extends BorderPane
 {
+        private String tableName;
+
         private final TabPane tabPane = new TabPane();
         private final Tab dataGridTab = new Tab();
         private final VkTableView<GridRow> tableView = new VkTableView<>();
@@ -76,6 +81,12 @@ public class DataGridViewPane extends BorderPane
 
         public DataGridViewPane(Tab attachedToTab, boolean isPreview)
         {
+                this(null, attachedToTab, isPreview);
+        }
+
+        public DataGridViewPane(String tableName, Tab attachedToTab, boolean isPreview)
+        {
+                this.tableName = tableName;
                 this.attachedToTab = attachedToTab;
 
                 dataGridTab.setClosable(false);
@@ -193,14 +204,14 @@ public class DataGridViewPane extends BorderPane
         {
                 grid.update();
                 updateCheckCross();
-                render(grid);
+                reload(tableName, grid);
         }
 
         private void applyCross()
         {
                 grid.clearUpdateBuffer();
                 updateCheckCross();
-                render(grid);
+                reload(tableName, grid);
         }
 
         public void setProgressIndicator()
@@ -231,7 +242,7 @@ public class DataGridViewPane extends BorderPane
                 new Thread(() -> {
                         try {
                                 grid.reload();
-                                Platform.runLater(() -> render(grid));
+                                Platform.runLater(() -> reload(tableName, grid));
                         } finally {
                                 tableView.playFlash();
 
@@ -268,6 +279,37 @@ public class DataGridViewPane extends BorderPane
         private void setupTableView()
         {
                 tableView.enableRectangularSelection();
+
+                ContextMenu contextMenu = new ContextMenu();
+
+                Menu copyItem = new Menu("复制为");
+                MenuItem copyAsInsert = new MenuItem("复制为 INSERT 语句");
+                copyAsInsert.setOnAction(event -> copyAsSql("INSERT"));
+                MenuItem copyAsUpdate = new MenuItem("复制为 UPDATE 语句");
+                copyAsUpdate.setOnAction(event -> copyAsSql("UPDATE"));
+                MenuItem normalCopyItem = new MenuItem("复制为 Excel 行");
+                normalCopyItem.setOnAction(event -> copyTableViewSelectedCell());
+
+                copyItem.getItems().addAll(
+                        copyAsInsert,
+                        copyAsUpdate,
+                        new SeparatorMenuItem(),
+                        normalCopyItem);
+
+                MenuItem selectAllItem = new MenuItem("全选");
+                selectAllItem.setOnAction(event -> tableView.getSelectionModel().selectAll());
+                MenuItem refreshItem = new MenuItem("刷新");
+                refreshItem.setOnAction(event -> reloadAndBlinkTable(true));
+
+                contextMenu.getItems().addAll(
+                        copyItem,
+                        selectAllItem,
+                        new SeparatorMenuItem(),
+                        refreshItem);
+
+                tableView.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
+                        tableView.setContextMenu(contextMenu);
+                });
 
                 tableView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                         if ((event.isShortcutDown())
@@ -332,6 +374,61 @@ public class DataGridViewPane extends BorderPane
                 Application.copyToClipboard(builder.toString());
         }
 
+        @SuppressWarnings({"rawtypes"})
+        private void copyAsSql(String type)
+        {
+                ObservableList<TablePosition> cells = tableView.getSelectionModel().getSelectedCells();
+                if (cells == null || cells.isEmpty())
+                        return;
+
+                int minRow = cells.stream().map(TablePosition::getRow).min(Integer::compareTo).orElse(0);
+                int maxRow = cells.stream().map(TablePosition::getRow).max(Integer::compareTo).orElse(0);
+                int minCol = cells.stream().map(TablePosition::getColumn).min(Integer::compareTo).orElse(0);
+                int maxCol = cells.stream().map(TablePosition::getColumn).max(Integer::compareTo).orElse(0);
+
+                String tableName = Optional.ifBlank(this.tableName, "?");
+
+                List<Column> columns = grid.getColumns();
+                List<GridRow> rows = grid.getRows();
+
+                StringBuilder sql = new StringBuilder();
+                if ("INSERT".equals(type)) {
+                        for (int r = minRow; r <= maxRow; r++) {
+                                GridRow row = rows.get(r);
+                                sql.append("INSERT INTO ").append(tableName).append(" (");
+                                for (int c = minCol; c <= maxCol; c++) {
+                                        sql.append(columns.get(c).getLabel());
+                                        if (c < maxCol) sql.append(", ");
+                                }
+                                sql.append(") VALUES (");
+                                for (int c = minCol; c <= maxCol; c++) {
+                                        sql.append("'").append(row.get(c)).append("'");
+                                        if (c < maxCol) sql.append(", ");
+                                }
+                                sql.append(");\n");
+                        }
+                } else if ("UPDATE".equals(type)) {
+                        for (int r = minRow; r <= maxRow; r++) {
+                                GridRow row = rows.get(r);
+                                sql.append("UPDATE ").append(tableName).append(" SET ");
+                                for (int c = minCol; c <= maxCol; c++) {
+                                        sql.append(columns.get(c).getLabel()).append(" = '").append(row.get(c)).append("'");
+                                        if (c < maxCol) sql.append(", ");
+                                }
+                                sql.append(" WHERE ");
+                                Column pkCol = columns.stream().filter(Column::isPrimary).findFirst().orElse(null);
+                                if (pkCol != null) {
+                                        int pkIndex = columns.indexOf(pkCol);
+                                        sql.append(pkCol.getLabel()).append(" = '").append(row.get(pkIndex)).append("';\n");
+                                } else {
+                                        sql.append("<COND> = ?;");
+                                }
+                        }
+                }
+
+                Application.copyToClipboard(sql.toString());
+        }
+
         public void selectResultSetFirst()
         {
                 select(dataGridTab);
@@ -360,8 +457,10 @@ public class DataGridViewPane extends BorderPane
                 grid.addUpdateRow(cell.getColumnIndex(), cell.getRowIndex(), cell.getNewValue());
         }
 
-        public void render(DataGrid grid)
+        public void reload(String tableName, DataGrid grid)
         {
+                this.tableName = tableName;
+                
                 if (this.grid != grid) {
                         this.grid = grid;
                         this.grid.setUpdateListener(r -> updateCheckCross());

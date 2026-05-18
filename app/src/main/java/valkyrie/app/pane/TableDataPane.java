@@ -39,7 +39,7 @@ public class TableDataPane extends BorderPane
                 this.session = session;
                 this.driver = driver;
                 this.table = table;
-                this.dataGridViewPane = new DataGridViewPane(owner, true);
+                this.dataGridViewPane = new DataGridViewPane(table.getName(), owner, true);
 
                 dataGridViewPane.setReloadProgressListener(new DataGridViewPane.ReloadProgressListener()
                 {
@@ -78,7 +78,7 @@ public class TableDataPane extends BorderPane
                         try {
                                 DataGrid rs = driver.selectByPage(session, table.getName(), start, size);
                                 rs.setAddable(true);
-                                Platform.runLater(() -> dataGridViewPane.render(rs));
+                                Platform.runLater(() -> dataGridViewPane.reload(table.getName(), rs));
                         } catch (Exception e) {
                                 VkDialogHelper.alert(e);
                         } finally {

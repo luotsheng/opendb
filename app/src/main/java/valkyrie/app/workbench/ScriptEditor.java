@@ -489,7 +489,7 @@ public class ScriptEditor extends SplitPane implements EventListener
 
                                         if (grid != null) {
                                                 Platform.runLater(() -> {
-                                                        dataGridViewPane.render(grid);
+                                                        dataGridViewPane.reload(sql.getSingleTableName(), grid);
                                                         showResultSetTableViewPane(QUERY_RESULT_SET_FIRST);
                                                 });
                                         } else {

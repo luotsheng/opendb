@@ -83,6 +83,8 @@ public class SQLParsedStatement
 
         public String getSingleTableName()
         {
+                if (tables.size() > 1)
+                        return null;
                 return tables.iterator().next();
         }
 
