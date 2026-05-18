@@ -24,7 +24,7 @@ import valkyrie.app.event.workbench.ConnectionOpenedNotifyEvent;
 import valkyrie.app.explorer.UICatalogNode;
 import valkyrie.app.explorer.UIConnectionNode;
 import valkyrie.app.model.UIExplorerStatus;
-import valkyrie.app.pane.DataGridViewPane;
+import valkyrie.app.pane.ResultViewPane;
 import valkyrie.app.pane.SqlMessagePane;
 import valkyrie.app.widgets.VkComboBox;
 import valkyrie.app.widgets.VkIconButton;
@@ -65,7 +65,7 @@ public class ScriptEditor extends SplitPane implements EventListener
         private final ToolBar toolBar;
         private final MonacoEditor editor;
         private final BorderPane topBorderPane;
-        private final DataGridViewPane dataGridViewPane;
+        private final ResultViewPane resultViewPane;
         private final Tab sqlMessageTab;
         private final SqlMessagePane sqlMessagePane;
 
@@ -106,7 +106,7 @@ public class ScriptEditor extends SplitPane implements EventListener
                 topBorderPane = new BorderPane();
                 toolBar = new ToolBar();
                 editor = createEditor();
-                dataGridViewPane = new DataGridViewPane(owner, false);
+                resultViewPane = new ResultViewPane(owner, false);
                 sqlMessagePane = new SqlMessagePane();
 
                 // 绑定日志标签
@@ -274,8 +274,8 @@ public class ScriptEditor extends SplitPane implements EventListener
 
         private void setupResultSetCloseEvent()
         {
-                dataGridViewPane.setOnClosedListener(() ->
-                        getItems().remove(dataGridViewPane));
+                resultViewPane.setOnClosedListener(() ->
+                        getItems().remove(resultViewPane));
         }
 
         private VkComboBox<UIConnectionNode> newConnectionComboBox()
@@ -449,16 +449,16 @@ public class ScriptEditor extends SplitPane implements EventListener
 
         private void showResultSetTableViewPane(int flag)
         {
-                if (!dataGridViewPane.getTabs().contains(sqlMessageTab))
-                        dataGridViewPane.getTabs().add(sqlMessageTab);
+                if (!resultViewPane.getTabs().contains(sqlMessageTab))
+                        resultViewPane.getTabs().add(sqlMessageTab);
 
                 switch (flag) {
-                        case QUERY_RESULT_SET_FIRST -> dataGridViewPane.selectResultSetFirst();
-                        case QUERY_MESSAGE_LOG_FIRST -> dataGridViewPane.select(sqlMessageTab);
+                        case QUERY_RESULT_SET_FIRST -> resultViewPane.selectResultSetFirst();
+                        case QUERY_MESSAGE_LOG_FIRST -> resultViewPane.select(sqlMessageTab);
                 }
 
-                if (!getItems().contains(dataGridViewPane))
-                        getItems().add(dataGridViewPane);
+                if (!getItems().contains(resultViewPane))
+                        getItems().add(resultViewPane);
         }
 
         /**
@@ -544,7 +544,7 @@ public class ScriptEditor extends SplitPane implements EventListener
 
                                         if (queryResult != null) {
                                                 Platform.runLater(() -> {
-                                                        dataGridViewPane.reload(sql.getSingleTableName(), queryResult);
+                                                        resultViewPane.reload(sql.getSingleTableName(), queryResult);
                                                         showResultSetTableViewPane(QUERY_RESULT_SET_FIRST);
                                                 });
                                         } else {

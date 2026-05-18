@@ -18,7 +18,7 @@ import valkyrie.driver.api.Table;
  * @since 2026/3/30
  */
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
-public class TableDataPane extends BorderPane
+public class QueryResultPane extends BorderPane
 {
         private int start = 0;
         private int size = 1024;
@@ -28,20 +28,20 @@ public class TableDataPane extends BorderPane
         private final Driver driver;
         private final Session session;
         private final Table table;
-        private final DataGridViewPane dataGridViewPane;
+        private final ResultViewPane resultViewPane;
 
-        public TableDataPane(Tab owner,
-                             Session session,
-                             Driver driver,
-                             Table table)
+        public QueryResultPane(Tab owner,
+                               Session session,
+                               Driver driver,
+                               Table table)
         {
                 this.owner = owner;
                 this.session = session;
                 this.driver = driver;
                 this.table = table;
-                this.dataGridViewPane = new DataGridViewPane(table.getName(), owner, true);
+                this.resultViewPane = new ResultViewPane(table.getName(), owner, true);
 
-                dataGridViewPane.setReloadProgressListener(new DataGridViewPane.ReloadProgressListener()
+                resultViewPane.setReloadProgressListener(new ResultViewPane.ReloadProgressListener()
                 {
                         @Override
                         public void start()
@@ -56,7 +56,7 @@ public class TableDataPane extends BorderPane
                         }
                 });
 
-                setCenter(dataGridViewPane);
+                setCenter(resultViewPane);
         }
 
         private void setLoadingIndicator()
@@ -78,7 +78,7 @@ public class TableDataPane extends BorderPane
                         try {
                                 QueryResult rs = driver.selectByPage(session, table.getName(), start, size);
                                 rs.setAddable(true);
-                                Platform.runLater(() -> dataGridViewPane.reload(table.getName(), rs));
+                                Platform.runLater(() -> resultViewPane.reload(table.getName(), rs));
                         } catch (Exception e) {
                                 VkDialogHelper.alert(e);
                         } finally {

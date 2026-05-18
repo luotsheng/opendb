@@ -4,7 +4,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import valkyrie.app.assets.Assets;
 import valkyrie.app.explorer.UICatalogNode;
-import valkyrie.app.pane.TableDataPane;
+import valkyrie.app.pane.QueryResultPane;
 import valkyrie.driver.api.Driver;
 import valkyrie.driver.api.Session;
 import valkyrie.driver.api.Table;
@@ -53,7 +53,7 @@ public class OpenTableDataPaneEvent extends OpenTabEvent
         public Node createPane(Tab tab)
         {
                 tab.setGraphic(Assets.use("table"));
-                TableDataPane pane = new TableDataPane(tab, session, driver, table);
+                QueryResultPane pane = new QueryResultPane(tab, session, driver, table);
                 pane.asyncUpdate();
                 return pane;
         }

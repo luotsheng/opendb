@@ -41,12 +41,12 @@ import static valkyrie.utils.string.StaticLibrary.*;
  * @since 2026/3/30
  */
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
-public class DataGridViewPane extends BorderPane
+public class ResultViewPane extends BorderPane
 {
         private String tableName;
 
         private final TabPane tabPane = new TabPane();
-        private final Tab dataGridTab = new Tab();
+        private final Tab viewTab = new Tab();
         private final VkTableView<GridRow> tableView = new VkTableView<>();
         private final ToolBar toolBar = new ToolBar();
         private final VBox vContainer;
@@ -78,17 +78,17 @@ public class DataGridViewPane extends BorderPane
         @Setter
         private ReloadProgressListener reloadProgressListener;
 
-        public DataGridViewPane(Tab attachedToTab, boolean isPreview)
+        public ResultViewPane(Tab attachedToTab, boolean isPreview)
         {
                 this(null, attachedToTab, isPreview);
         }
 
-        public DataGridViewPane(String tableName, Tab attachedToTab, boolean isPreview)
+        public ResultViewPane(String tableName, Tab attachedToTab, boolean isPreview)
         {
                 this.tableName = tableName;
                 this.attachedToTab = attachedToTab;
 
-                dataGridTab.setClosable(false);
+                viewTab.setClosable(false);
 
                 setupTableView();
 
@@ -106,7 +106,7 @@ public class DataGridViewPane extends BorderPane
 
                 vContainer = new VBox(tableView);
                 VBox.setVgrow(tableView, Priority.ALWAYS);
-                dataGridTab.setContent(vContainer);
+                viewTab.setContent(vContainer);
 
                 setTop(toolBar);
                 setCenter(tabPane);
@@ -218,7 +218,7 @@ public class DataGridViewPane extends BorderPane
                 if (reloadProgressListener != null) {
                         Platform.runLater(reloadProgressListener::start);
                 } else {
-                        Platform.runLater(() -> dataGridTab.setGraphic(progressIndicator));
+                        Platform.runLater(() -> viewTab.setGraphic(progressIndicator));
                 }
         }
 
@@ -227,7 +227,7 @@ public class DataGridViewPane extends BorderPane
                 if (reloadProgressListener != null) {
                         Platform.runLater(reloadProgressListener::end);
                 } else {
-                        Platform.runLater(() -> dataGridTab.setGraphic(null));
+                        Platform.runLater(() -> viewTab.setGraphic(null));
                 }
         }
 
@@ -430,7 +430,7 @@ public class DataGridViewPane extends BorderPane
 
         public void selectResultSetFirst()
         {
-                select(dataGridTab);
+                select(viewTab);
         }
 
         public void select(Tab tab)
@@ -467,12 +467,12 @@ public class DataGridViewPane extends BorderPane
                 tableView.getColumns().clear();
                 tableView.getItems().clear();
 
-                if (!tabPane.getTabs().contains(dataGridTab))
-                        tabPane.getTabs().addFirst(dataGridTab);
+                if (!tabPane.getTabs().contains(viewTab))
+                        tabPane.getTabs().addFirst(viewTab);
 
                 setToolButtonStatus(queryResult.isAddable(), queryResult.isEditable());
 
-                dataGridTab.setText(fmt("查询结果集 (%d条)", queryResult.getRows().size()));
+                viewTab.setText(fmt("查询结果集 (%d条)", queryResult.getRows().size()));
 
                 for (int i = 0; i < queryResult.getColumns().size(); i++) {
                         int index = i;

@@ -1,9 +1,9 @@
 package valkyrie.app.pane;
 
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
-
-import static valkyrie.utils.string.StaticLibrary.fmt;
 
 /**
  * @author Luo Tiansheng
@@ -25,7 +25,15 @@ public class SqlMessagePane extends VirtualizedScrollPane<CodeArea>
 
         private void setupContextMenu()
         {
+                ContextMenu contextMenu = new ContextMenu();
 
+                MenuItem copyAllItem = new MenuItem("复制执行日志");
+                MenuItem clearAllItem = new MenuItem("清空日志列表");
+
+                contextMenu.getItems().addAll(
+                        copyAllItem,
+                        clearAllItem
+                );
         }
 
         private void clearAll()
